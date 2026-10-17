@@ -5,6 +5,8 @@
 html, body { height: 100%; }
 body { background: #f1f5f9; color: #1b2a41; font-family: Barlow, system-ui, sans-serif; }
 
-.field { @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-[15px] text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20; }
+.field { @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-[16px] text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20; }
 .label { @apply mb-1 block text-xs font-bold uppercase tracking-[0.12em] text-muted; }
-.pill-btn { @apply inline-flex h-10 items-center justify-center rounded-full px-5 text-sm font-semibold transition; }
+.pill-btn { @apply inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold transition; }
+
+@media (max-width: 1023px) { html { -webkit-tap-highlight-color: transparent; } button, select { touch-action: manipulation; } }

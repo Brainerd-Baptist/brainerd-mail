@@ -31,6 +31,7 @@ export function runChecks(doc: EmailDoc, htmlBytes: number, address: string): Ch
   const emptyLabels = all.filter((l) => !l.label.trim() || !l.url.trim());
   const noAlt = blocks.flatMap(images).filter((i) => !i.alt.trim());
   const kb = Math.round(htmlBytes / 1024);
+  const unUploaded = blocks.flatMap(images).filter((i) => i.url.startsWith("data:"));
   const subj = doc.subject.trim().length;
   const checks: Check[] = [
     {
@@ -43,6 +44,7 @@ export function runChecks(doc: EmailDoc, htmlBytes: number, address: string): Ch
     { ok: !!doc.previewText.trim(), severity: "warn", label: doc.previewText.trim() ? "Preview text added" : "Add preview text (the gray line in the inbox)" },
     { ok: kb < 90, severity: "block", label: `${kb} KB, ${kb < 90 ? "under" : "close to"} Gmail's ~102 KB clip limit` },
     { ok: noAlt.length === 0, severity: "warn", label: noAlt.length ? `${noAlt.length} photo${noAlt.length === 1 ? "" : "s"} missing a description` : "All photos have descriptions", detail: noAlt.length ? "Helps people using screen readers and when images are blocked" : undefined },
+    { ok: unUploaded.length === 0, severity: "block", label: unUploaded.length ? `${unUploaded.length} photo${unUploaded.length === 1 ? " hasn't" : "s haven't"} finished uploading` : "All photos are uploaded" },
     { ok: !!address && !address.includes("["), severity: "block", label: !!address && !address.includes("[") ? "Mailing address and unsubscribe are in the footer" : "Church mailing address still needs to be set" },
   ];
   return checks;

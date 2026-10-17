@@ -1,5 +1,8 @@
 "use client";
+import { useRef, useState } from "react";
+import { Camera, ClipboardPaste, ImagePlus } from "lucide-react";
 import type { Btn, Img } from "@/lib/blocks";
+import { uploadPhoto } from "@/lib/image";
 
 export function Field({ label, value, onChange, placeholder, hint }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; hint?: string }) {
   return (
@@ -64,25 +67,70 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
   );
 }
 
+export function LinkField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [msg, setMsg] = useState("");
+  async function paste() {
+    try {
+      const t = (await navigator.clipboard.readText()).trim();
+      if (t) { onChange(/^https?:\/\//i.test(t) ? t : `https://${t}`); setMsg(""); }
+      else setMsg("Nothing copied yet");
+    } catch { setMsg("Press and hold in the box, then tap Paste"); }
+  }
+  return (
+    <div>
+      <span className="label">Where it goes</span>
+      <div className="flex gap-2">
+        <input className="field min-w-0 flex-1" inputMode="url" autoCapitalize="none" autoCorrect="off" spellCheck={false} value={value} placeholder="https://" onChange={(e) => onChange(e.target.value)} />
+        <button type="button" onClick={paste} className="pill-btn shrink-0 border-2 border-navy px-4 text-navy" aria-label="Paste the link you copied"><ClipboardPaste size={18} className="mr-1.5" />Paste</button>
+      </div>
+      {msg ? <span className="mt-1 block text-xs text-muted">{msg}</span> : null}
+    </div>
+  );
+}
+
 export function ButtonFields({ label = "Button", value, onChange }: { label?: string; value?: Btn; onChange: (v: Btn | undefined) => void }) {
   const v = value ?? { label: "", url: "" };
   return (
     <div className="space-y-3 rounded-xl border border-line bg-white p-3">
       <span className="label !mb-0">{label}</span>
       <Field label="Words on the button" value={v.label} onChange={(x) => onChange({ ...v, label: x })} />
-      <Field label="Where it goes" value={v.url} onChange={(x) => onChange({ ...v, url: x })} placeholder="https://" />
+      <LinkField value={v.url} onChange={(x) => onChange({ ...v, url: x })} />
     </div>
   );
 }
 
 export function ImageFields({ label = "Photo", value, onChange }: { label?: string; value?: Img; onChange: (v: Img) => void }) {
   const v = value ?? { url: "", alt: "" };
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState("");
+
+  async function pick(file?: File | null) {
+    if (!file) return;
+    setBusy(true); setNote("");
+    try {
+      const r = await uploadPhoto(file);
+      onChange({ ...v, url: r.url });
+      setNote(r.local ? "Preview only. Photos upload for real once storage is connected." : `Added (${Math.round(r.bytes / 1024)} KB)`);
+    } catch { setNote("That photo could not be read. Try another."); }
+    finally { setBusy(false); if (input.current) input.current.value = ""; }
+  }
+
   return (
     <div className="space-y-3 rounded-xl border border-line bg-white p-3">
       <span className="label !mb-0">{label}</span>
-      {v.url ? <img src={v.url} alt="" className="h-24 w-full rounded-lg object-cover" /> : <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-line text-sm text-muted">No photo yet</div>}
-      <Field label="Photo address" value={v.url} onChange={(x) => onChange({ ...v, url: x })} placeholder="Upload coming soon, paste an address for now" />
-      <Field label="Description for screen readers" value={v.alt} onChange={(x) => onChange({ ...v, alt: x })} hint="Describe what is in the photo" />
+      {v.url ? <img src={v.url} alt="" className="h-40 w-full rounded-lg object-cover" /> : (
+        <button type="button" onClick={() => input.current?.click()} className="flex h-32 w-full flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-line text-muted active:bg-[#f4f8fd]">
+          <ImagePlus size={28} /><span className="text-sm font-semibold">Tap to add a photo</span>
+        </button>
+      )}
+      <input ref={input} type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
+      <div className="flex gap-2">
+        <button type="button" onClick={() => input.current?.click()} disabled={busy} className="pill-btn flex-1 border-2 border-navy text-navy"><Camera size={18} className="mr-1.5" />{busy ? "Adding…" : v.url ? "Change photo" : "Choose or take a photo"}</button>
+        {v.url ? <button type="button" onClick={() => onChange({ ...v, url: "" })} className="pill-btn px-4 text-muted">Remove</button> : null}
+      </div>
+      {note ? <span className="block text-xs text-muted">{note}</span> : null}
+      <Field label="Description for screen readers" value={v.alt} onChange={(x) => onChange({ ...v, alt: x })} hint="Say what is in the photo, in a few words" />
     </div>
   );
 }

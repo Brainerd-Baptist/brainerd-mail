@@ -1,9 +1,19 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
   title: "Brainerd Mail",
   description: "Newsletters and texts for Brainerd Baptist ministries",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "Brainerd Mail", statusBarStyle: "default" },
+  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#00205b",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
