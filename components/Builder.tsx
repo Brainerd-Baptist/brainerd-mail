@@ -41,6 +41,7 @@ export default function Builder() {
   const isDesktop = useIsDesktop();
   const prevSel = useRef<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const emailIdRef = useRef<string | undefined>(undefined);
   const palette = paletteFor(doc.ministry);
 
   useEffect(() => {
@@ -143,8 +144,9 @@ export default function Builder() {
   async function sendTest() {
     setStatus("Sending a test to you…");
     try {
-      const res = await fetch("/api/test-send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ doc }) });
+      const res = await fetch("/api/test-send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ doc, emailId: emailIdRef.current }) });
       const j = await res.json();
+      if (j.emailId) emailIdRef.current = j.emailId;
       setStatus(res.ok ? `Test sent to ${j.to}. Check your inbox and phone.` : j.error || "Could not send the test.");
     } catch { setStatus("Could not send the test."); }
   }

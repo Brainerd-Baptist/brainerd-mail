@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 // Stores a (already resized) photo and returns a public https address that
 // email apps can load. Wired to Supabase Storage once the project exists.
+// Only signed-in staff reach this route (see middleware.ts).
 export async function POST(req: Request) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

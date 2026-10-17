@@ -1,0 +1,37 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+
+// Everything needs a signed-in staff member except the public pages readers use.
+const PUBLIC = ["/login", "/auth", "/w/", "/r/", "/u/", "/api/pray", "/manifest.webmanifest", "/icons/", "/sample/", "/_next/", "/favicon"];
+
+export async function middleware(req: NextRequest) {
+  const path = req.nextUrl.pathname;
+  if (PUBLIC.some((p) => path.startsWith(p))) return NextResponse.next();
+  // Scheduled jobs authenticate with their own secret, not a login.
+  if (path.startsWith("/api/cron/")) return NextResponse.next();
+
+  // Until the database keys are set, keep the preview-only editor open.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.next();
+
+  let res = NextResponse.next({ request: req });
+  const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    cookies: {
+      getAll: () => req.cookies.getAll(),
+      setAll: (list: { name: string; value: string; options?: any }[]) => {
+        list.forEach(({ name, value }) => req.cookies.set(name, value));
+        res = NextResponse.next({ request: req });
+        list.forEach(({ name, value, options }) => res.cookies.set(name, value, options));
+      },
+    },
+  });
+  const { data } = await supabase.auth.getUser();
+  if (data.user) return res;
+
+  if (path.startsWith("/api/")) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  const url = req.nextUrl.clone();
+  url.pathname = "/login";
+  url.search = "";
+  return NextResponse.redirect(url);
+}
+
+export const config = { matcher: ["/((?!_next/static|_next/image).*)"] };
