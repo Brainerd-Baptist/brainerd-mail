@@ -1,0 +1,59 @@
+import type { EmailDoc } from "../blocks";
+
+// Starting point for every Missions newsletter. "Start from last email"
+// will copy the most recent sent email instead; this is the first one.
+export const MISSIONS_TEMPLATE: EmailDoc = {
+  ministry: "missions",
+  title: "October Global Update",
+  subject: "Kingdom work around the globe",
+  previewText: "Who is traveling, who we are praying for, and how God is working around the world.",
+  monthLabel: "OCTOBER 2026",
+  footerNote: "You're receiving this email because you're part of our church family or signed up for our regular newsletter.",
+  blocks: [
+    {
+      id: "hero1", type: "hero", eyebrow: "OCTOBER 2026",
+      headline: "Kingdom work around the globe.",
+      body: "Explore where Brainerd is involved in the work God is doing around the world.",
+      showImage: true,
+      image: { url: "/sample/map.svg", alt: "A map showing where Brainerd missionaries and teams serve around the world" },
+      button: { label: "Explore the map", url: "https://brainerdbaptist.org/missions" },
+    },
+    {
+      id: "travel1", type: "travel", heading: "UPCOMING TRAVEL", layout: "side-by-side",
+      teams: [
+        { id: "t1", name: "South Asia Team", dates: "Oct 18 – 24", places: "CH · BJ", prayer: ["Partners to be strengthened and supported by this visit", "Endurance and joy in challenging circumstances"] },
+        { id: "t2", name: "Southeast Asia Team", dates: "Oct 15 – 26", places: "SB · CB · JW · KW", prayer: ["Hearts open to the teaching", "Health and safety during travel", "Encouragement for local partners"] },
+      ],
+    },
+    {
+      id: "partners1", type: "partners", heading: "PARTNER UPDATES", showImages: true,
+      items: [
+        {
+          id: "p1", label: "SERVING IN SOUTH ASIA", heading: "Update from the Fricks",
+          body: "Before heading to their stateside assignment, they celebrated God's faithfulness with local Baptist pastors. One of their ministry partners, Rahtee, visited the states and shared how God is working in her life with churches and communities.",
+          prayer: ["Praise God for how He provided for Rahtee and used her sharing to impact churches", "Continued growth as the girls learn in classroom settings during stateside time", "Meaningful time with parents and rest before returning to ministry overseas"],
+          image: { url: "/sample/photo-a.svg", alt: "The Frick family with local pastors" },
+          button: { label: "Read more from the Fricks", url: "https://brainerdbaptist.org/missions/fricks" },
+        },
+        {
+          id: "p2", label: "SERVING IN TOGO", heading: "Update from Laura",
+          body: "Laura's first term overseas is wrapping up, and what a journey it has been. From her first words of French in a chilly studio to delivering babies and sharing Jesus in Togo, she has seen God's faithfulness every step of the way.",
+          prayer: ["People in Togo to accept Jesus, and gospel workers to pursue Kingdom work", "Laura and Will as they travel to the States and prepare for marriage", "The maintenance team as they work to restore the oxygen concentrator"],
+          image: { url: "/sample/photo-b.svg", alt: "Laura at the clinic in Togo" },
+          button: { label: "Read more from Laura", url: "https://brainerdbaptist.org/missions/laura" },
+        },
+      ],
+    },
+    {
+      id: "cta1", type: "cta", heading: "Give to Missions",
+      body: "Your generosity supports our missionary partners overseas, sends teams from Brainerd to serve alongside them, and helps equip believers in other nations. Give regularly or toward a specific project.",
+      button: { label: "Give to Missions", url: "https://brainerdbaptist.org/give" },
+      note: "Questions? missions@brainerdbaptist.org",
+    },
+    {
+      id: "card1", type: "card", heading: "Pray for those we have sent",
+      body: "Our church has sent many members to serve around the world. They need our ongoing prayer for strength, provision and open doors for the Gospel.",
+      button: { label: "See our deployed members", url: "https://brainerdbaptist.org/missions/deployed" },
+    },
+  ],
+};
