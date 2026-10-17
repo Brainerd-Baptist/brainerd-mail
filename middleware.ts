@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 // Everything needs a signed-in staff member except the public pages readers use.
-const PUBLIC = ["/login", "/auth", "/w/", "/r/", "/u/", "/api/pray", "/manifest.webmanifest", "/icons/", "/sample/", "/_next/", "/favicon"];
+const PUBLIC = ["/login", "/auth", "/brand/", "/w/", "/r/", "/u/", "/api/pray", "/manifest.webmanifest", "/icons/", "/sample/", "/_next/", "/favicon"];
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
