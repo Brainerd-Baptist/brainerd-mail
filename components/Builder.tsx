@@ -141,7 +141,10 @@ export default function Builder() {
   const blocking = checks.filter((c) => !c.ok && c.severity === "block").length;
   const warns = checks.filter((c) => !c.ok && c.severity === "warn").length;
 
+  const testingRef = useRef(false);
   async function sendTest() {
+    if (testingRef.current) return;
+    testingRef.current = true;
     setStatus("Sending a test to you…");
     try {
       const res = await fetch("/api/test-send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ doc, emailId: emailIdRef.current }) });
@@ -149,6 +152,7 @@ export default function Builder() {
       if (j.emailId) emailIdRef.current = j.emailId;
       setStatus(res.ok ? `Test sent to ${j.to}. Check your inbox and phone.` : j.error || "Could not send the test.");
     } catch { setStatus("Could not send the test."); }
+    finally { testingRef.current = false; }
   }
 
   const isPhoneLayout = isDesktop === false;
