@@ -14,6 +14,7 @@ export type RenderOpts = {
   unsubscribeUrl: string;
   preferencesUrl: string;
   address: string;
+  contactEmail?: string;
   siteUrl?: string; // for relative sample images and the web "I'm praying" call
   issueSlug?: string;
   editable?: boolean; // adds data-bid so the editor preview can select blocks
@@ -232,6 +233,7 @@ ${blocks}
 <tr><td class="px" style="background:${p.dark};padding:36px 40px;">
 <div style="font-family:${SANS};font-size:16px;font-weight:700;letter-spacing:0.16em;color:#ffffff;margin:0 0 14px 0;">BRAINERD BAPTIST CHURCH</div>
 <p style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">${esc(doc.footerNote)}</p>
+${o.contactEmail ? `<p style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">Questions? Write us at <a href="mailto:${esc(o.contactEmail)}" style="color:#ffffff;text-decoration:underline;">${esc(o.contactEmail)}</a></p>` : ""}
 <div style="margin:0 0 16px 0;">${links}</div>
 <p style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:${p.soft};">${esc(o.address)}</p>
 </td></tr>
@@ -260,6 +262,6 @@ export function renderPlainText(doc: EmailDoc, o: RenderOpts): string {
     }
     lines.push("");
   }
-  lines.push(doc.footerNote, "", `Manage preferences: ${o.preferencesUrl}`, `Unsubscribe: ${o.unsubscribeUrl}`, o.address);
+  lines.push(doc.footerNote, o.contactEmail ? `Questions? ${o.contactEmail}` : "", "", `Manage preferences: ${o.preferencesUrl}`, `Unsubscribe: ${o.unsubscribeUrl}`, o.address);
   return lines.filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n");
 }

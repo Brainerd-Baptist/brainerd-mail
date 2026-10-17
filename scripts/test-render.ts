@@ -1,6 +1,7 @@
 import { writeFileSync, mkdirSync } from "fs";
 import { renderEmail, renderPlainText } from "../lib/render";
 import { MISSIONS_TEMPLATE } from "../lib/templates/missions";
+import { CHURCH_ADDRESS, CONTACT_EMAIL } from "../lib/church";
 
 const links: string[] = [];
 const opts = {
@@ -9,7 +10,8 @@ const opts = {
   webUrl: "http://localhost:3000/w/test",
   unsubscribeUrl: "http://localhost:3000/u/test",
   preferencesUrl: "http://localhost:3000/p/test",
-  address: "[Church mailing address]",
+  address: CHURCH_ADDRESS,
+  contactEmail: CONTACT_EMAIL,
   siteUrl: "http://localhost:3000",
 };
 const html = renderEmail(MISSIONS_TEMPLATE, opts);

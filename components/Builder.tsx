@@ -7,6 +7,7 @@ import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
 import { runChecks } from "@/lib/checks";
 import { MISSIONS_TEMPLATE } from "@/lib/templates/missions";
+import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import { Area, Field } from "./fields";
 import Inspector from "./Inspector";
 
@@ -24,7 +25,7 @@ function useIsDesktop(): boolean | null {
   return v;
 }
 const STORE_KEY = "brainerd-mail:draft:missions";
-const ADDRESS = process.env.NEXT_PUBLIC_MAIL_ADDRESS || "[Church mailing address]";
+const ADDRESS = CHURCH_ADDRESS;
 const ADDABLE: BlockType[] = ["hero", "text", "photo", "event", "travel", "partners", "cta", "card", "divider"];
 
 export default function Builder() {
@@ -69,6 +70,7 @@ export default function Builder() {
       unsubscribeUrl: "#unsubscribe",
       preferencesUrl: "#preferences",
       address: ADDRESS,
+      contactEmail: CONTACT_EMAIL,
       siteUrl: origin,
     }),
     [origin]
