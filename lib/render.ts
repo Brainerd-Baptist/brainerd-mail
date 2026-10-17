@@ -74,7 +74,7 @@ function button(b: Btn | undefined, kind: BtnKind, p: Palette, o: RenderOpts, li
 // Must be a full https address so email apps can load it.
 function logo(o: RenderOpts, w: number): string {
   const base = (o.siteUrl || "https://mail.brainerdhq.app").replace(/\/+$/, "");
-  const h = Math.round((w * 130) / 560);
+  const h = Math.round((w * 84) / 560);
   return `<img src="${esc(base)}/brand/brainerd-logo-white.png" alt="Brainerd Baptist Church" width="${w}" height="${h}" style="display:inline-block;vertical-align:middle;width:${w}px;height:${h}px;border:0;outline:none;text-decoration:none;">`;
 }
 
@@ -94,7 +94,7 @@ function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
       const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
       return `<tr><td class="px" style="background:${p.dark};padding:28px 40px 40px 40px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td style="font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;color:${p.soft};">${logo(o, 150)}${p.name === "BRAINERD" ? "" : `<span class="hdr-label" style="display:inline-block;vertical-align:middle;margin-left:14px;padding-left:14px;border-left:1px solid ${p.soft};line-height:30px;">${esc(p.label.toUpperCase())}</span>`}</td>
+<td style="font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;color:${p.soft};">${logo(o, 150)}${p.name === "BRAINERD" ? "" : `<span class="hdr-label" style="display:inline-block;vertical-align:middle;margin-left:14px;padding-left:14px;border-left:1px solid ${p.soft};line-height:23px;">${esc(p.label.toUpperCase())}</span>`}</td>
 <td align="right" style="font-family:${SANS};font-size:13px;font-weight:600;letter-spacing:0.14em;color:${p.soft};">${esc(b.eyebrow)}</td>
 </tr></table>
 <h1 class="h1" style="margin:28px 0 14px 0;font-family:${SERIF};font-weight:700;font-size:42px;line-height:1.1;color:#ffffff;">${esc(b.headline)}</h1>

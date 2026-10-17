@@ -326,7 +326,7 @@ export default function Builder() {
     <div className="flex h-screen flex-col bg-mist">
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-line bg-white px-5">
         <div className="flex items-center gap-4">
-          <span className="flex items-center gap-3"><img src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={112} height={26} className="h-[26px] w-auto" /><span className="text-[15px] font-bold tracking-[0.16em] text-navy">MAIL</span></span>
+          <span className="flex items-center gap-3"><img src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={112} height={17} className="h-[17px] w-auto" /><span className="text-[15px] font-bold tracking-[0.16em] text-navy">MAIL</span></span>
           <span className="h-7 w-px bg-line" />
           {ministrySelect}
           <div>

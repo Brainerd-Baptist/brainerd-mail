@@ -19,7 +19,7 @@ export default async function Unsubscribe({ params, searchParams }: { params: { 
   return (
     <main style={{ minHeight: "100dvh", background: p.tint, display: "grid", placeItems: "center", padding: "24px 16px", fontFamily: "Barlow, system-ui, sans-serif" }}>
       <div style={{ width: "100%", maxWidth: 440, background: "#fff", borderRadius: 16, border: `1px solid ${p.tint}`, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,.06)" }}>
-        <div style={{ background: p.dark, padding: "22px 24px" }}><img src="/brand/brainerd-logo-white.png" alt="Brainerd Baptist Church" width={160} height={37} style={{ display: "block", width: 160, height: "auto" }} /></div>
+        <div style={{ background: p.dark, padding: "22px 24px" }}><img src="/brand/brainerd-logo-white.png" alt="Brainerd Baptist Church" width={160} height={24} style={{ display: "block", width: 160, height: "auto" }} /></div>
         <div style={{ padding: 24 }}>
           {done ? (
             <>
