@@ -70,6 +70,14 @@ function button(b: Btn | undefined, kind: BtnKind, p: Palette, o: RenderOpts, li
 </div>`;
 }
 
+// The real Brainerd logo (white version, for the dark header and footer).
+// Must be a full https address so email apps can load it.
+function logo(o: RenderOpts, w: number): string {
+  const base = (o.siteUrl || "https://mail.brainerdhq.app").replace(/\/+$/, "");
+  const h = Math.round((w * 130) / 560);
+  return `<img src="${esc(base)}/brand/brainerd-logo-white.png" alt="Brainerd Baptist Church" width="${w}" height="${h}" style="display:inline-block;vertical-align:middle;width:${w}px;height:${h}px;border:0;outline:none;text-decoration:none;">`;
+}
+
 function image(img: Img | undefined, o: RenderOpts, style = "width:100%;height:auto;display:block;border:0;"): string {
   if (!img?.url) return "";
   const src = img.url.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + img.url : img.url;
@@ -86,7 +94,7 @@ function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
       const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
       return `<tr><td class="px" style="background:${p.dark};padding:28px 40px 40px 40px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td style="font-family:${SANS};font-size:20px;font-weight:700;letter-spacing:0.16em;color:#ffffff;">BRAINERD <span style="font-weight:500;color:${p.soft};">${esc(p.name === "BRAINERD" ? "" : p.name)}</span></td>
+<td style="font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;color:${p.soft};">${logo(o, 150)}${p.name === "BRAINERD" ? "" : `<span class="hdr-label" style="display:inline-block;vertical-align:middle;margin-left:14px;padding-left:14px;border-left:1px solid ${p.soft};line-height:30px;">${esc(p.label.toUpperCase())}</span>`}</td>
 <td align="right" style="font-family:${SANS};font-size:13px;font-weight:600;letter-spacing:0.14em;color:${p.soft};">${esc(b.eyebrow)}</td>
 </tr></table>
 <h1 class="h1" style="margin:28px 0 14px 0;font-family:${SERIF};font-weight:700;font-size:42px;line-height:1.1;color:#ffffff;">${esc(b.headline)}</h1>
@@ -204,7 +212,7 @@ body{margin:0;padding:0;-webkit-text-size-adjust:100%;}
 table{border-collapse:collapse;}
 img{-ms-interpolation-mode:bicubic;}
 a{color:inherit;}
-@media (max-width:620px){
+@media (max-width:620px){.hdr-label{display:block!important;margin:10px 0 0 0!important;padding:0!important;border:0!important;line-height:1.2!important;}
  .px{padding-left:20px!important;padding-right:20px!important;}
  .h1{font-size:32px!important;}
  .stack{display:block!important;width:100%!important;box-sizing:border-box;padding-left:0!important;padding-right:0!important;}
@@ -231,7 +239,7 @@ ${preview}
 ${blocks}
 <tr><td style="height:32px;line-height:32px;font-size:1px;">&nbsp;</td></tr>
 <tr><td class="px" style="background:${p.dark};padding:36px 40px;">
-<div style="font-family:${SANS};font-size:16px;font-weight:700;letter-spacing:0.16em;color:#ffffff;margin:0 0 14px 0;">BRAINERD BAPTIST CHURCH</div>
+<div style="margin:0 0 16px 0;">${logo(o, 150)}</div>
 <p style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">${esc(doc.footerNote)}</p>
 ${o.contactEmail ? `<p style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">Questions? Write us at <a href="mailto:${esc(o.contactEmail)}" style="color:#ffffff;text-decoration:underline;">${esc(o.contactEmail)}</a></p>` : ""}
 <div style="margin:0 0 16px 0;">${links}</div>
