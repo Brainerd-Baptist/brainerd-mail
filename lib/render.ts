@@ -92,12 +92,12 @@ function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
   switch (b.type) {
     case "hero": {
       const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
-      return `<tr><td class="px" style="background:${p.dark};padding:28px 40px 40px 40px;">
+      return `<tr><td class="px" style="background:${p.dark};background-image:linear-gradient(${p.dark},${p.dark});padding:28px 40px 40px 40px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
 <td style="font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;color:${p.soft};">${logo(o, 150, p.key)}${p.name === "BRAINERD" ? "" : `<span class="hdr-label" style="display:inline-block;vertical-align:middle;margin-left:14px;padding-left:14px;border-left:1px solid ${p.soft};line-height:30px;">${esc(p.label.toUpperCase())}</span>`}</td>
 <td align="right" style="font-family:${SANS};font-size:13px;font-weight:600;letter-spacing:0.14em;color:${p.soft};">${esc(b.eyebrow)}</td>
 </tr></table>
-<h1 class="h1" style="margin:28px 0 14px 0;font-family:${SERIF};font-weight:700;font-size:42px;line-height:1.1;color:#ffffff;">${esc(b.headline)}</h1>
+<h1 class="h1" style="margin:28px 0 14px 0;font-family:${SERIF};font-weight:700;font-size:42px;line-height:1.1;color:#f6faf8;">${esc(b.headline)}</h1>
 ${b.body ? `<p style="margin:0 0 20px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:${p.soft};max-width:500px;">${esc(b.body)}</p>` : ""}
 ${img ? `<div style="margin:0 0 20px 0;">${img}</div>` : ""}
 ${button(b.button, "onDark", p, o, b.id)}
@@ -184,7 +184,7 @@ export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
     })
     .join("\n");
   const footerLink = (url: string, label: string, id: string) =>
-    `<a href="${esc(o.wrap(url, id, label))}" style="color:#ffffff;text-decoration:underline;font-family:${SANS};font-size:14px;font-weight:600;margin-right:20px;">${esc(label)}</a>`;
+    `<a href="${esc(o.wrap(url, id, label))}" style="color:#f6faf8;text-decoration:underline;font-family:${SANS};font-size:14px;font-weight:600;margin-right:20px;">${esc(label)}</a>`;
   const links = [
     o.mode === "email" && o.webUrl ? footerLink(o.webUrl, "View in browser", "footer-web") : "",
     footerLink(o.preferencesUrl, "Manage preferences", "footer-prefs"),
@@ -238,10 +238,10 @@ ${preview}
 <table role="presentation" class="wrap dm-wrap" width="640" cellpadding="0" cellspacing="0" border="0" style="width:640px;max-width:640px;background:#ffffff;border-radius:12px;overflow:hidden;">
 ${blocks}
 <tr><td style="height:32px;line-height:32px;font-size:1px;">&nbsp;</td></tr>
-<tr><td class="px" style="background:${p.dark};padding:36px 40px;">
+<tr><td class="px" style="background:${p.dark};background-image:linear-gradient(${p.dark},${p.dark});padding:36px 40px;">
 <div style="margin:0 0 16px 0;">${logo(o, 150, p.key)}</div>
 <p style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">${esc(doc.footerNote)}</p>
-${o.contactEmail ? `<p style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">Questions? Write us at <a href="mailto:${esc(o.contactEmail)}" style="color:#ffffff;text-decoration:underline;">${esc(o.contactEmail)}</a></p>` : ""}
+${o.contactEmail ? `<p style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">Questions? Write us at <a href="mailto:${esc(o.contactEmail)}" style="color:#f6faf8;text-decoration:underline;">${esc(o.contactEmail)}</a></p>` : ""}
 <div style="margin:0 0 16px 0;">${links}</div>
 <p style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:${p.soft};">${esc(o.address)}</p>
 </td></tr>
