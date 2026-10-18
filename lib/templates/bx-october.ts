@@ -16,7 +16,7 @@ export const BX_OCTOBER: EmailDoc = {
       id: "hero1", type: "hero", eyebrow: "OCTOBER BX NEWS",
       headline: "A new season at the BX.",
       body: "Save some dates and hop into a new class this semester.",
-      showImage: true,
+      showImage: false,
       image: { url: `${CANVA}/7215fc0879558a3e35256c94f797c89e.jpg`, alt: "Sneakers, dumbbells and a water bottle on the floor of the BX fitness room, with the Brainerd BX Crossroads logo" },
     },
     {
