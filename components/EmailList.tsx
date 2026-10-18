@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { NavMenu } from "@/components/NavMenu";
+import { HelpButton } from "@/components/HelpButton";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Copy, Globe, LogOut, Plus, Search, Trash2, X } from "lucide-react";
 import { PALETTES, paletteFor } from "@/lib/ministries";
@@ -73,6 +74,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
           <NavMenu />
           <HeaderBrand label="Mail" />
           <span className="flex-1" />
+          <HelpButton />
         </div>
       </header>
 

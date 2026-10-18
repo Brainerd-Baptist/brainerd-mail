@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Crown, MailPlus, RotateCw, ShieldCheck, UserPlus, X } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
+import { HelpButton } from "@/components/HelpButton";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { ROLES, ROLE_BLURB, ROLE_LABEL, canManageTarget, rolesICanGrant, type Role } from "@/lib/roles-ui";
@@ -104,6 +105,7 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
           <NavMenu />
           <HeaderBrand label="Team" />
           <span className="flex-1" />
+          <HelpButton />
         </div>
       </header>
 

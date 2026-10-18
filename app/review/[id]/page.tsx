@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { NavMenu } from "@/components/NavMenu";
+import { HelpButton } from "@/components/HelpButton";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { renderEmail } from "@/lib/render";
@@ -30,7 +31,7 @@ export default async function ReviewPage({ params }: { params: { id: string } })
   return (
     <div className="flex min-h-[100dvh] flex-col bg-mist">
       <header className="border-b border-line bg-white px-4 py-3">
-        <div className="flex items-center gap-2"><NavMenu /><Link href="/emails" className="text-sm font-semibold text-brand">← All emails</Link></div>
+        <div className="flex items-center gap-2"><NavMenu /><Link href="/emails" className="text-sm font-semibold text-brand">← All emails</Link><span className="flex-1" /><HelpButton /></div>
         <h1 className="mt-1 font-serif text-xl font-semibold text-navy">{row.title || "Untitled"}</h1>
         <p className="text-sm text-muted"><span className="font-semibold" style={{ color: p.dark }}>{p.label}</span>{doc.subject ? ` · ${doc.subject}` : ""}</p>
         {row.scheduled_at ? <p className="mt-1 text-sm text-ink">Planned to go out <b>{when(row.scheduled_at)}</b>{row.expedited ? " (expedited)" : ""}</p> : null}

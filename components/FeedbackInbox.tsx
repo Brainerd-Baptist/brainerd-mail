@@ -1,13 +1,13 @@
 "use client";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Bug, Lightbulb, MessageCircle } from "lucide-react";
+import { ArrowLeft, Bug, HelpCircle, Lightbulb, MessageCircle } from "lucide-react";
 
 export type Note = {
-  id: number; created_at: string; email: string | null; kind: "problem" | "feature" | "feedback";
+  id: number; created_at: string; email: string | null; kind: "problem" | "feature" | "feedback" | "question";
   message: string; context: Record<string, unknown>; status: "new" | "seen" | "planned" | "done" | "wont"; note: string | null;
 };
 
-const KIND = { problem: { label: "Problem", Icon: Bug }, feature: { label: "Feature request", Icon: Lightbulb }, feedback: { label: "Feedback", Icon: MessageCircle } } as const;
+const KIND = { problem: { label: "Problem", Icon: Bug }, feature: { label: "Feature request", Icon: Lightbulb }, feedback: { label: "Feedback", Icon: MessageCircle }, question: { label: "Help question", Icon: HelpCircle } } as const;
 const STATUS: { k: Note["status"]; label: string }[] = [
   { k: "new", label: "New" }, { k: "seen", label: "Seen" }, { k: "planned", label: "Planned" }, { k: "done", label: "Done" }, { k: "wont", label: "Won't do" },
 ];

@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/resend";
 import { feedbackEmails, currentMe, canSeeFeedback, canManageTeam, canEditRoster } from "@/lib/roles";
 
-const KINDS = { problem: "Problem", feature: "Feature request", feedback: "Feedback" } as const;
+const KINDS = { problem: "Problem", feature: "Feature request", feedback: "Feedback", question: "Help question" } as const;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
 // "Report a problem / request a feature / give feedback" from inside the builder.

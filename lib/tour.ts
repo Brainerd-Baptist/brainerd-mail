@@ -11,6 +11,7 @@ export function tourFor(role: Role, name: string): TourStep[] {
   const emails: TourStep = { title: "Emails", body: "The Emails screen lists every email from every ministry, newest edit first. Search by name, or filter by ministry. Tap one to open it.", hint: "Menu → Emails" };
   const calendar: TourStep = { title: "The calendar", body: "See what each ministry plans to send and what actually went out: on time, late, or missed (judged by the day). Switch between Month and Week. Every email links straight from its day.", hint: "Menu → Calendar" };
   const feedback: TourStep = { title: "Tell us what's off", body: "Something confusing, broken, or missing? Use Feedback inside the email editor. It goes straight to the owner and admins.", hint: "Editor → Feedback" };
+  const help: TourStep = { title: "Help is one tap away", body: "The ? button at the top of every screen shows help for the page you're on. You can also type a question in plain English, like \"how do I make a photo bigger?\" If help can't answer it, you can send it to us right there.", hint: "? at the top of any screen" };
   const replay: TourStep = { title: "You're set", body: "You can replay this tour any time from the menu: tap the three lines, then Take the tour.", hint: "Menu → Take the tour" };
 
   const steps: TourStep[] = [welcome, menu];
@@ -50,6 +51,6 @@ export function tourFor(role: Role, name: string): TourStep[] {
     );
     if (role === "owner") steps.push({ title: "Owner only", body: "Only you can see when each person last signed in (in Team), change Admins, or hand ownership to someone else with Make owner. There is only ever one owner." , hint: "Team" });
   }
-  steps.push(replay);
+  steps.push(help, replay);
   return steps;
 }
