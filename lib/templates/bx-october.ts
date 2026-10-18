@@ -7,8 +7,8 @@ const CANVA = "https://brainerdbaptistkidsnews.my.canva.site/september-bx-news/_
 export const BX_OCTOBER: EmailDoc = {
   ministry: "bx",
   title: "October BX News",
-  subject: "October at the BX: Walk/Run 5K on Oct 24",
-  previewText: "Join us for the annual Walk/Run 5K, plus training with Cherish Hamill and new equipment on the way.",
+  subject: "October at the BX: Family Fun Run on Oct 24",
+  previewText: "Join us for the Family Fun Run on October 24, plus the group fitness schedule and training with Cherish Hamill.",
   monthLabel: "OCTOBER 2026",
   footerNote: "You’re receiving this email because you’re part of the BX community.",
   blocks: [
@@ -21,13 +21,13 @@ export const BX_OCTOBER: EmailDoc = {
     },
     {
       id: "photo1", type: "photo", caption: "",
-      image: { url: `${CANVA}/6cd2786357a683ae9579d83a02793402.jpg`, alt: "Brainerd Baptist family Walk/Run 5K graphic with autumn leaves and the church campus" },
+      image: { url: `${CANVA}/6cd2786357a683ae9579d83a02793402.jpg`, alt: "Brainerd Baptist Family Fun Run graphic with autumn leaves and the church campus" },
     },
     {
-      id: "event1", type: "event", eyebrow: "COMMUNITY EVENT", title: "Annual Walk/Run 5K",
-      body: "Support the community, get a sweat in, and pick up free giveaways.",
+      id: "event1", type: "event", eyebrow: "COMMUNITY EVENT", title: "Family Fun Run",
+      body: "Run with us! Support the community, get a sweat in, and pick up free giveaways.",
       date: "Saturday, October 24 · 9 to 11 AM", place: "Belvoir neighborhood",
-      button: { label: "Register", url: "https://brainerdbaptist.churchcenter.com/registrations/events/3072435" },
+      button: { label: "Register", url: "https://brainerdbaptist.churchcenter.com/registrations/events/3663860" },
     },
     {
       id: "coach1", type: "partners", heading: "MEET A COACH", showImages: true,
@@ -36,7 +36,6 @@ export const BX_OCTOBER: EmailDoc = {
         body: "Cherish has a BS in Exercise Science and an M Ed in Physical Education. She is an ACSM certified personal trainer and group fitness instructor, holds a CrossFit L1 certification, and is a certified Health and Nutrition Coach.\n\nShe loves coaching the Advanced Fitness class and enjoys one-on-one training built around each person’s needs and goals, plus nutrition and healthy habit coaching for lifestyle changes that last.\n\nJoin her Mondays and Fridays at 9 AM for Advanced Fitness in the Aerobics Room. To get started, call 423-503-4482.",
         prayer: [],
         image: { url: `${CANVA}/b268163684a2a539a1c106dc26f357da.jpg`, alt: "Cherish Hamill, BX trainer, smiling in a light blue tank top" },
-        button: { label: "Learn more", url: "https://brainerdbaptist.churchcenter.com/registrations/events/3663860" },
       }],
     },
     {
