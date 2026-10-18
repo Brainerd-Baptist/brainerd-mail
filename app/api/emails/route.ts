@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     doc.title = `${String(src.title || doc.title || "Untitled").replace(/ \(copy\)$/, "")} (copy)`;
   } else {
     const ministry = typeof body.ministry === "string" && PALETTES[body.ministry] ? body.ministry : "church-wide";
-    doc = body.start === "october" ? octoberDoc() : body.start === "starter" || body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
+    doc = body.start === "october" ? octoberDoc(ministry) : body.start === "starter" || body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
   }
 
   const { data: row, error } = await sb.from("emails").insert({ ministry: doc.ministry, title: doc.title || "Untitled", doc, created_by: auth.user.id }).select("id").single();

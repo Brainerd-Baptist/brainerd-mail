@@ -1,6 +1,7 @@
 "use client";
 
 import { when } from "@/lib/approval";
+import { OCTOBER } from "@/lib/templates/blank";
 import { STARTERS } from "@/lib/templates/starters";
 import { useMemo, useState } from "react";
 import Link from "next/link";
@@ -133,18 +134,18 @@ export function EmailList({ initial }: { initial: Item[] }) {
             <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">New email</h2><button aria-label="Close" onClick={() => setCreating(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
             <label className="mb-4 block">
               <span className="label">Ministry</span>
-              <select className="field" value={ministry} onChange={(e) => { setMinistry(e.target.value); if (start === "october" && e.target.value !== "missions") setStart("blank"); }}>
+              <select className="field" value={ministry} onChange={(e) => { setMinistry(e.target.value); if (start === "october" && !OCTOBER[e.target.value]) setStart("blank"); }}>
                 {Object.values(PALETTES).map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
               </select>
             </label>
             <fieldset className="mb-5 space-y-2">
               <legend className="label">Start from</legend>
-              {([["blank", "A blank email", "A header and a text block."], ["starter", STARTERS[ministry]?.label ?? "A starter", STARTERS[ministry]?.blurb ?? "A ready-made layout to fill in."], ["october", "The October Global Update", "The email we sent for Missions, ready to edit."]] as const).map(([k, t, d]) => {
-                const off = k === "october" && ministry !== "missions";
+              {([["blank", "A blank email", "A header and a text block."], ["starter", STARTERS[ministry]?.label ?? "A starter", STARTERS[ministry]?.blurb ?? "A ready-made layout to fill in."], ["october", OCTOBER[ministry]?.label ?? "October email", OCTOBER[ministry]?.blurb ?? ""]] as const).map(([k, t, d]) => {
+                const off = k === "october" && !OCTOBER[ministry];
                 return (
                   <label key={k} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${start === k ? "border-brand bg-[#f4f8fd]" : "border-line"} ${off ? "opacity-40" : ""}`}>
                     <input type="radio" name="start" className="mt-1" checked={start === k} disabled={off} onChange={() => setStart(k)} />
-                    <span><span className="block text-[15px] font-semibold text-ink">{t}</span><span className="block text-sm text-muted">{off ? "Only for Missions." : d}</span></span>
+                    <span><span className="block text-[15px] font-semibold text-ink">{t}</span><span className="block text-sm text-muted">{off ? "Only for Missions and the BX." : d}</span></span>
                   </label>
                 );
               })}

@@ -1,5 +1,6 @@
 import { newBlock, type EmailDoc } from "../blocks";
 import { MISSIONS_TEMPLATE } from "./missions";
+import { BX_OCTOBER } from "./bx-october";
 import { STARTERS } from "./starters";
 
 // A fresh email for any ministry: a header and a text block to start from.
@@ -20,6 +21,11 @@ export function blankDoc(ministry: string): EmailDoc {
 export function templateDoc(ministry: string): EmailDoc {
   return STARTERS[ministry] ? STARTERS[ministry].build() : blankDoc(ministry);
 }
-export function octoberDoc(): EmailDoc {
-  return JSON.parse(JSON.stringify(MISSIONS_TEMPLATE));
+// Ready-made October 2026 emails rebuilt from the Canva newsletters.
+export const OCTOBER: Record<string, { label: string; blurb: string; doc: EmailDoc }> = {
+  missions: { label: "The October Global Update", blurb: "The email we sent for Missions, ready to edit.", doc: MISSIONS_TEMPLATE },
+  bx: { label: "October BX News", blurb: "The 5K, Cherish Hamill, and new equipment, rebuilt from the Canva newsletter.", doc: BX_OCTOBER },
+};
+export function octoberDoc(ministry = "missions"): EmailDoc {
+  return JSON.parse(JSON.stringify((OCTOBER[ministry] ?? OCTOBER.missions).doc));
 }
