@@ -17,7 +17,7 @@ export default function Inspector({ block, onChange }: P) {
           <Field label="Headline" value={block.headline} onChange={(v) => set({ headline: v })} />
           <Area label="Short intro" value={block.body} onChange={(v) => set({ body: v })} rows={3} />
           <Toggle label="Show a picture" checked={block.showImage} onChange={(v) => set({ showImage: v })} />
-          {block.showImage ? <ImageFields value={block.image} onChange={(v) => set({ image: v })} /> : null}
+          {block.showImage ? <ImageFields label="Header photo (cropped to a wide banner)" aspect={3} value={block.image} onChange={(v) => set({ image: v })} /> : null}
           <ButtonFields value={block.button} onChange={(v) => set({ button: v })} />
         </div>
       );

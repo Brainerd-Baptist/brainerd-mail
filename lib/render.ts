@@ -91,7 +91,7 @@ function section(inner: string, pad = "32px 40px 8px 40px"): string {
 function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
   switch (b.type) {
     case "hero": {
-      const img = b.showImage ? image(b.image, o, "width:100%;max-width:260px;height:auto;display:block;border:0;border-radius:12px;") : "";
+      const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
       const kicker = [p.name === "BRAINERD" ? "" : p.label, b.eyebrow].filter(Boolean).join("  ·  ");
       return `<tr><td class="px dm-hero" style="background:${p.tint};padding:30px 40px 34px 40px;">
 ${kicker ? `<div style="margin:0 0 10px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}

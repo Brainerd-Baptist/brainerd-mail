@@ -99,7 +99,7 @@ export function ButtonFields({ label = "Button", value, onChange }: { label?: st
   );
 }
 
-export function ImageFields({ label = "Photo", value, onChange }: { label?: string; value?: Img; onChange: (v: Img) => void }) {
+export function ImageFields({ label = "Photo", value, onChange, aspect }: { label?: string; value?: Img; onChange: (v: Img) => void; aspect?: number }) {
   const v = value ?? { url: "", alt: "" };
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -109,7 +109,7 @@ export function ImageFields({ label = "Photo", value, onChange }: { label?: stri
     if (!file) return;
     setBusy(true); setNote("");
     try {
-      const r = await uploadPhoto(file);
+      const r = await uploadPhoto(file, aspect);
       onChange({ ...v, url: r.url });
       setNote(r.local ? "Preview only. Photos upload for real once storage is connected." : `Added (${Math.round(r.bytes / 1024)} KB)`);
     } catch { setNote("That photo could not be read. Try another."); }
