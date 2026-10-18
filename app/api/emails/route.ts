@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PALETTES } from "@/lib/ministries";
-import { blankDoc, templateDoc } from "@/lib/templates/blank";
+import { blankDoc, octoberDoc, templateDoc } from "@/lib/templates/blank";
 import type { EmailDoc } from "@/lib/blocks";
 
 // Creates an email: blank, from the Missions template, or a copy of an existing one.
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     doc.title = `${String(src.title || doc.title || "Untitled").replace(/ \(copy\)$/, "")} (copy)`;
   } else {
     const ministry = typeof body.ministry === "string" && PALETTES[body.ministry] ? body.ministry : "church-wide";
-    doc = body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
+    doc = body.start === "october" ? octoberDoc() : body.start === "starter" || body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
   }
 
   const { data: row, error } = await sb.from("emails").insert({ ministry: doc.ministry, title: doc.title || "Untitled", doc, created_by: auth.user.id }).select("id").single();

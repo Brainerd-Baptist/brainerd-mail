@@ -1,5 +1,7 @@
 "use client";
 
+import { when } from "@/lib/approval";
+import { STARTERS } from "@/lib/templates/starters";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,7 +9,7 @@ import { Copy, Globe, LogOut, Plus, Search, Trash2, X } from "lucide-react";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { ago } from "@/lib/time";
 
-export type Item = { id: string; ministry: string; title: string; subject: string | null; status: string; updated_at: string };
+export type Item = { id: string; ministry: string; title: string; subject: string | null; status: string; updated_at: string; scheduled_at?: string | null; expedited?: boolean };
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   draft: { label: "Draft", cls: "bg-[#eef1f5] text-[#33445d]" },
@@ -29,7 +31,7 @@ export function EmailList({ initial }: { initial: Item[] }) {
   const [err, setErr] = useState("");
   const [creating, setCreating] = useState(false);
   const [ministry, setMinistry] = useState("church-wide");
-  const [start, setStart] = useState<"blank" | "template">("blank");
+  const [start, setStart] = useState<"blank" | "starter" | "october">("blank");
 
   const ministries = useMemo(() => Array.from(new Set(items.map((i) => i.ministry))), [items]);
   const shown = items.filter((i) => (filter === "all" || i.ministry === filter) && (!q.trim() || `${i.title} ${i.subject ?? ""}`.toLowerCase().includes(q.trim().toLowerCase())));
@@ -105,13 +107,13 @@ export function EmailList({ initial }: { initial: Item[] }) {
               return (
                 <li key={it.id} className={`flex items-stretch overflow-hidden rounded-xl border border-line bg-white ${busy === it.id ? "opacity-60" : ""}`}>
                   <span className="w-1.5 shrink-0" style={{ background: p.button }} />
-                  <Link href={`/editor?e=${it.id}`} className="min-w-0 flex-1 p-4 active:bg-[#f4f8fd]">
+                  <Link href={it.status === "pending_approval" ? `/review/${it.id}` : `/editor?e=${it.id}`} className="min-w-0 flex-1 p-4 active:bg-[#f4f8fd]">
                     <span className="block truncate text-[16px] font-semibold text-ink">{it.title || "Untitled"}</span>
                     {it.subject ? <span className="mt-0.5 block truncate text-sm text-muted">{it.subject}</span> : null}
                     <span className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
                       <span className="font-semibold" style={{ color: p.dark }}>{p.label}</span>
                       <span className={`rounded-full px-2 py-0.5 font-semibold ${st.cls}`}>{st.label}</span>
-                      <span>Edited {ago(it.updated_at)}</span>
+                      <span>{it.scheduled_at && ["pending_approval", "approved", "scheduled"].includes(it.status) ? `Goes out ${when(it.scheduled_at)}` : `Edited ${ago(it.updated_at)}`}</span>
                     </span>
                   </Link>
                   <div className="flex shrink-0 items-center pr-1">
@@ -131,14 +133,14 @@ export function EmailList({ initial }: { initial: Item[] }) {
             <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">New email</h2><button aria-label="Close" onClick={() => setCreating(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
             <label className="mb-4 block">
               <span className="label">Ministry</span>
-              <select className="field" value={ministry} onChange={(e) => { setMinistry(e.target.value); if (e.target.value !== "missions") setStart("blank"); }}>
+              <select className="field" value={ministry} onChange={(e) => { setMinistry(e.target.value); if (start === "october" && e.target.value !== "missions") setStart("blank"); }}>
                 {Object.values(PALETTES).map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
               </select>
             </label>
             <fieldset className="mb-5 space-y-2">
               <legend className="label">Start from</legend>
-              {([["blank", "A blank email", "A header and a text block."], ["template", "The October Global Update", "Teams, partner updates and a way to give, ready to edit."]] as const).map(([k, t, d]) => {
-                const off = k === "template" && ministry !== "missions";
+              {([["blank", "A blank email", "A header and a text block."], ["starter", STARTERS[ministry]?.label ?? "A starter", STARTERS[ministry]?.blurb ?? "A ready-made layout to fill in."], ["october", "The October Global Update", "The email we sent for Missions, ready to edit."]] as const).map(([k, t, d]) => {
+                const off = k === "october" && ministry !== "missions";
                 return (
                   <label key={k} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${start === k ? "border-brand bg-[#f4f8fd]" : "border-line"} ${off ? "opacity-40" : ""}`}>
                     <input type="radio" name="start" className="mt-1" checked={start === k} disabled={off} onChange={() => setStart(k)} />

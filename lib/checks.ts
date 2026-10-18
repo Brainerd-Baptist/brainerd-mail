@@ -1,5 +1,19 @@
 import type { EmailDoc, Block } from "./blocks";
 
+// Words left over from a template or a new block: prompts in [brackets] and the stock phrases.
+const STOCK = ["Your headline goes here.", "Write something here.", "Team name", "Prayer point", "Event title", "Heading", "Update from", "SERVING IN"];
+function strings(v: unknown, out: string[] = []): string[] {
+  if (typeof v === "string") out.push(v);
+  else if (Array.isArray(v)) v.forEach((x) => strings(x, out));
+  else if (v && typeof v === "object") for (const [k, x] of Object.entries(v)) if (!["id", "url", "type", "layout", "original", "edit", "quality"].includes(k)) strings(x, out);
+  return out;
+}
+export function leftoverText(doc: EmailDoc): string[] {
+  const texts = doc.blocks.filter((b) => !b.hidden).flatMap((b) => strings(b)).map((t) => t.trim());
+  texts.push(doc.subject.trim(), doc.previewText.trim());
+  return Array.from(new Set(texts.filter((t) => /\[[^\]\n]{2,}\]/.test(t) || STOCK.includes(t)))).map((t) => (t.length > 40 ? t.slice(0, 40) + "…" : t));
+}
+
 export type Check = { ok: boolean; label: string; detail?: string; severity: "block" | "warn" };
 
 function links(b: Block): { label: string; url: string }[] {
@@ -34,6 +48,7 @@ export function runChecks(doc: EmailDoc, htmlBytes: number, address: string): Ch
   const kb = Math.round(htmlBytes / 1024);
   const unUploaded = blocks.flatMap(images).filter((i) => i.url.startsWith("data:"));
   const subj = doc.subject.trim().length;
+  const left = leftoverText(doc);
   const checks: Check[] = [
     {
       ok: bad.length === 0 && emptyLabels.length === 0,
@@ -46,6 +61,7 @@ export function runChecks(doc: EmailDoc, htmlBytes: number, address: string): Ch
     { ok: kb < 90, severity: "block", label: `${kb} KB, ${kb < 90 ? "under" : "close to"} Gmail's ~102 KB clip limit` },
     { ok: noAlt.length === 0, severity: "warn", label: noAlt.length ? `${noAlt.length} photo${noAlt.length === 1 ? "" : "s"} missing a description` : "All photos have descriptions", detail: noAlt.length ? "Helps people using screen readers and when images are blocked" : undefined },
     { ok: unUploaded.length === 0, severity: "block", label: unUploaded.length ? `${unUploaded.length} photo${unUploaded.length === 1 ? " hasn't" : "s haven't"} finished uploading` : "All photos are uploaded" },
+    { ok: left.length === 0, severity: "block", label: left.length ? `${left.length} spot${left.length === 1 ? " still has" : "s still have"} template wording` : "No leftover template wording", detail: left.slice(0, 4).join(" · ") || undefined },
     { ok: !!address && !address.includes("["), severity: "block", label: !!address && !address.includes("[") ? "Mailing address and unsubscribe are in the footer" : "Church mailing address still needs to be set" },
   ];
   return checks;

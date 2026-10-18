@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History } from "lucide-react";
 import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc } from "@/lib/blocks";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
@@ -11,6 +12,8 @@ import { PolishPanel } from "@/components/PolishPanel";
 import { FeedbackSheet } from "@/components/FeedbackSheet";
 import { polish, readDismissed } from "@/lib/polish";
 import { MISSIONS_TEMPLATE } from "@/lib/templates/missions";
+import { SubmitSheet, HistorySheet } from "@/components/ApprovalSheets";
+import { SENDING_ENABLED, when } from "@/lib/approval";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import { Area, Field } from "./fields";
 import Inspector from "./Inspector";
@@ -34,7 +37,18 @@ const ADDABLE: BlockType[] = ["hero", "text", "photo", "event", "travel", "partn
 type SaveState = "saved" | "saving" | "error" | "conflict";
 
 export default function Builder({ emailId }: { emailId: string }) {
-  const [doc, setDoc] = useState<EmailDoc>(MISSIONS_TEMPLATE);
+  const router = useRouter();
+  const [doc, setDocRaw] = useState<EmailDoc>(MISSIONS_TEMPLATE);
+  const [rowStatus, setRowStatus] = useState("draft");
+  const [reviewNote, setReviewNote] = useState<string | null>(null);
+  const [sched, setSched] = useState<{ at: string | null; expedited: boolean }>({ at: null, expedited: false });
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const locked = rowStatus !== "draft";
+  const lockedRef = useRef(false);
+  lockedRef.current = locked;
+  // Once an email is waiting for approval, approved or sent, nothing may change it by accident.
+  const setDoc = useCallback((v: EmailDoc | ((d: EmailDoc) => EmailDoc)) => { if (!lockedRef.current) setDocRaw(v); }, []);
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [device, setDevice] = useState<Device>("phone");
@@ -84,8 +98,9 @@ export default function Builder({ emailId }: { emailId: string }) {
             if (b?.base === j.version && b.doc && JSON.stringify(b.doc) !== JSON.stringify(j.doc)) { next = b.doc; dirtyRef.current = true; }
           }
         } catch {}
-        setDoc(next);
-        if (j.status !== "draft") { stateRef.current = "conflict"; setSaved("conflict"); setSaveMsg("This email has already gone out, so it can’t be changed. Duplicate it from the Emails list to make a new version."); }
+        setRowStatus(j.status); setReviewNote(j.reviewNote ?? null); setSched({ at: j.scheduledAt ?? null, expedited: !!j.expedited });
+        if (j.status !== "draft") { next = j.doc; dirtyRef.current = false; }
+        setDocRaw(next);
         setLoaded(true);
       } catch { if (!cancelled) setLoadErr("Couldn’t open this email. Check your connection and try again."); }
     })();
@@ -179,6 +194,7 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   useEffect(() => {
     const onMsg = (e: MessageEvent) => {
+      if (lockedRef.current) return;
       if (e.data && typeof e.data === "object" && "bid" in e.data) { setSelected(e.data.bid); setTab("edit"); }
     };
     window.addEventListener("message", onMsg);
@@ -237,6 +253,50 @@ export default function Builder({ emailId }: { emailId: string }) {
       setStatus(res.ok ? `Test sent to ${j.to}. Check your inbox and phone.` : j.error || "Could not send the test.");
     } catch { setStatus("Could not send the test."); }
     finally { testingRef.current = false; }
+  }
+
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  async function flushSave() {
+    while (inflightRef.current) await sleep(100);
+    if (dirtyRef.current) await saveNow();
+  }
+  async function submitForApproval(sendAtIso: string): Promise<string | null> {
+    await flushSave();
+    if (stateRef.current === "conflict") return "This email changed somewhere else. Reload it first.";
+    try {
+      const r = await fetch(`/api/emails/${emailId}/submit`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sendAt: sendAtIso }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) return j.error || "Could not send for approval.";
+      versionRef.current = j.version;
+      setRowStatus("pending_approval"); setSched({ at: sendAtIso, expedited: !!j.expedited }); setReviewNote(null); setSelected(null);
+      setSubmitOpen(false); setSendOpen(false);
+      setStatus("Sent for approval. You’ll get an email when it’s reviewed.");
+      return null;
+    } catch { return "Couldn’t reach the server. Try again."; }
+  }
+  async function startEditing() {
+    if (!confirm("Editing cancels the approval. You’ll need to send it for approval again. Continue?")) return;
+    const r = await fetch(`/api/emails/${emailId}/withdraw`, { method: "POST" });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { setStatus(j.error || "Couldn’t reopen this email for editing."); return; }
+    if (j.version) versionRef.current = j.version;
+    lockedRef.current = false; setRowStatus("draft"); setSched({ at: null, expedited: false }); setStatus("Back to a draft. Make your changes, then send it for approval again.");
+  }
+  async function duplicateThis() {
+    const r = await fetch("/api/emails", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fromId: emailId }) });
+    const j = await r.json().catch(() => ({}));
+    if (r.ok) router.push(`/editor?e=${j.id}`); else setStatus(j.error || "Couldn’t duplicate this email.");
+  }
+  async function saveCopy() { await flushSave(); await fetch(`/api/emails/${emailId}/versions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ note: "Saved copy" }) }); }
+  async function restoreVersion(id: string): Promise<string | null> {
+    const r = await fetch(`/api/emails/${emailId}/versions?v=${id}`, { cache: "no-store" });
+    if (!r.ok) return "Couldn’t load that copy.";
+    const j = await r.json();
+    await flushSave();
+    await fetch(`/api/emails/${emailId}/versions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ note: "Before restoring" }) });
+    setDocRaw(j.doc); setSelected(null); setHistoryOpen(false);
+    setStatus("Restored. It’s saved as your current version.");
+    return null;
   }
 
   const saveLabel = saved === "saving" ? "Saving…" : saved === "error" ? "Not saved yet" : saved === "conflict" ? "Not saved" : "Saved";
@@ -364,10 +424,36 @@ export default function Builder({ emailId }: { emailId: string }) {
     </div>
   ) : null;
 
-  const sendActions = (
+  const stateBanner = locked ? (
+    <div className="flex flex-wrap items-center justify-between gap-2 bg-[#e8f0fb] px-4 py-2 text-sm text-[#0d2b52]">
+      <span>
+        {rowStatus === "pending_approval" ? <><b>Waiting for approval.</b> {sched.at ? `Set to go out ${when(sched.at)}.` : ""}{sched.expedited ? " Expedited." : ""}</> : null}
+        {rowStatus === "approved" ? <><b>Approved.</b> {sched.at ? `Scheduled for ${when(sched.at)}.` : ""}{!SENDING_ENABLED ? " Sending isn’t switched on yet, so it will wait." : ""}</> : null}
+        {rowStatus === "scheduled" || rowStatus === "sending" ? <b>This email is being sent.</b> : null}
+        {rowStatus === "sent" ? <b>This email has been sent.</b> : null}
+        {rowStatus === "cancelled" ? <b>This email was cancelled.</b> : null}
+      </span>
+      <span className="flex gap-3 font-semibold">
+        {rowStatus === "pending_approval" || rowStatus === "approved" ? <button onClick={startEditing} className="min-h-11 underline">Edit again</button> : <button onClick={duplicateThis} className="min-h-11 underline">Duplicate</button>}
+      </span>
+    </div>
+  ) : reviewNote ? (
+    <div className="bg-[#fff3d6] px-4 py-2 text-sm text-[#5c3a00]"><b>Changes requested:</b> {reviewNote}</div>
+  ) : null;
+
+  const sheets = (
+    <>
+      {submitOpen ? <SubmitSheet onClose={() => setSubmitOpen(false)} onSubmit={submitForApproval} softWarnings={0} /> : null}
+      {historyOpen ? <HistorySheet emailId={emailId} onClose={() => setHistoryOpen(false)} onRestore={restoreVersion} onSaveCopy={saveCopy} readOnly={locked} /> : null}
+    </>
+  );
+
+  const sendActions = locked ? (
+    <p className="text-sm text-muted">This email is {rowStatus === "pending_approval" ? "waiting for approval" : rowStatus.replace("_", " ")}. Use “Edit again” above to change it.</p>
+  ) : (
     <div className="flex flex-col gap-3">
       <button onClick={sendTest} className="pill-btn w-full border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
-      <button onClick={() => { if (!confirmPhotos()) return; }} disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
+      <button onClick={() => { if (!confirmPhotos()) return; setSendOpen(false); setSubmitOpen(true); }} disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
       {blocking ? <p className="text-center text-xs text-muted">Fix the {blocking} item{blocking > 1 ? "s" : ""} in the checklist first.</p> : null}
     </div>
   );
@@ -381,18 +467,21 @@ export default function Builder({ emailId }: { emailId: string }) {
             <Link href="/emails" aria-label="Back to all emails" className="flex h-11 w-9 shrink-0 items-center justify-center text-brand"><ArrowLeft size={22} /></Link>
             <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: palette.button }} />
             <div className="min-w-0">
-              <input aria-label="Email name" className="w-full min-w-0 truncate bg-transparent text-[16px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
+              <input aria-label="Email name" readOnly={locked} className="w-full min-w-0 truncate bg-transparent text-[16px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
               <div className="-mt-0.5 text-xs text-muted">{palette.label} · {saveLabel}</div>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1">
             {doc.ministry === "missions" ? <a href="/roster" aria-label="Edit members serving globally" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><Globe size={22} /></a> : null}
             <button onClick={() => setFeedbackOpen(true)} aria-label="Report a problem or share feedback" className="relative flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><LifeBuoy size={22} />{inboxNew ? <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#c8102e]" /> : null}</button>
-            <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />Send</button>
+            <button onClick={() => setHistoryOpen(true)} aria-label="Version history" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><History size={22} /></button>
+            <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />{locked ? "Status" : "Send"}</button>
           </div>
         </header>
         {status ? <div className="bg-[#e8f5ee] px-4 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
         {saveBanner}
+        {stateBanner}
+        {sheets}
         {feedbackSheet}
 
         <div className="min-h-0 flex-1 overflow-hidden">
@@ -446,7 +535,7 @@ export default function Builder({ emailId }: { emailId: string }) {
           <Link href="/emails" className="flex min-h-11 items-center gap-1 text-sm font-semibold text-brand"><ArrowLeft size={16} />Emails</Link>
                     {ministrySelect}
           <div>
-            <input aria-label="Email name" className="w-64 bg-transparent text-[15px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
+            <input aria-label="Email name" readOnly={locked} className="w-64 bg-transparent text-[15px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
             <div className="text-xs text-muted">{saveLabel}</div>
           </div>
         </div>
@@ -454,12 +543,15 @@ export default function Builder({ emailId }: { emailId: string }) {
         <div className="flex items-center gap-3">
           {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><Globe size={18} />Serving list</a> : null}
           <button onClick={() => setFeedbackOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} />Feedback{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+          <button onClick={() => setHistoryOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><History size={18} />History</button>
           <button onClick={sendTest} className="pill-btn border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
-          <button onClick={() => { if (!confirmPhotos()) return; }} disabled={blocking > 0} className={`pill-btn ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
+          <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
         </div>
       </header>
       {status ? <div className="bg-[#e8f5ee] px-5 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
       {saveBanner}
+      {stateBanner}
+      {sheets}
       {feedbackSheet}
       <div className="grid min-h-0 flex-1 grid-cols-[280px_minmax(0,1fr)_360px]">
         <aside className="overflow-y-auto border-r border-line bg-white p-4">{blocksPanel}</aside>

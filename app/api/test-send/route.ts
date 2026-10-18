@@ -6,6 +6,7 @@ import { renderFor, syncLinks } from "@/lib/tracking";
 import { sendEmail } from "@/lib/resend";
 import { siteUrl } from "@/lib/site";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
+import { snapshot } from "@/lib/versions";
 import type { EmailDoc } from "@/lib/blocks";
 
 // "Send me a test": goes only to the signed-in staff member's own address.
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
       emailId = row.id; slug = row.slug; version = row.updated_at;
     }
 
+    await snapshot(admin, emailId!, doc, user.id, "Test sent", 5);
     const site = siteUrl();
     const base = { mode: "email" as const, siteUrl: site, address: CHURCH_ADDRESS, contactEmail: CONTACT_EMAIL, issueSlug: slug,
       webUrl: `${site}/w/${slug}`, unsubscribeUrl: `${site}/u/x`, preferencesUrl: `${site}/u/x` };

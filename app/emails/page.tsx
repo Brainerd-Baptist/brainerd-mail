@@ -8,7 +8,7 @@ export const metadata = { title: "Emails | Brainerd Mail" };
 export default async function EmailsPage() {
   const { data } = await supabaseAdmin()
     .from("emails")
-    .select("id,ministry,title,status,updated_at,subject:doc->>subject")
+    .select("id,ministry,title,status,updated_at,scheduled_at,expedited,subject:doc->>subject")
     .order("updated_at", { ascending: false })
     .limit(300);
   return <EmailList initial={(data ?? []) as unknown as Item[]} />;
