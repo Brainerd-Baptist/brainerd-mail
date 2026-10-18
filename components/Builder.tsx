@@ -444,9 +444,7 @@ export default function Builder({ emailId }: { emailId: string }) {
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-line bg-white px-5">
         <div className="flex items-center gap-4">
           <Link href="/emails" className="flex min-h-11 items-center gap-1 text-sm font-semibold text-brand"><ArrowLeft size={16} />Emails</Link>
-          <span className="flex items-center gap-3"><img src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={112} height={17} className="h-[17px] w-auto" /><span className="text-[15px] font-bold tracking-[0.16em] text-navy">MAIL</span></span>
-          <span className="h-7 w-px bg-line" />
-          {ministrySelect}
+                    {ministrySelect}
           <div>
             <input aria-label="Email name" className="w-64 bg-transparent text-[15px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
             <div className="text-xs text-muted">{saveLabel}</div>
