@@ -42,6 +42,10 @@ export default function Builder() {
   const [tab, setTab] = useState<Tab>("edit");
   const [sendOpen, setSendOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [inboxNew, setInboxNew] = useState<number | null>(null); // null = not an admin
+  useEffect(() => {
+    fetch("/api/feedback?summary=1").then((r) => (r.ok ? r.json() : null)).then((j) => { if (j?.admin) setInboxNew(j.new ?? 0); }).catch(() => {});
+  }, [feedbackOpen]);
   const isDesktop = useIsDesktop();
   const prevSel = useRef<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -208,7 +212,7 @@ export default function Builder() {
   );
 
   const feedbackSheet = feedbackOpen ? (
-    <FeedbackSheet onClose={() => setFeedbackOpen(false)} context={{ ministry: doc.ministry, emailTitle: doc.title, tab, device, selectedBlock: selected ? doc.blocks.find((b) => b.id === selected)?.type : null, page: typeof location !== "undefined" ? location.pathname : "", build: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) }} />
+    <FeedbackSheet onClose={() => setFeedbackOpen(false)} inboxNew={inboxNew} context={{ ministry: doc.ministry, emailTitle: doc.title, tab, device, selectedBlock: selected ? doc.blocks.find((b) => b.id === selected)?.type : null, page: typeof location !== "undefined" ? location.pathname : "", build: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) }} />
   ) : null;
 
   const detailsPanel = (
@@ -299,7 +303,7 @@ export default function Builder() {
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1">
-            <button onClick={() => setFeedbackOpen(true)} aria-label="Report a problem or share feedback" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><LifeBuoy size={22} /></button>
+            <button onClick={() => setFeedbackOpen(true)} aria-label="Report a problem or share feedback" className="relative flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><LifeBuoy size={22} />{inboxNew ? <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#c8102e]" /> : null}</button>
             <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />Send</button>
           </div>
         </header>
@@ -364,7 +368,7 @@ export default function Builder() {
         </div>
         {deviceToggle(["phone", "desktop", "dark", "text"])}
         <div className="flex items-center gap-3">
-          <button onClick={() => setFeedbackOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} />Feedback</button>
+          <button onClick={() => setFeedbackOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} />Feedback{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
           <button onClick={sendTest} className="pill-btn border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
           <button onClick={() => { if (!confirmPhotos()) return; }} disabled={blocking > 0} className={`pill-btn ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
         </div>

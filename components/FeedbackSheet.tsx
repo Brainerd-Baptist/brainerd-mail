@@ -10,7 +10,7 @@ const KINDS = [
 
 // Slides up from the bottom on phones. Sends along where the person was, so
 // "it broke" arrives with enough to find the cause.
-export function FeedbackSheet({ onClose, context }: { onClose: () => void; context: Record<string, unknown> }) {
+export function FeedbackSheet({ onClose, context, inboxNew }: { onClose: () => void; context: Record<string, unknown>; inboxNew?: number | null }) {
   const [kind, setKind] = useState<(typeof KINDS)[number]["k"]>("problem");
   const [message, setMessage] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
@@ -37,6 +37,7 @@ export function FeedbackSheet({ onClose, context }: { onClose: () => void; conte
           <h2 className="font-serif text-xl font-semibold text-navy">Help us improve Brainerd Mail</h2>
           <button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-full text-muted"><X size={22} /></button>
         </div>
+        {inboxNew != null ? <a href="/feedback" className="mb-3 flex min-h-11 items-center justify-between rounded-xl bg-[#f4f8fd] px-3 text-[15px] font-semibold text-navy">Open the feedback inbox<span className="text-sm text-muted">{inboxNew ? `${inboxNew} new` : "all caught up"}</span></a> : null}
         {state === "sent" ? (
           <div className="py-6 text-center">
             <Check size={36} className="mx-auto mb-2 text-[#1e7a4c]" />

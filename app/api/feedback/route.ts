@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/resend";
-import { ADMIN_EMAILS } from "@/lib/access";
+import { ADMIN_EMAILS, isAdminEmail } from "@/lib/access";
 
 const KINDS = { problem: "Problem", feature: "Feature request", feedback: "Feedback" } as const;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -41,4 +41,22 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Could not send that right now. Please try again." }, { status: 502 });
   }
+}
+
+// Admins: the inbox list. Anyone signed in: ?summary=1 says whether they are an admin and how many notes are new.
+export async function GET(req: Request) {
+  const { data } = await supabaseServer().auth.getUser();
+  const email = data.user?.email;
+  if (!email) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  const admin = isAdminEmail(email);
+  const summary = new URL(req.url).searchParams.get("summary");
+  if (!admin) return summary ? NextResponse.json({ admin: false }) : NextResponse.json({ error: "Admins only" }, { status: 403 });
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ admin: true, new: 0, items: [] });
+  const db = supabaseAdmin();
+  if (summary) {
+    const { count } = await db.from("feedback").select("id", { count: "exact", head: true }).eq("status", "new");
+    return NextResponse.json({ admin: true, new: count ?? 0 });
+  }
+  const { data: items } = await db.from("feedback").select("*").order("created_at", { ascending: false }).limit(300);
+  return NextResponse.json({ admin: true, items: items ?? [] });
 }
