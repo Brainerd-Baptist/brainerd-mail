@@ -41,7 +41,7 @@ function paragraphs(body: string, color: string, size = 16, cls = "dm-text"): st
 
 function eyebrow(text: string, color: string): string {
   if (!text) return "";
-  return `<div style="font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.14em;color:${color};text-transform:uppercase;margin:0 0 10px 0;">${esc(text)}</div>`;
+  return `<div class="dm-eb" style="font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.14em;color:${color};text-transform:uppercase;margin:0 0 10px 0;">${esc(text)}</div>`;
 }
 
 function bullets(items: string[], title = "PRAY FOR", color: string, accent: string): string {
@@ -94,7 +94,7 @@ function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
       const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
       const kicker = [p.name === "BRAINERD" ? "" : p.label, b.eyebrow].filter(Boolean).join("  ·  ");
       return `<tr><td class="px dm-hero" style="background:${p.tint};padding:30px 40px 34px 40px;">
-${kicker ? `<div style="margin:0 0 10px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}
+${kicker ? `<div class="dm-eb" style="margin:0 0 10px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}
 <h1 class="h1 dm-head" style="margin:0 0 14px 0;font-family:${SERIF};font-weight:700;font-size:40px;line-height:1.1;color:${p.dark};">${esc(b.headline)}</h1>
 ${b.body ? `<p class="dm-text" style="margin:0 0 20px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:#33445d;max-width:500px;">${esc(b.body)}</p>` : ""}
 ${img ? `<div style="margin:0 0 18px 0;">${img}</div>` : ""}
@@ -235,6 +235,7 @@ a{color:inherit;}
  .dm-card{background:#1d2836!important;border-color:#33425a!important;}
  .dm-panel{background:#1d2836!important;}
  .dm-head{color:#ffffff!important;}
+ .dm-eb{color:${p.bright}!important;}
  .dm-text{color:#d4dce8!important;}
  .dm-muted{color:#a9b6c8!important;}
 }

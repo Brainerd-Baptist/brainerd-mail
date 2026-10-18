@@ -19,7 +19,7 @@ export const PALETTES: Record<string, Palette> = {
   kids: { key: "kids", name: "KIDS", label: "Kids", dark: "#0b4452", button: "#007b90", btnText: "#ffffff", bright: "#00abc9", tint: "#e0f5f9", soft: "#bfe7ef" },
   students: { key: "students", name: "STUDENTS", label: "Students", dark: "#6e2f0c", button: "#b84d0a", btnText: "#ffffff", bright: "#f79648", tint: "#fef0e3", soft: "#fbd5b3" },
   missions: { key: "missions", name: "MISSIONS", label: "Missions", dark: "#0d3b2c", button: "#118058", btnText: "#ffffff", bright: "#b7dcc8", tint: "#e6f5ee", soft: "#b7dcc8" },
-  bx: { key: "bx", name: "BX", label: "BX", dark: "#3d0810", button: "#ad0b1c", btnText: "#ffffff", bright: "#f93f4e", tint: "#fbe9eb", soft: "#f6adb1" },
+  bx: { key: "bx", name: "BX", label: "BX", dark: "#161616", button: "#2e2e2e", btnText: "#ffffff", bright: "#b8b8b8", tint: "#f0f0f0", soft: "#cfcfcf" },
   "life-groups": { key: "life-groups", name: "LIFE GROUPS", label: "Life Groups", dark: "#4a3a05", button: "#e0b22c", btnText: "#2a2100", bright: "#fff35b", tint: "#fdf6df", soft: "#f3dd91" },
   adults: { key: "adults", name: "ADULTS", label: "Adults", dark: "#202020", button: "#3d3a36", btnText: "#ffffff", bright: "#c9bfb1", tint: "#fef7ee", soft: "#d9d2c8" },
   men: { key: "men", name: "MEN", label: "Men", dark: "#1f2b17", button: "#4c6338", btnText: "#ffffff", bright: "#a9c48f", tint: "#edf1e8", soft: "#c6d6b6" },
