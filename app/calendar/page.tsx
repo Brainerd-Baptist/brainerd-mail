@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { CalendarView } from "@/components/CalendarView";
-import { etKey, monthGrid, type CalEmail, type CalSlot } from "@/lib/calendar";
+import { addDays, etKey, monthGrid, weekStartOf, type CalEmail, type CalSlot } from "@/lib/calendar";
 import { ensureSlots, type Series } from "@/lib/series";
 
 export const dynamic = "force-dynamic";
@@ -9,13 +9,17 @@ export const metadata = { title: "Calendar | Brainerd Mail" };
 const COLS = "id,ministry,title,status,series_id,planned_at,scheduled_at,sent_at,sent_marked_by,subject:doc->>subject";
 
 // The planner: what each ministry plans to send, and what actually went out. Signed-in staff only.
-export default async function CalendarPage({ searchParams }: { searchParams: { m?: string } }) {
+export default async function CalendarPage({ searchParams }: { searchParams: { m?: string; v?: string; d?: string } }) {
   const today = etKey(new Date());
   const ym = /^\d{4}-(0[1-9]|1[0-2])$/.test(searchParams.m ?? "") ? searchParams.m! : today.slice(0, 7);
-  const grid = monthGrid(ym);
+  const view = searchParams.v === "week" ? "week" : "month";
+  const anchor = /^\d{4}-\d{2}-\d{2}$/.test(searchParams.d ?? "") ? searchParams.d! : today;
+  const weekStart = weekStartOf(anchor);
+  const first = view === "week" ? weekStart : monthGrid(ym)[0][0];
+  const last = view === "week" ? addDays(weekStart, 6) : monthGrid(ym).slice(-1)[0][6];
   // A day of slack on each side so Eastern-time days are never clipped; the view sorts them into days.
-  const from = new Date(new Date(grid[0][0] + "T00:00:00Z").getTime() - 86400000).toISOString();
-  const to = new Date(new Date(grid[grid.length - 1][6] + "T00:00:00Z").getTime() + 2 * 86400000).toISOString();
+  const from = new Date(new Date(first + "T00:00:00Z").getTime() - 86400000).toISOString();
+  const to = new Date(new Date(last + "T00:00:00Z").getTime() + 2 * 86400000).toISOString();
   const sb = supabaseAdmin();
   // Repeating emails: make sure their slots exist before reading them.
   const { data: seriesRows } = await sb.from("send_series").select("*").order("created_at");
@@ -29,7 +33,10 @@ export default async function CalendarPage({ searchParams }: { searchParams: { m
   ]);
   return (
     <CalendarView
-      ym={ym}
+      key={view === "week" ? `w${weekStart}` : `m${ym}`}
+      view={view}
+      ym={view === "week" ? weekStart.slice(0, 7) : ym}
+      weekStart={weekStart}
       today={today}
       emails={(emails.data ?? []) as unknown as CalEmail[]}
       slots={(slots.data ?? []) as unknown as CalSlot[]}

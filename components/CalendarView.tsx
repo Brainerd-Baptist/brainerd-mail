@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Check, ChevronLeft, ChevronRight, CircleDashed, Clock, ExternalLink, Pause, Play, Plus, Repeat, SkipForward, Trash2, Undo2, X } from "lucide-react";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import {
-  BADGE, LABEL, approvalDeadline, dayDiff, dayTitle, etKey, monthGrid, monthTitle, outcome, plannedFor, shiftMonth, shortTime, timeLabel, timingNote, toLocalInput, whenOf,
+  BADGE, LABEL, addDays, approvalDeadline, dayDiff, dayTitle, etKey, monthGrid, monthTitle, outcome, plannedFor, shiftMonth, shortTime, timeLabel, timingNote, toLocalInput, weekDays, weekTitle, whenOf,
   type CalEmail, type CalSlot, type Kind,
 } from "@/lib/calendar";
 import { describe, repeatOptions, type Series } from "@/lib/series";
@@ -22,9 +22,10 @@ const ICON: Partial<Record<Kind, JSX.Element>> = {
 const hrefFor = (e: CalEmail) => (e.status === "pending_approval" ? `/review/${e.id}` : `/editor?e=${e.id}`);
 const fullWhen = (iso: string) => new Date(iso).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
 
-export function CalendarView({ ym, today, emails, slots, undated, series }: { ym: string; today: string; emails: CalEmail[]; slots: CalSlot[]; undated: CalEmail[]; series: Series[] }) {
+export function CalendarView({ view, ym, weekStart, today, emails, slots, undated, series }: { view: "month" | "week"; ym: string; weekStart: string; today: string; emails: CalEmail[]; slots: CalSlot[]; undated: CalEmail[]; series: Series[] }) {
   const router = useRouter();
-  const [sel, setSel] = useState<string>(today.startsWith(ym) ? today : ym + "-01");
+  const days = useMemo(() => weekDays(weekStart), [weekStart]);
+  const [sel, setSel] = useState<string>(view === "week" ? (days.includes(today) ? today : weekStart) : today.startsWith(ym) ? today : ym + "-01");
   const [filter, setFilter] = useState("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState("");
@@ -40,6 +41,7 @@ export function CalendarView({ ym, today, emails, slots, undated, series }: { ym
 
   const now = Date.now();
   const grid = useMemo(() => monthGrid(ym), [ym]);
+  const inView = (k: string) => (view === "week" ? days.includes(k) : k.startsWith(ym));
   const seriesById = useMemo(() => new Map(series.map((s) => [s.id, s])), [series]);
 
   const byDay = useMemo(() => {
@@ -63,7 +65,7 @@ export function CalendarView({ ym, today, emails, slots, undated, series }: { ym
   const totals = useMemo(() => {
     const t = { planned: 0, on_time: 0, late: 0, missed: 0 };
     byDay.forEach((l, k) => {
-      if (!k.startsWith(ym)) return;
+      if (!inView(k)) return;
       for (const en of l) {
         if (en.kind === "on_time") t.on_time++;
         else if (en.kind === "late") t.late++;
@@ -72,7 +74,7 @@ export function CalendarView({ ym, today, emails, slots, undated, series }: { ym
       }
     });
     return t;
-  }, [byDay, ym]);
+  }, [byDay, ym, weekStart, view]);
 
   const ministryKeys = Object.keys(PALETTES);
   const dayList = byDay.get(sel) ?? [];
@@ -147,6 +149,40 @@ export function CalendarView({ ym, today, emails, slots, undated, series }: { ym
 
   const present = Array.from(new Set([...emails.map((e) => e.ministry), ...slots.map((s) => s.ministry)]));
 
+  const weekView = (
+    <div className="grid gap-2 sm:grid-cols-7">
+      {days.map((day) => {
+        const list = byDay.get(day) ?? [];
+        return (
+          <div key={day} className={`rounded-xl border bg-white ${day === sel ? "border-[#1e61b9] ring-2 ring-[#1e61b9]/25" : "border-line"}`}>
+            <button onClick={() => setSel(day)} className="flex w-full items-center gap-2 border-b border-line px-3 py-2 text-left">
+              <span className={`flex h-7 min-w-7 items-center justify-center rounded-full px-1 text-xs font-bold ${day === today ? "bg-[#1e61b9] text-white" : "text-ink"}`}>{Number(day.slice(8))}</span>
+              <span className="text-xs font-semibold text-muted">{new Date(day + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: day.endsWith("-01") ? "short" : undefined, timeZone: "UTC" })}</span>
+            </button>
+            <div className="min-h-[56px] space-y-2 p-2 sm:min-h-[220px]">
+              {list.length === 0 ? <p className="px-1 text-xs text-[#9aa8bd]">Nothing planned</p> : list.map((en) => {
+                const p = paletteFor(en.type === "email" ? en.e.ministry : en.s.ministry);
+                const text = en.type === "email" ? en.e.title || "Untitled" : en.s.label || "Open slot";
+                const note = en.type === "email" ? timingNote(en.e, now) : null;
+                const cls = `block w-full rounded-lg p-2 text-left text-xs ${BADGE[en.kind]}`;
+                const inner = (
+                  <>
+                    <span className="flex items-center gap-1 font-semibold"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: p.button }} />{ICON[en.kind]}<span className="truncate">{shortTime(en.at)} · {p.label}</span></span>
+                    <span className="mt-0.5 block break-words text-[13px] font-semibold leading-snug">{text}</span>
+                    <span className="mt-0.5 block opacity-80">{LABEL[en.kind]}{note ? ` · ${note}` : ""}</span>
+                  </>
+                );
+                return en.type === "email"
+                  ? <Link key={en.e.id} href={hrefFor(en.e)} className={cls}>{inner}</Link>
+                  : <button key={en.s.id} onClick={() => setSel(day)} className={cls}>{inner}</button>;
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="min-h-full bg-mist pb-16">
       <header className="sticky top-0 z-10 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
@@ -160,10 +196,15 @@ export function CalendarView({ ym, today, emails, slots, undated, series }: { ym
 
       <main className="mx-auto max-w-5xl space-y-4 px-4 pt-6">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="mr-2 font-serif text-2xl font-semibold text-navy">{monthTitle(ym)}</h1>
-          <Link href={`/calendar?m=${shiftMonth(ym, -1)}`} aria-label="Previous month" className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink"><ChevronLeft size={20} /></Link>
-          <Link href={`/calendar?m=${shiftMonth(ym, 1)}`} aria-label="Next month" className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink"><ChevronRight size={20} /></Link>
-          <Link href="/calendar" className="flex h-11 items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-ink">Today</Link>
+          <h1 className="mr-2 font-serif text-2xl font-semibold text-navy">{view === "week" ? weekTitle(weekStart) : monthTitle(ym)}</h1>
+          <Link href={view === "week" ? `/calendar?v=week&d=${addDays(weekStart, -7)}` : `/calendar?m=${shiftMonth(ym, -1)}`} aria-label={view === "week" ? "Previous week" : "Previous month"} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink"><ChevronLeft size={20} /></Link>
+          <Link href={view === "week" ? `/calendar?v=week&d=${addDays(weekStart, 7)}` : `/calendar?m=${shiftMonth(ym, 1)}`} aria-label={view === "week" ? "Next week" : "Next month"} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink"><ChevronRight size={20} /></Link>
+          <Link href={view === "week" ? "/calendar?v=week" : "/calendar"} className="flex h-11 items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-ink">Today</Link>
+          <span className="flex-1" />
+          <div role="tablist" aria-label="Calendar view" className="flex items-center gap-1 rounded-full bg-[#e3eaf2] p-1">
+            <Link role="tab" aria-selected={view === "month"} href={`/calendar?m=${sel.slice(0, 7)}`} className={`flex h-9 items-center rounded-full px-4 text-sm font-semibold ${view === "month" ? "bg-white text-navy shadow-sm" : "text-muted"}`}>Month</Link>
+            <Link role="tab" aria-selected={view === "week"} href={`/calendar?v=week&d=${sel}`} className={`flex h-9 items-center rounded-full px-4 text-sm font-semibold ${view === "week" ? "bg-white text-navy shadow-sm" : "text-muted"}`}>Week</Link>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
@@ -183,6 +224,7 @@ export function CalendarView({ ym, today, emails, slots, undated, series }: { ym
 
         {err && !adding ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
+        {view === "week" ? weekView : (
         <div className="overflow-hidden rounded-xl border border-line bg-white">
           <div className="grid grid-cols-7 border-b border-line bg-[#f7f9fc] text-center text-xs font-semibold text-muted">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <div key={d} className="py-2">{d}</div>)}
@@ -217,6 +259,7 @@ export function CalendarView({ ym, today, emails, slots, undated, series }: { ym
             </div>
           ))}
         </div>
+        )}
 
         <section aria-label={dayTitle(sel)} className="space-y-3">
           <div className="flex items-center justify-between gap-3">

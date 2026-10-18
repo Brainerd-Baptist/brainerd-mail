@@ -104,3 +104,15 @@ export function etInstant(key: string, hhmm: string): string {
   }
   return new Date(t).toISOString();
 }
+
+/** Day arithmetic on "YYYY-MM-DD" keys. */
+export const addDays = (key: string, n: number) => new Date(new Date(key + "T12:00:00Z").getTime() + n * 86400000).toISOString().slice(0, 10);
+/** The Sunday that starts the week containing this day. */
+export const weekStartOf = (key: string) => addDays(key, -new Date(key + "T12:00:00Z").getUTCDay());
+export const weekDays = (start: string) => Array.from({ length: 7 }, (_, i) => addDays(start, i));
+export function weekTitle(start: string): string {
+  const f = (k: string, o: Intl.DateTimeFormatOptions) => new Date(k + "T12:00:00Z").toLocaleDateString("en-US", { ...o, timeZone: "UTC" });
+  const end = addDays(start, 6);
+  const sameMonth = start.slice(0, 7) === end.slice(0, 7);
+  return `${f(start, { month: "short", day: "numeric" })} – ${sameMonth ? f(end, { day: "numeric" }) : f(end, { month: "short", day: "numeric" })}, ${end.slice(0, 4)}`;
+}
