@@ -180,11 +180,19 @@ ${b.note ? `<p class="dm-muted" style="margin:14px 0 0 0;font-family:${SANS};fon
         `<h3 class="dm-head" style="margin:0 0 10px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(b.heading)}</h3>${paragraphs(b.body, "#33445d")}${button(b.button, "secondary", p, o, b.id)}`,
         "24px 40px 24px 40px"
       );
-    case "photo":
+    case "photo": {
+      const imgHtml = image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;");
+      const raw = b.image?.url ?? "";
+      const full = raw.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + raw : raw;
+      const enlarge = b.enlarge !== false && /^https?:\/\//i.test(full);
+      const href = enlarge ? esc(o.wrap(full, b.id, "Enlarge photo")) : "";
+      const pic = enlarge ? `<a href="${href}" style="text-decoration:none;display:block;">${imgHtml}</a>` : imgHtml;
+      const more = enlarge ? `<p style="margin:10px 0 0 0;font-family:${SANS};font-size:14px;line-height:1.4;"><a class="dm-lk" href="${href}" style="color:${p.dark};text-decoration:underline;font-weight:600;">Tap to enlarge &middot; Save</a></p>` : "";
       return section(
-        `${image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;")}${b.caption ? `<p class="dm-muted" style="margin:10px 0 0 0;font-family:${SANS};font-size:14px;color:#5b6b80;">${esc(b.caption)}</p>` : ""}`,
+        `${pic}${b.caption ? `<p class="dm-muted" style="margin:10px 0 0 0;font-family:${SANS};font-size:14px;color:#5b6b80;">${esc(b.caption)}</p>` : ""}${more}`,
         "24px 40px 8px 40px"
       );
+    }
     case "event":
       return section(
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;"><tr><td style="padding:24px;">
@@ -227,7 +235,7 @@ export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
     })
     .join("\n");
   const footerLink = (url: string, label: string, id: string) =>
-    `<a href="${esc(o.wrap(url, id, label))}" style="color:${p.dark};text-decoration:underline;font-family:${SANS};font-size:14px;font-weight:600;margin-right:20px;">${esc(label)}</a>`;
+    `<a class="dm-lk" href="${esc(o.wrap(url, id, label))}" style="color:${p.dark};text-decoration:underline;font-family:${SANS};font-size:14px;font-weight:600;margin-right:20px;">${esc(label)}</a>`;
   const links = [
     o.mode === "email" && o.webUrl ? footerLink(o.webUrl, "View in browser", "footer-web") : "",
     footerLink(o.preferencesUrl, "Manage preferences", "footer-prefs"),
@@ -273,6 +281,7 @@ a{color:inherit;}
  .dm-panel{background:#1d2836!important;}
  .dm-head{color:#ffffff!important;}
  .dm-eb{color:${p.bright}!important;}
+ .dm-lk{color:${p.bright}!important;}
  .dm-text{color:#d4dce8!important;}
  .dm-muted{color:#a9b6c8!important;}
 }
@@ -287,7 +296,7 @@ ${blocks}
 <tr><td style="height:32px;line-height:32px;font-size:1px;">&nbsp;</td></tr>
 <tr><td class="px dm-foot" style="background:#f1f5f9;background-image:linear-gradient(#f1f5f9,#f1f5f9);padding:28px 40px 36px 40px;">
 ${churchFoot}<p class="dm-text" style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">${esc(doc.footerNote)}</p>
-${o.contactEmail ? `<p class="dm-text" style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">Questions? Write us at <a href="mailto:${esc(o.contactEmail)}" style="color:${p.dark};text-decoration:underline;font-weight:600;">${esc(o.contactEmail)}</a></p>` : ""}
+${o.contactEmail ? `<p class="dm-text" style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">Questions? Write us at <a class="dm-lk" href="mailto:${esc(o.contactEmail)}" style="color:${p.dark};text-decoration:underline;font-weight:600;">${esc(o.contactEmail)}</a></p>` : ""}
 <div style="margin:0 0 16px 0;">${links}</div>
 <p class="dm-muted" style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:#5b6b80;">${esc(o.address)}</p>
 </td></tr>
@@ -310,7 +319,7 @@ export function renderPlainText(doc: EmailDoc, o: RenderOpts): string {
       case "partners": lines.push(b.heading); b.items.forEach((i) => lines.push(i.heading, i.body, ...i.prayer.map((x) => `- ${x}`), link(i.button))); break;
       case "cta": lines.push(b.heading, b.body, link(b.button), b.note); break;
       case "card": lines.push(b.heading, b.body, link(b.button)); break;
-      case "photo": lines.push(b.caption); break;
+      case "photo": lines.push(b.caption, b.enlarge !== false && b.image?.url ? `Full size: ${b.image.url.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + b.image.url : b.image.url}` : ""); break;
       case "event": lines.push(b.title, b.body, [b.date, b.place].filter(Boolean).join(" · "), link(b.button)); break;
       case "divider": lines.push("----"); break;
     }

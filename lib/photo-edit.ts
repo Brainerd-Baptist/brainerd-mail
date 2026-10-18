@@ -30,16 +30,17 @@ export function autoGamma(brightness: number, target = 115): number {
 
 // Photo shapes the author can pick. Each one is a crop ratio; "circle" is a
 // square crop that the email rounds off (Outlook desktop shows it square).
-export type Shape = "banner" | "standard" | "square" | "tall" | "circle";
-export const SHAPES: { key: Shape; label: string; aspect: number }[] = [
+export type Shape = "original" | "banner" | "standard" | "square" | "tall" | "circle";
+export const SHAPES: { key: Shape; label: string; aspect: number | undefined }[] = [
+  { key: "original", label: "Full photo", aspect: undefined },
   { key: "banner", label: "Wide banner", aspect: 3 },
   { key: "standard", label: "Standard", aspect: 1.5 },
   { key: "square", label: "Square", aspect: 1 },
   { key: "tall", label: "Tall", aspect: 0.8 },
   { key: "circle", label: "Circle", aspect: 1 },
 ];
-export const shapeAspect = (s: Shape) => SHAPES.find((x) => x.key === s)!.aspect;
+export const shapeAspect = (s: Shape): number | undefined => SHAPES.find((x) => x.key === s)!.aspect;
 export function shapeFromAspect(a?: number): Shape {
-  if (!a) return "standard";
+  if (!a) return "original";
   return a >= 2.5 ? "banner" : "standard";
 }

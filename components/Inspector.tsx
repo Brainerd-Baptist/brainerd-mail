@@ -96,6 +96,7 @@ export default function Inspector({ block, onChange }: P) {
       return (
         <div className="space-y-4">
           <ImageFields value={block.image} onChange={(v) => set({ image: v })} />
+          <Toggle label="Tap to enlarge (opens full size so people can zoom and save it)" checked={block.enlarge !== false} onChange={(v) => set({ enlarge: v })} />
           <Field label="Caption (optional)" value={block.caption} onChange={(v) => set({ caption: v })} />
         </div>
       );

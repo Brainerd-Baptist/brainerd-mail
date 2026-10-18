@@ -2,7 +2,7 @@
 // they never place things by pixel. Every block has `id` and may be hidden.
 
 import type { PhotoEdit } from "./photo-edit";
-export type Img = { url: string; alt: string; shape?: "banner" | "standard" | "square" | "tall" | "circle"; original?: string; edit?: PhotoEdit; quality?: { dark?: boolean; soft?: boolean; small?: boolean; brightness?: number; sharpness?: number } };
+export type Img = { url: string; alt: string; shape?: "original" | "banner" | "standard" | "square" | "tall" | "circle"; original?: string; edit?: PhotoEdit; quality?: { dark?: boolean; soft?: boolean; small?: boolean; brightness?: number; sharpness?: number } };
 export type Btn = { label: string; url: string };
 
 export type HeroBlock = {
@@ -23,7 +23,7 @@ export type PartnerItem = {
 export type PartnerBlock = { id: string; type: "partners"; heading: string; items: PartnerItem[]; showImages: boolean };
 export type CtaBlock = { id: string; type: "cta"; heading: string; body: string; button: Btn; note: string };
 export type CardBlock = { id: string; type: "card"; heading: string; body: string; button?: Btn };
-export type PhotoBlock = { id: string; type: "photo"; image: Img; caption: string };
+export type PhotoBlock = { id: string; type: "photo"; image: Img; caption: string; enlarge?: boolean }; // enlarge defaults to on
 export type EventBlock = {
   id: string; type: "event"; eyebrow: string; title: string; body: string;
   date: string; place: string; button?: Btn;
