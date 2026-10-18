@@ -6,7 +6,7 @@ const PUBLIC = ["/login", "/auth", "/brand/", "/w/", "/r/", "/u/", "/api/pray", 
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  if (PUBLIC.some((p) => path.startsWith(p))) return NextResponse.next();
+  if (PUBLIC.some((p) => path.startsWith(p)) || path === "/serving") return NextResponse.next();
   // Scheduled jobs authenticate with their own secret, not a login.
   if (path.startsWith("/api/cron/")) return NextResponse.next();
 

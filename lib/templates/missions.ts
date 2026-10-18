@@ -64,7 +64,7 @@ export const MISSIONS_TEMPLATE: EmailDoc = {
     {
       id: "card1", type: "card", heading: "Sent from Brainerd",
       body: "Our church has sent many members to serve around the world. They need our ongoing prayer as they share Christ’s love and face the challenges of cross-cultural ministry. Pray for their strength, provision, and open doors for the Gospel. Let’s faithfully support those we’ve sent as partners in the Great Commission.",
-      button: { label: "See our deployed members", url: "https://drive.google.com/file/d/1NHFkahqEitIfQ6tZcgHgRFg6S0WnUwia/view" },
+      button: { label: "See everyone serving globally", url: "https://mail.brainerdhq.app/serving" },
     },
   ],
 };
