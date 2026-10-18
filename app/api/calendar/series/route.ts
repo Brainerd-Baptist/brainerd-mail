@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PALETTES } from "@/lib/ministries";
 import { ensureSlots, fromRepeat, type Series } from "@/lib/series";
+import { whoAmI, needBuild } from "@/lib/email-guard";
 
 // Create a repeating email: "Kids, third Friday of every month at 7:00 AM".
 export async function POST(req: Request) {
-  const { data: auth } = await supabaseServer().auth.getUser();
-  if (!auth.user) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  const w = await whoAmI();
+  if (w.err) return w.err;
+  const auth = { user: w.user };
   const b = await req.json().catch(() => ({}));
   if (typeof b.ministry !== "string" || !PALETTES[b.ministry]) return NextResponse.json({ error: "Pick a ministry." }, { status: 400 });
+  { const deny = needBuild(w.me, b.ministry); if (deny) return deny; }
   const label = typeof b.label === "string" ? b.label.trim().slice(0, 120) : "";
   if (!label) return NextResponse.json({ error: "Give the repeating email a name, like “Monthly Kids update”." }, { status: 400 });
   const rule = fromRepeat(b.repeat, String(b.date ?? ""), String(b.time ?? ""));

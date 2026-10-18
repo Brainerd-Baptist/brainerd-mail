@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { notify, approverEmails } from "@/lib/notify";
+import { notify } from "@/lib/notify";
+import { approverEmails } from "@/lib/roles";
 import { REMINDER_HOURS } from "@/lib/approval";
 import { paletteFor } from "@/lib/ministries";
 import { blockingChecks } from "@/lib/email-guard";
@@ -31,7 +32,7 @@ export async function GET(req: Request) {
         await sb.from("audit_log").insert({ action: "auto_approve", email_id: r.id, detail: {} });
         out.autoApproved++;
       } else if (!sent.includes(-1)) {
-        await notify(approverEmails(), { kind: "passed", ...base });
+        await notify(await approverEmails(), { kind: "passed", ...base });
         await sb.from("emails").update({ reminders_sent: [...sent, -1] }).eq("id", r.id);
         out.passed++;
       }
@@ -39,7 +40,7 @@ export async function GET(req: Request) {
     }
     const due = REMINDER_HOURS.filter((h) => waited >= h && !sent.includes(h)).pop();
     if (due) {
-      await notify(approverEmails(), { kind: "reminder", ...base, hoursWaiting: waited });
+      await notify(await approverEmails(), { kind: "reminder", ...base, hoursWaiting: waited });
       await sb.from("emails").update({ reminders_sent: [...sent, ...REMINDER_HOURS.filter((h) => h <= due && !sent.includes(h))] }).eq("id", r.id);
       out.reminded++;
     }

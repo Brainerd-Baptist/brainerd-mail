@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/resend";
-import { ADMIN_EMAILS, isAdminEmail } from "@/lib/access";
+import { feedbackEmails, currentMe, canSeeFeedback, canManageTeam, canEditRoster } from "@/lib/roles";
 
 const KINDS = { problem: "Problem", feature: "Feature request", feedback: "Feedback" } as const;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -14,6 +14,7 @@ export async function POST(req: Request) {
   const user = data.user;
   if (!user?.email) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ error: "Feedback isn't switched on yet." }, { status: 501 });
+  if (!(await currentMe())) return NextResponse.json({ error: "Your access to Brainerd Mail has changed." }, { status: 403 });
 
   const body = await req.json().catch(() => ({}));
   const kind = body.kind as keyof typeof KINDS;
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
       const ctx = Object.entries(context).map(([k, v]) => `${k}: ${typeof v === "string" ? v : JSON.stringify(v)}`).join("\n");
       const text = `${KINDS[kind]} from ${user.email}\n\n${message}\n\n---\n${ctx}`;
       const html = `<div style="font-family:system-ui,sans-serif;font-size:16px;color:#1b2a41"><p><b>${KINDS[kind]}</b> from ${esc(user.email)}</p><p style="white-space:pre-wrap">${esc(message)}</p><pre style="font-size:12px;color:#5b6b80;white-space:pre-wrap">${esc(ctx)}</pre></div>`;
-      await Promise.all(ADMIN_EMAILS.map((to) => sendEmail({ to, subject: `[Brainerd Mail] ${KINDS[kind]}: ${message.slice(0, 60)}`, html, text, replyTo: user.email! }).catch(() => null)));
+      await Promise.all((await feedbackEmails()).map((to) => sendEmail({ to, subject: `[Brainerd Mail] ${KINDS[kind]}: ${message.slice(0, 60)}`, html, text, replyTo: user.email! }).catch(() => null)));
     }
     return NextResponse.json({ ok: true });
   } catch {
@@ -43,20 +44,20 @@ export async function POST(req: Request) {
   }
 }
 
-// Admins: the inbox list. Anyone signed in: ?summary=1 says whether they are an admin and how many notes are new.
+// Owner and admins: the inbox list. Anyone signed in: ?summary=1 says what their role lets them see (for the menu) and how many notes are new.
 export async function GET(req: Request) {
-  const { data } = await supabaseServer().auth.getUser();
-  const email = data.user?.email;
-  if (!email) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
-  const admin = isAdminEmail(email);
+  const me = await currentMe();
   const summary = new URL(req.url).searchParams.get("summary");
-  if (!admin) return summary ? NextResponse.json({ admin: false }) : NextResponse.json({ error: "Admins only" }, { status: 403 });
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ admin: true, new: 0, items: [] });
+  if (!me) return summary ? NextResponse.json({ role: null }) : NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  const admin = canSeeFeedback(me);
+  const info = { role: me.role, email: me.email, name: me.name, admin, team: canManageTeam(me), roster: canEditRoster(me) };
+  if (!admin) return summary ? NextResponse.json(info) : NextResponse.json({ error: "Owner and admins only" }, { status: 403 });
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ ...info, new: 0, items: [] });
   const db = supabaseAdmin();
   if (summary) {
     const { count } = await db.from("feedback").select("id", { count: "exact", head: true }).eq("status", "new");
-    return NextResponse.json({ admin: true, new: count ?? 0 });
+    return NextResponse.json({ ...info, new: count ?? 0 });
   }
   const { data: items } = await db.from("feedback").select("*").order("created_at", { ascending: false }).limit(300);
-  return NextResponse.json({ admin: true, items: items ?? [] });
+  return NextResponse.json({ ...info, items: items ?? [] });
 }

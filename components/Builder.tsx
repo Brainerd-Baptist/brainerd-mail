@@ -48,7 +48,10 @@ export default function Builder({ emailId }: { emailId: string }) {
   const [submitOpen, setSubmitOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const locked = rowStatus !== "draft";
+  const [canEdit, setCanEdit] = useState(true);
+  const [role, setRole] = useState("");
+  const viewOnly = !canEdit;
+  const locked = rowStatus !== "draft" || viewOnly;
   const lockedRef = useRef(false);
   lockedRef.current = locked;
   // Once an email is waiting for approval, approved or sent, nothing may change it by accident.
@@ -103,8 +106,8 @@ export default function Builder({ emailId }: { emailId: string }) {
             if (b?.base === j.version && b.doc && JSON.stringify(b.doc) !== JSON.stringify(j.doc)) { next = b.doc; dirtyRef.current = true; }
           }
         } catch {}
-        setRowStatus(j.status); setReviewNote(j.reviewNote ?? null); setSched({ at: j.scheduledAt ?? null, expedited: !!j.expedited }); setPlannedAt(j.plannedAt ?? null);
-        if (j.status !== "draft") { next = j.doc; dirtyRef.current = false; }
+        setCanEdit(j.canEdit !== false); setRole(j.role ?? ""); setRowStatus(j.status); setReviewNote(j.reviewNote ?? null); setSched({ at: j.scheduledAt ?? null, expedited: !!j.expedited }); setPlannedAt(j.plannedAt ?? null);
+        if (j.status !== "draft" || j.canEdit === false) { next = j.doc; dirtyRef.current = false; }
         setDocRaw(next);
         setLoaded(true);
       } catch { if (!cancelled) setLoadErr("Couldn’t open this email. Check your connection and try again."); }
@@ -531,7 +534,9 @@ export default function Builder({ emailId }: { emailId: string }) {
     </div>
   ) : null;
 
-  const stateBanner = locked ? (
+  const stateBanner = viewOnly ? (
+    <div className="bg-[#e8f0fb] px-4 py-2 text-sm text-[#0d2b52]"><b>View only.</b> {role === "viewer" ? "Your role can look at emails but not change them." : `Only people assigned to ${paletteFor(doc.ministry).label} can change this email.`}</div>
+  ) : locked ? (
     <div className="flex flex-wrap items-center justify-between gap-2 bg-[#e8f0fb] px-4 py-2 text-sm text-[#0d2b52]">
       <span>
         {rowStatus === "pending_approval" ? <><b>Waiting for approval.</b> {sched.at ? `Set to go out ${when(sched.at)}.` : ""}{sched.expedited ? " Expedited." : ""}</> : null}

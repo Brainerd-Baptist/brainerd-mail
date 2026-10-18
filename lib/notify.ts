@@ -1,6 +1,5 @@
 import { sendEmail } from "./resend";
 import { siteUrl } from "./site";
-import { ADMIN_EMAILS } from "./access";
 import { when } from "./approval";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -67,4 +66,3 @@ export async function notify(to: string[], n: Note) {
   await Promise.all(to.map((addr) => sendEmail({ to: addr, subject: c.subject(n), html, text }).catch(() => null)));
 }
 
-export const approverEmails = () => ADMIN_EMAILS;

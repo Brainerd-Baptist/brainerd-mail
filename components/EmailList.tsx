@@ -10,6 +10,7 @@ import { NavMenu } from "@/components/NavMenu";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Copy, Globe, LogOut, Plus, Search, Trash2, X } from "lucide-react";
 import { PALETTES, paletteFor } from "@/lib/ministries";
+import { canBuildIn, type Perm } from "@/lib/roles-ui";
 import { ago } from "@/lib/time";
 
 export type Item = { id: string; ministry: string; title: string; subject: string | null; status: string; updated_at: string; scheduled_at?: string | null; expedited?: boolean };
@@ -25,7 +26,8 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 };
 const canDelete = (s: string) => s === "draft" || s === "cancelled";
 
-export function EmailList({ initial }: { initial: Item[] }) {
+export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
+  const buildable = Object.keys(PALETTES).filter((k) => canBuildIn(perm, k));
   const router = useRouter();
   const [items, setItems] = useState<Item[]>(initial);
   const [filter, setFilter] = useState("all");
@@ -33,7 +35,7 @@ export function EmailList({ initial }: { initial: Item[] }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState("");
   const [creating, setCreating] = useState(false);
-  const [ministry, setMinistry] = useState("church-wide");
+  const [ministry, setMinistry] = useState(buildable.includes("church-wide") ? "church-wide" : buildable[0] ?? "church-wide");
   const [start, setStart] = useState<"blank" | "starter" | "october">("blank");
 
   const ministries = useMemo(() => Array.from(new Set(items.map((i) => i.ministry))), [items]);
@@ -77,7 +79,7 @@ export function EmailList({ initial }: { initial: Item[] }) {
       <main className="mx-auto max-w-3xl space-y-4 px-4 pt-6">
         <div className="flex items-center justify-between gap-3">
           <h1 className="font-serif text-2xl font-semibold text-navy">Emails</h1>
-          <button onClick={() => setCreating(true)} className="pill-btn bg-[#1e61b9] text-white"><Plus size={16} className="mr-1.5" />New email</button>
+          {buildable.length ? <button onClick={() => setCreating(true)} className="pill-btn bg-[#1e61b9] text-white"><Plus size={16} className="mr-1.5" />New email</button> : null}
         </div>
 
         {items.length > 4 ? (
@@ -99,7 +101,7 @@ export function EmailList({ initial }: { initial: Item[] }) {
 
         {shown.length === 0 ? (
           <div className="rounded-xl border border-dashed border-line bg-white p-8 text-center text-[15px] text-muted">
-            {items.length === 0 ? "No emails yet. Tap New email to start one." : "Nothing matches. Clear the search or filter."}
+            {items.length === 0 ? (buildable.length ? "No emails yet. Tap New email to start one." : "No emails yet.") : "Nothing matches. Clear the search or filter."}
           </div>
         ) : (
           <ul className="space-y-3">
@@ -119,8 +121,8 @@ export function EmailList({ initial }: { initial: Item[] }) {
                     </span>
                   </Link>
                   <div className="flex shrink-0 items-center pr-1">
-                    <button onClick={() => create({ fromId: it.id }, it.id)} disabled={!!busy} aria-label={`Duplicate ${it.title}`} title="Duplicate" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-ink disabled:opacity-40"><Copy size={18} /></button>
-                    {canDelete(it.status) ? <button onClick={() => remove(it)} disabled={!!busy} aria-label={`Delete ${it.title}`} title="Delete" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-[#c8102e] disabled:opacity-40"><Trash2 size={18} /></button> : null}
+                    {canBuildIn(perm, it.ministry) ? <button onClick={() => create({ fromId: it.id }, it.id)} disabled={!!busy} aria-label={`Duplicate ${it.title}`} title="Duplicate" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-ink disabled:opacity-40"><Copy size={18} /></button> : null}
+                    {canDelete(it.status) && canBuildIn(perm, it.ministry) ? <button onClick={() => remove(it)} disabled={!!busy} aria-label={`Delete ${it.title}`} title="Delete" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-[#c8102e] disabled:opacity-40"><Trash2 size={18} /></button> : null}
                   </div>
                 </li>
               );
@@ -136,7 +138,7 @@ export function EmailList({ initial }: { initial: Item[] }) {
             <label className="mb-4 block">
               <span className="label">Ministry</span>
               <select className="field" value={ministry} onChange={(e) => { setMinistry(e.target.value); if (start === "october" && !OCTOBER[e.target.value]) setStart("blank"); }}>
-                {Object.values(PALETTES).map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
+                {buildable.map((k) => <option key={k} value={k}>{PALETTES[k].label}</option>)}
               </select>
             </label>
             <fieldset className="mb-5 space-y-2">

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { currentMe, canEditRoster } from "@/lib/roles";
 import type { Member } from "@/lib/serving";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -11,6 +12,8 @@ const clip = (v: unknown, n: number) => (typeof v === "string" ? v.trim().slice(
 export async function POST(req: Request) {
   const { data: auth } = await supabaseServer().auth.getUser();
   if (!auth.user) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  const me = await currentMe();
+  if (!me || !canEditRoster(me)) return NextResponse.json({ error: "Your role can look at the Serving list but not change it." }, { status: 403 });
 
   const body = await req.json().catch(() => null);
   const list: Partial<Member>[] | null = Array.isArray(body?.members) ? body.members : null;

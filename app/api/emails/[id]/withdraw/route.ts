@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { staffAndId } from "@/lib/email-guard";
+import { staffAndId, requireBuild } from "@/lib/email-guard";
 import { EDITING_CANCELS } from "@/lib/approval";
 
 // Back to draft so it can be edited. Cancels any approval; it has to be submitted again.
 export async function POST(_: Request, { params }: { params: { id: string } }) {
   const g = await staffAndId(params.id);
   if (g.err) return g.err;
+  { const deny = await requireBuild(g.sb, g.me, params.id); if (deny) return deny; }
   const { user, sb } = g;
   const { data: row } = await sb.from("emails").select("status").eq("id", params.id).maybeSingle();
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });

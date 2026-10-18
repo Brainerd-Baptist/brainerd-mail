@@ -7,6 +7,7 @@ import { sendEmail } from "@/lib/resend";
 import { siteUrl } from "@/lib/site";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import { snapshot } from "@/lib/versions";
+import { meFor } from "@/lib/roles";
 import type { EmailDoc } from "@/lib/blocks";
 
 // "Send me a test": goes only to the signed-in staff member's own address.
@@ -15,6 +16,7 @@ export async function POST(req: Request) {
   const { data } = await supabaseServer().auth.getUser();
   const user = data.user;
   if (!user?.email) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  if (!(await meFor(user.id))) return NextResponse.json({ error: "Your access to Brainerd Mail has changed." }, { status: 403 });
   if (!process.env.RESEND_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY)
     return NextResponse.json({ error: "Test sending isn't switched on yet (missing server keys)." }, { status: 501 });
 

@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { UUID } from "@/lib/email-guard";
+import { UUID, whoAmI, needBuild } from "@/lib/email-guard";
 import { ensureSlots, type Series } from "@/lib/series";
 
 async function who(id: string) {
-  const { data: auth } = await supabaseServer().auth.getUser();
-  if (!auth.user) return { err: NextResponse.json({ error: "Sign in required" }, { status: 401 }) } as const;
+  const w = await whoAmI();
+  if (w.err) return { err: w.err } as const;
   if (!UUID.test(id)) return { err: NextResponse.json({ error: "Not found" }, { status: 404 }) } as const;
+  const { data: row } = await w.sb.from("send_series").select("ministry").eq("id", id).maybeSingle();
+  if (!row) return { err: NextResponse.json({ error: "Not found" }, { status: 404 }) } as const;
+  const deny = needBuild(w.me, row.ministry as string);
+  if (deny) return { err: deny } as const;
   return { sb: supabaseAdmin() } as const;
 }
 // Only slots that haven't happened and have no email yet are ever rebuilt or removed.

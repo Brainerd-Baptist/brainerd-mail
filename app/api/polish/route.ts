@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
+import { meFor, canBuild } from "@/lib/roles";
 import type { EmailDoc } from "@/lib/blocks";
 import { SYSTEM, TOOL, userMessage, validateEdits } from "@/lib/polish-ai";
 
@@ -9,6 +10,8 @@ export async function POST(req: Request) {
   if (configured) {
     const { data } = await supabaseServer().auth.getUser();
     if (!data.user?.email) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+    const me = await meFor(data.user.id);
+    if (!me || !canBuild(me)) return NextResponse.json({ error: "Your role can't use writing ideas." }, { status: 403 });
   }
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) return NextResponse.json({ error: "Writing ideas aren't switched on yet (missing ANTHROPIC_API_KEY)." }, { status: 501 });

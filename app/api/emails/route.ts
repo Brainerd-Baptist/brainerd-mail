@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PALETTES } from "@/lib/ministries";
 import { blankDoc, octoberDoc, templateDoc, OCTOBER } from "@/lib/templates/blank";
+import { whoAmI, needBuild } from "@/lib/email-guard";
 import type { EmailDoc } from "@/lib/blocks";
 
 // Creates an email: blank, from the Missions template, or a copy of an existing one.
 export async function POST(req: Request) {
-  const { data: auth } = await supabaseServer().auth.getUser();
-  if (!auth.user) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  const w = await whoAmI();
+  if (w.err) return w.err;
+  const auth = { user: w.user };
+  const me = w.me;
   const body = await req.json().catch(() => ({}));
   const sb = supabaseAdmin();
 
@@ -17,6 +19,7 @@ export async function POST(req: Request) {
     const m: string = body.openMinistry;
     const { data: found } = await sb.from("emails").select("id").eq("ministry", m).not("status", "in", "(sent,sending,cancelled)").order("updated_at", { ascending: false }).limit(1);
     if (found && found[0]) return NextResponse.json({ ok: true, id: found[0].id, created: false });
+    { const deny = needBuild(me, m); if (deny) return deny; }
     const d = OCTOBER[m] ? octoberDoc(m) : templateDoc(m);
     const { data: made, error: e2 } = await sb.from("emails").insert({ ministry: m, title: d.title || "Untitled", doc: d, created_by: auth.user.id }).select("id").single();
     if (e2 || !made) return NextResponse.json({ error: "Could not open that ministry's email." }, { status: 502 });
@@ -45,6 +48,8 @@ export async function POST(req: Request) {
     const ministry = typeof body.ministry === "string" && PALETTES[body.ministry] ? body.ministry : "church-wide";
     doc = body.start === "october" ? octoberDoc(ministry) : body.start === "starter" || body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
   }
+
+  { const deny = needBuild(me, doc.ministry); if (deny) return deny; }
 
   // From the calendar: start an email for a day and time (and claim the open slot it came from).
   const plan = typeof body.plannedAt === "string" && !isNaN(new Date(body.plannedAt).getTime()) ? new Date(body.plannedAt).toISOString() : null;

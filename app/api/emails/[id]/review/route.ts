@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { staffAndId, blockingChecks } from "@/lib/email-guard";
-import { isAdmin } from "@/lib/approval";
+import { canApprove } from "@/lib/roles";
 import { snapshot } from "@/lib/versions";
 import { notify } from "@/lib/notify";
 import { paletteFor } from "@/lib/ministries";
@@ -12,7 +12,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const g = await staffAndId(params.id);
   if (g.err) return g.err;
   const { user, sb } = g;
-  if (!isAdmin(user.email)) return NextResponse.json({ error: "Only an approver can do this." }, { status: 403 });
+  if (!canApprove(g.me)) return NextResponse.json({ error: "Only an approver can do this." }, { status: 403 });
   const body = await req.json().catch(() => ({}));
 
   const { data: row } = await sb.from("emails").select("id,doc,status,title,ministry,expedited,scheduled_at,submitted_by").eq("id", params.id).maybeSingle();
@@ -22,6 +22,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const now = new Date().toISOString();
 
   if (body.action === "approve") {
+    if (row.submitted_by === user.id && g.me.role !== "owner") return NextResponse.json({ error: "You sent this one for approval, so someone else needs to approve it." }, { status: 403 });
     const blocking = blockingChecks(doc);
     if (blocking.length) return NextResponse.json({ error: `Can’t approve yet: ${blocking.map((c) => c.label).join("; ")}` }, { status: 422 });
     if (row.expedited && body.confirmExpedited !== true) return NextResponse.json({ error: "Confirm that you approve an expedited send." }, { status: 400 });

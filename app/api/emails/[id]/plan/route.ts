@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { staffAndId } from "@/lib/email-guard";
+import { staffAndId, requireBuild } from "@/lib/email-guard";
 
 // Sets (or clears) the day and time a draft is planned to go out. Shows on the calendar.
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const g = await staffAndId(params.id);
   if (g.err) return g.err;
+  { const deny = await requireBuild(g.sb, g.me, params.id); if (deny) return deny; }
   const { user, sb } = g;
   const body = await req.json().catch(() => ({}));
   let plannedAt: string | null = null;

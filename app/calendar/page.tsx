@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { CalendarView } from "@/components/CalendarView";
 import { addDays, etKey, monthGrid, weekStartOf, type CalEmail, type CalSlot } from "@/lib/calendar";
 import { ensureSlots, type Series } from "@/lib/series";
+import { currentMe } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Calendar | Brainerd Mail" };
@@ -10,6 +11,7 @@ const COLS = "id,ministry,title,status,series_id,planned_at,scheduled_at,sent_at
 
 // The planner: what each ministry plans to send, and what actually went out. Signed-in staff only.
 export default async function CalendarPage({ searchParams }: { searchParams: { m?: string; v?: string; d?: string } }) {
+  const me = await currentMe();
   const today = etKey(new Date());
   const ym = /^\d{4}-(0[1-9]|1[0-2])$/.test(searchParams.m ?? "") ? searchParams.m! : today.slice(0, 7);
   const view = searchParams.v === "week" ? "week" : "month";
@@ -42,6 +44,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: { m
       slots={(slots.data ?? []) as unknown as CalSlot[]}
       undated={(undated.data ?? []) as unknown as CalEmail[]}
       series={series}
+      perm={{ role: me?.role ?? "viewer", ministries: me?.ministries ?? [] }}
     />
   );
 }

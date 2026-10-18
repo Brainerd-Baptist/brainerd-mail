@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { staffAndId } from "@/lib/email-guard";
+import { staffAndId, requireBuild } from "@/lib/email-guard";
 
 // Real sending isn't switched on yet. Until it is, whoever sends through ClearStream marks it
 // here so the calendar can show what actually went out, and when.
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const g = await staffAndId(params.id);
   if (g.err) return g.err;
+  { const deny = await requireBuild(g.sb, g.me, params.id); if (deny) return deny; }
   const { user, sb } = g;
   const body = await req.json().catch(() => ({}));
   const at = body.sentAt ? new Date(body.sentAt) : new Date();

@@ -20,4 +20,3 @@ export function when(iso: string | null | undefined): string {
   if (!iso) return "";
   return new Date(iso).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
 }
-export const isAdmin = (email?: string | null) => !!email && ["jking@brainerdbaptist.org"].includes(email.toLowerCase());

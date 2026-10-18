@@ -2,11 +2,11 @@ import Link from "next/link";
 import { NavMenu } from "@/components/NavMenu";
 import { notFound } from "next/navigation";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { supabaseServer } from "@/lib/supabase/server";
 import { renderEmail } from "@/lib/render";
 import { paletteFor } from "@/lib/ministries";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
-import { isAdmin, when } from "@/lib/approval";
+import { when } from "@/lib/approval";
+import { currentMe, canApprove } from "@/lib/roles";
 import { ReviewActions } from "@/components/ReviewActions";
 import type { EmailDoc } from "@/lib/blocks";
 
@@ -18,10 +18,10 @@ const UUID = /^[0-9a-f-]{36}$/i;
 // Phone-friendly review screen. Signed-in staff only (middleware.ts); only the approver sees the buttons.
 export default async function ReviewPage({ params }: { params: { id: string } }) {
   if (!UUID.test(params.id)) notFound();
-  const { data: row } = await supabaseAdmin().from("emails").select("id,doc,status,title,ministry,expedited,scheduled_at,submitted_at,review_note").eq("id", params.id).maybeSingle();
+  const { data: row } = await supabaseAdmin().from("emails").select("id,doc,status,title,ministry,expedited,scheduled_at,submitted_at,review_note,submitted_by").eq("id", params.id).maybeSingle();
   if (!row) notFound();
-  const { data: u } = await supabaseServer().auth.getUser();
-  const admin = isAdmin(u.user?.email);
+  const me = await currentMe();
+  const admin = !!me && canApprove(me) && (me.role === "owner" || row.submitted_by !== me.userId);
   const doc = row.doc as EmailDoc;
   const p = paletteFor(row.ministry);
   const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://mail.brainerdhq.app";

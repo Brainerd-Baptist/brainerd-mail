@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { staffAndId, UUID } from "@/lib/email-guard";
+import { staffAndId, requireBuild, UUID } from "@/lib/email-guard";
 import { snapshot } from "@/lib/versions";
 import { summarizeChange } from "@/lib/doc-diff";
 
@@ -30,6 +30,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const g = await staffAndId(params.id);
   if (g.err) return g.err;
+  { const deny = await requireBuild(g.sb, g.me, params.id); if (deny) return deny; }
   const body = await req.json().catch(() => ({}));
   const { data: row } = await g.sb.from("emails").select("doc").eq("id", params.id).maybeSingle();
   if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });

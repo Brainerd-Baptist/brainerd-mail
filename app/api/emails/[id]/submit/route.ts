@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { staffAndId, blockingChecks } from "@/lib/email-guard";
+import { staffAndId, requireBuild, blockingChecks } from "@/lib/email-guard";
 import { MIN_SEND_MINUTES, isExpedited } from "@/lib/approval";
 import { snapshot } from "@/lib/versions";
-import { notify, approverEmails } from "@/lib/notify";
+import { notify } from "@/lib/notify";
+import { approverEmails } from "@/lib/roles";
 import { paletteFor } from "@/lib/ministries";
 import type { EmailDoc } from "@/lib/blocks";
 
@@ -10,6 +11,7 @@ import type { EmailDoc } from "@/lib/blocks";
 export async function POST(req: Request, { params }: { params: { id: string } }) {
   const g = await staffAndId(params.id);
   if (g.err) return g.err;
+  { const deny = await requireBuild(g.sb, g.me, params.id); if (deny) return deny; }
   const { user, sb } = g;
   const body = await req.json().catch(() => ({}));
   const sendAt = new Date(body.sendAt);
@@ -34,6 +36,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
   await snapshot(sb, params.id, doc, user.id, "Sent for approval");
   await sb.from("audit_log").insert({ actor: user.id, action: "submit_for_approval", email_id: params.id, detail: { sendAt: sendAt.toISOString(), expedited } });
-  await notify(approverEmails(), { kind: "submitted", emailId: params.id, title: row.title, subject: doc.subject, ministry: paletteFor(row.ministry).label, sendAt: sendAt.toISOString(), expedited });
+  await notify(await approverEmails(), { kind: "submitted", emailId: params.id, title: row.title, subject: doc.subject, ministry: paletteFor(row.ministry).label, sendAt: sendAt.toISOString(), expedited });
   return NextResponse.json({ ok: true, expedited, version: now });
 }
