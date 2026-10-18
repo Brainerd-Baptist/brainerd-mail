@@ -5,34 +5,6 @@ import type { EmailDoc } from "../blocks";
 // Content mirrors the October 2026 Canva newsletter, tightened for a phone.
 const CANVA = "https://brainerdbaptistkidsnews.my.canva.site/brainerd-baptist-missions-newsletter-october-2026/_assets/media";
 
-const ROSTER_PHOTOS = [
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/c48e080f-7ea1-4464-bd05-e142df112b42.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/8e5dab4d-ea2a-41ac-b3ce-597f3c2fd46d.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/58fe98ce-dfa6-45ef-9cdb-949a8cb3b74b.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/fc559dd4-842b-48a9-8153-a089c1279f92.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/27251e8f-6fe2-46fe-81f6-d991da9a1be2.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/6a454a6f-41d3-4668-80e1-c2aba95ca168.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/7c7a88fd-925f-49ca-8347-0d14f9014704.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/d229ffea-5e43-453e-bda0-5c19a8e2551d.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/5630ad39-2df6-4e9e-9008-73d2338b2d0d.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/1320a49e-5eb8-4b63-8543-2f2a7b5cf702.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/dc19e371-401c-43cb-a438-dd6ad090ae14.jpg",
-  "https://zboopubzfjomqbqtnzdr.supabase.co/storage/v1/object/public/email-images/2026-10/e376b090-7597-4092-982d-742c7e6392f5.jpg",
-];
-const ROSTER = [
-  { region: "South America", who: "Ignacio, Lauren, Ali Greis, Sofia, Nicolas, Eleonora & Tobías", place: "Ecuador", deployed: "July 2017", note: "" },
-  { region: "South America", who: "John, Aimee, Leia, Clara, Micah & Makayla", place: "Panama", deployed: "2009", note: "Pray for their ministry of sharing, equipping and encouraging." },
-  { region: "South America", who: "Jim, Mandy, Micah & Ellie", place: "Peru", deployed: "November 2014", note: "" },
-  { region: "Europe / Middle East", who: "Jeremy", place: "Eastern Europe", deployed: "", note: "Pray as he trains and serves with pastors and church planters in Eastern Europe and leads our International Community Connection ministry." },
-  { region: "Europe / Middle East", who: "R, A, C, L", place: "", deployed: "September 2019", note: "" },
-  { region: "Europe / Middle East", who: "Jeff, Jennifer, Parker, Reece, Riley & Braxton", place: "Germany", deployed: "2023", note: "Serving as a NAMB chaplain for the US Armed Forces." },
-  { region: "Africa", who: "Laura", place: "Togo", deployed: "December 2022", note: "" },
-  { region: "North America", who: "Dave & Mollie", place: "Tempe, AZ", deployed: "July 2018", note: "NAMB church planters of Salt River Community Church." },
-  { region: "South Asia", who: "Brain, Stephanie, Matthew & Caleb", place: "South Asia", deployed: "March 2015", note: "Pray for believers in South Asia who are facing persecution and opposition as a result of placing their faith in Jesus." },
-  { region: "South Asia", who: "Jett & Morgan Bates", place: "South Asia", deployed: "March 2026", note: "Pray for a smooth transition to their new home, language learning, new friendships and a fruitful ministry." },
-  { region: "South Asia", who: "Greg", place: "South Asia", deployed: "", note: "Pray for Greg’s ministry work in South Asia, that hearts and minds may be receptive to the Good News." },
-  { region: "Southeast Asia", who: "Nathan, Amber, Reese & Zella Kate", place: "Asia Pacific Rim", deployed: "October 2013", note: "Pray for the people of Southeast Asia who are still waiting to hear the Good News." },
-];
 
 export const MISSIONS_TEMPLATE: EmailDoc = {
   ministry: "missions",
@@ -88,13 +60,6 @@ export const MISSIONS_TEMPLATE: EmailDoc = {
       id: "card1", type: "card", heading: "Sent from Brainerd",
       body: "Our church has sent many members to serve around the world. They need our ongoing prayer as they share Christ’s love and face the challenges of cross-cultural ministry. Pray for their strength, provision, and open doors for the Gospel. Let’s faithfully support those we’ve sent as partners in the Great Commission.",
       button: { label: "See the full list", url: "https://mail.brainerdhq.app/serving" },
-    },
-    {
-      id: "roster1", type: "partners", heading: "WHO WE’VE SENT", showImages: true,
-      items: ROSTER.map((r, n) => ({
-        id: `m${n}`, label: [r.region, r.place].filter(Boolean).join(" · ").toUpperCase(), heading: r.who, image: { url: ROSTER_PHOTOS[n], alt: r.who },
-        body: [r.deployed && `Deployed ${r.deployed}.`, r.note].filter(Boolean).join(" "), prayer: [],
-      })),
     },
     {
       id: "cta1", type: "cta", heading: "Give to Missions",
