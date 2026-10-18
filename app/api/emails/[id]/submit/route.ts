@@ -27,7 +27,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const now = new Date().toISOString();
   const expedited = isExpedited(sendAt);
   const { error } = await sb.from("emails").update({
-    status: "pending_approval", scheduled_at: sendAt.toISOString(), submitted_at: now, submitted_by: user.id, expedited,
+    status: "pending_approval", scheduled_at: sendAt.toISOString(), planned_at: sendAt.toISOString(), submitted_at: now, submitted_by: user.id, expedited,
     approved_by: null, approved_at: null, approval_kind: null, reminders_sent: [], review_note: null, updated_at: now,
   }).eq("id", params.id);
   if (error) return NextResponse.json({ error: "Could not submit." }, { status: 502 });

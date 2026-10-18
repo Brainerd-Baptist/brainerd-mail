@@ -6,7 +6,7 @@ import { STARTERS } from "@/lib/templates/starters";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Copy, Globe, LogOut, Plus, Search, Trash2, X } from "lucide-react";
+import { CalendarDays, Copy, Globe, LogOut, Plus, Search, Trash2, X } from "lucide-react";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { ago } from "@/lib/time";
 
@@ -68,6 +68,7 @@ export function EmailList({ initial }: { initial: Item[] }) {
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <span className="flex items-center gap-3"><img src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={112} height={17} className="h-[17px] w-auto" /><span className="text-[15px] font-bold tracking-[0.16em] text-navy">MAIL</span></span>
           <span className="flex-1" />
+          <Link href="/calendar" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><CalendarDays size={18} /><span className="hidden sm:inline">Calendar</span></Link>
           <Link href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><Globe size={18} /><span className="hidden sm:inline">Serving list</span></Link>
           <form action="/auth/signout" method="post"><button className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]" aria-label="Sign out"><LogOut size={18} /><span className="hidden sm:inline">Sign out</span></button></form>
         </div>

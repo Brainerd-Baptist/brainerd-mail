@@ -42,6 +42,8 @@ export default function Builder({ emailId }: { emailId: string }) {
   const [rowStatus, setRowStatus] = useState("draft");
   const [reviewNote, setReviewNote] = useState<string | null>(null);
   const [sched, setSched] = useState<{ at: string | null; expedited: boolean }>({ at: null, expedited: false });
+  const [plannedAt, setPlannedAt] = useState<string | null>(null);
+  const [planErr, setPlanErr] = useState("");
   const [submitOpen, setSubmitOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const locked = rowStatus !== "draft";
@@ -99,7 +101,7 @@ export default function Builder({ emailId }: { emailId: string }) {
             if (b?.base === j.version && b.doc && JSON.stringify(b.doc) !== JSON.stringify(j.doc)) { next = b.doc; dirtyRef.current = true; }
           }
         } catch {}
-        setRowStatus(j.status); setReviewNote(j.reviewNote ?? null); setSched({ at: j.scheduledAt ?? null, expedited: !!j.expedited });
+        setRowStatus(j.status); setReviewNote(j.reviewNote ?? null); setSched({ at: j.scheduledAt ?? null, expedited: !!j.expedited }); setPlannedAt(j.plannedAt ?? null);
         if (j.status !== "draft") { next = j.doc; dirtyRef.current = false; }
         setDocRaw(next);
         setLoaded(true);
@@ -420,6 +422,20 @@ export default function Builder({ emailId }: { emailId: string }) {
       <Field label="Subject line" value={doc.subject} onChange={(v) => setDoc({ ...doc, subject: v })} hint={`${doc.subject.length} characters`} />
       <Area label="Preview text" value={doc.previewText} onChange={(v) => setDoc({ ...doc, previewText: v })} rows={2} hint="The gray line people see next to the subject" />
       {colorSelect}
+      {emailId ? (
+        <label className="block"><span className="label">Planned send</span>
+          <input type="datetime-local" className="field" disabled={locked} value={plannedAt ? new Date(new Date(plannedAt).getTime() - new Date(plannedAt).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
+            onChange={async (e) => {
+              const iso = e.target.value ? new Date(e.target.value).toISOString() : null;
+              setPlannedAt(iso); setPlanErr("");
+              try {
+                const r = await fetch(`/api/emails/${emailId}/plan`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plannedAt: iso }) });
+                if (!r.ok) setPlanErr((await r.json().catch(() => ({}))).error || "Could not save the planned time.");
+              } catch { setPlanErr("Could not save the planned time."); }
+            }} />
+          <span className="mt-1 block text-xs text-muted">{planErr ? <span className="text-[#8a1020]">{planErr}</span> : <>Shows on the <a href="/calendar" className="underline">calendar</a>. The final time is confirmed when you send for approval.</>}</span>
+        </label>
+      ) : null}
       <Area label="Footer note" value={doc.footerNote} onChange={(v) => setDoc({ ...doc, footerNote: v })} rows={3} />
     </div>
   );
@@ -515,7 +531,7 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   const sheets = (
     <>
-      {submitOpen ? <SubmitSheet onClose={() => setSubmitOpen(false)} onSubmit={submitForApproval} softWarnings={0} /> : null}
+      {submitOpen ? <SubmitSheet onClose={() => setSubmitOpen(false)} onSubmit={submitForApproval} softWarnings={0} initial={plannedAt} /> : null}
       {historyOpen ? <HistorySheet emailId={emailId} onClose={() => setHistoryOpen(false)} onRestore={restoreVersion} onSaveCopy={saveCopy} readOnly={locked} renderHtml={(d) => renderEmail(d as EmailDoc, baseOpts)} /> : null}
     </>
   );

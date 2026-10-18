@@ -35,8 +35,11 @@ export async function POST(req: Request) {
     doc = body.start === "october" ? octoberDoc(ministry) : body.start === "starter" || body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
   }
 
-  const { data: row, error } = await sb.from("emails").insert({ ministry: doc.ministry, title: doc.title || "Untitled", doc, created_by: auth.user.id }).select("id").single();
+  // From the calendar: start an email for a day and time (and claim the open slot it came from).
+  const plan = typeof body.plannedAt === "string" && !isNaN(new Date(body.plannedAt).getTime()) ? new Date(body.plannedAt).toISOString() : null;
+  const { data: row, error } = await sb.from("emails").insert({ ministry: doc.ministry, title: doc.title || "Untitled", doc, created_by: auth.user.id, planned_at: plan }).select("id").single();
   if (error || !row) return NextResponse.json({ error: "Could not create the email." }, { status: 502 });
+  if (typeof body.slotId === "string" && /^[0-9a-f-]{36}$/i.test(body.slotId)) await sb.from("send_slots").update({ email_id: row.id }).eq("id", body.slotId);
   await sb.from("audit_log").insert({ actor: auth.user.id, action: body.fromId ? "duplicate_email" : "create_email", email_id: row.id, detail: {} });
   return NextResponse.json({ ok: true, id: row.id });
 }

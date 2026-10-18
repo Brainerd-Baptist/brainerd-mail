@@ -26,8 +26,9 @@ function Sheet({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-export function SubmitSheet({ onClose, onSubmit, softWarnings }: { onClose: () => void; onSubmit: (sendAtIso: string) => Promise<string | null>; softWarnings: number }) {
-  const [value, setValue] = useState(defaultSendTime);
+export function SubmitSheet({ onClose, onSubmit, softWarnings, initial }: { onClose: () => void; onSubmit: (sendAtIso: string) => Promise<string | null>; softWarnings: number; initial?: string | null }) {
+  // Start from the time planned on the calendar if it is still far enough away.
+  const [value, setValue] = useState(() => (initial && new Date(initial).getTime() >= Date.now() + MIN_SEND_MINUTES * 60000 ? local(new Date(initial)) : defaultSendTime()));
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const sendAt = useMemo(() => new Date(value), [value]);

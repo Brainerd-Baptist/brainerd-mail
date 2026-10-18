@@ -17,9 +17,9 @@ async function guard(id: string) {
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const g = await guard(params.id);
   if (g.err) return g.err;
-  const { data } = await supabaseAdmin().from("emails").select("id,doc,status,updated_at,review_note,scheduled_at,expedited,approved_at").eq("id", params.id).maybeSingle();
+  const { data } = await supabaseAdmin().from("emails").select("id,doc,status,updated_at,review_note,scheduled_at,planned_at,expedited,approved_at").eq("id", params.id).maybeSingle();
   if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json({ id: data.id, doc: data.doc, status: data.status, version: data.updated_at, reviewNote: data.review_note, scheduledAt: data.scheduled_at, expedited: data.expedited, approvedAt: data.approved_at });
+  return NextResponse.json({ id: data.id, doc: data.doc, status: data.status, version: data.updated_at, reviewNote: data.review_note, scheduledAt: data.scheduled_at, plannedAt: data.planned_at, expedited: data.expedited, approvedAt: data.approved_at });
 }
 
 // Autosave. `version` is the updated_at this copy was loaded from: if the email changed
