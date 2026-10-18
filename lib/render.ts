@@ -78,6 +78,30 @@ function logo(o: RenderOpts, w: number, key: string): string {
   return `<img src="${esc(base)}/brand/logo-${esc(key)}.png" alt="Brainerd Baptist Church" width="${w}" height="${h}" style="display:inline-block;vertical-align:middle;width:${w}px;height:${h}px;border:0;outline:none;text-decoration:none;">`;
 }
 
+// Ministries with their own white identity mark sit it directly on the dark bar.
+// Heights are tuned per mark so the visual weight matches; ministries not listed
+// keep the baked Brainerd header image.
+const MARKS: Record<string, { w: number; h: number }> = {
+  missions: { w: 300, h: 30 },
+  kids: { w: 300, h: 32 },
+  men: { w: 300, h: 30 },
+  women: { w: 280, h: 29 },
+  students: { w: 190, h: 50 },
+  bx: { w: 150, h: 65 },
+};
+function mark(o: RenderOpts, key: string): string | null {
+  const m = MARKS[key];
+  if (!m) return null;
+  const base = (o.siteUrl || "https://mail.brainerdhq.app").replace(/\/+$/, "");
+  return `<img src="${esc(base)}/brand/mark-${esc(key)}.png" alt="Brainerd ${esc(key)}" width="${m.w}" height="${m.h}" style="display:block;width:${m.w}px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;">`;
+}
+function footLogo(o: RenderOpts, w: number): string {
+  const base = (o.siteUrl || "https://mail.brainerdhq.app").replace(/\/+$/, "");
+  const h = Math.round((w * 131) / 560);
+  const st = `width:${w}px;height:${h}px;border:0;outline:none;text-decoration:none;`;
+  return `<div class="lg-light" style="margin:0 0 18px 0;line-height:0;font-size:0;"><img src="${esc(base)}/brand/brainerd-full.png" alt="Brainerd Baptist Church" width="${w}" height="${h}" style="display:block;${st}"></div><div class="lg-dark" style="display:none;max-height:0;overflow:hidden;margin:0;line-height:0;font-size:0;"><img src="${esc(base)}/brand/brainerd-full-white.png" alt="Brainerd Baptist Church" width="${w}" height="${h}" style="display:block;${st}"></div>`;
+}
+
 function image(img: Img | undefined, o: RenderOpts, style = "width:100%;height:auto;display:block;border:0;"): string {
   if (!img?.url) return "";
   const src = img.url.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + img.url : img.url;
@@ -183,7 +207,11 @@ function stripe(color: string): string {
 
 export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
   const p = paletteFor(doc.ministry);
-  const masthead = bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px") + "\n" + stripe(p.bright);
+  const mk = mark(o, p.key);
+  const masthead = (mk
+    ? bar(p.dark, `<div style="line-height:0;font-size:0;">${mk}</div>`, "26px 40px")
+    : bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px")) + "\n" + stripe(p.bright);
+  const churchFoot = mk ? footLogo(o, 150) : "";
   const blocks = doc.blocks
     .filter((b) => !b.hidden)
     .map((b) => {
@@ -231,7 +259,9 @@ a{color:inherit;}
  .dm-bg{background:#0f141b!important;}
  .dm-wrap{background:#17202b!important;}
  .dm-hero{background:#1d2836!important;}
- .dm-foot{background:#111821!important;}
+ .dm-foot{background:#111821!important;background-image:none!important;}
+ .lg-light{display:none!important;max-height:0!important;}
+ .lg-dark{display:block!important;max-height:none!important;overflow:visible!important;}
  .dm-card{background:#1d2836!important;border-color:#33425a!important;}
  .dm-panel{background:#1d2836!important;}
  .dm-head{color:#ffffff!important;}
@@ -248,8 +278,8 @@ ${preview}
 ${masthead}
 ${blocks}
 <tr><td style="height:32px;line-height:32px;font-size:1px;">&nbsp;</td></tr>
-<tr><td class="px dm-foot" style="background:#f1f5f9;padding:28px 40px 36px 40px;">
-<p class="dm-text" style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">${esc(doc.footerNote)}</p>
+<tr><td class="px dm-foot" style="background:#f1f5f9;background-image:linear-gradient(#f1f5f9,#f1f5f9);padding:28px 40px 36px 40px;">
+${churchFoot}<p class="dm-text" style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">${esc(doc.footerNote)}</p>
 ${o.contactEmail ? `<p class="dm-text" style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">Questions? Write us at <a href="mailto:${esc(o.contactEmail)}" style="color:${p.dark};text-decoration:underline;font-weight:600;">${esc(o.contactEmail)}</a></p>` : ""}
 <div style="margin:0 0 16px 0;">${links}</div>
 <p class="dm-muted" style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:#5b6b80;">${esc(o.address)}</p>
