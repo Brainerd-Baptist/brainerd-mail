@@ -521,6 +521,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   if (!loaded) return <div className="flex min-h-[100dvh] items-center justify-center bg-mist text-sm text-muted">Opening…</div>;
 
   const planIso = locked ? sched.at : plannedAt;
+  const chipShort = (iso: string) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
   const chipWhen = (iso: string) => new Date(iso).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
 
   const saveBanner = saveMsg && (saved === "conflict" || saved === "error") ? (
@@ -647,19 +648,19 @@ export default function Builder({ emailId }: { emailId: string }) {
           <NavMenu />
                     {ministrySelect}
           <div>
-            <input aria-label="Email name" readOnly={locked} className="w-64 bg-transparent text-[15px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
+            <input aria-label="Email name" readOnly={locked} className="w-44 bg-transparent text-[15px] font-semibold outline-none 2xl:w-64" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
             <div className="text-xs text-muted">{saveLabel}</div>
           </div>
         </div>
         {deviceToggle(["phone", "desktop", "dark", "text"])}
         <div className="flex items-center gap-3">
-          {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><Globe size={18} />Serving list</a> : null}
-          <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-sm font-semibold hover:bg-[#f4f8fd] ${planIso ? "border-line text-ink" : "border-transparent text-[#1e61b9]"}`}><CalendarClock size={18} className={planIso ? "text-[#1e61b9]" : ""} />{planIso ? chipWhen(planIso) : "Schedule"}</button>
-          <button onClick={() => setFeedbackOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} />Feedback{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+          {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><Globe size={18} /><span className="hidden 2xl:inline">Serving list</span></a> : null}
+          <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 text-sm font-semibold hover:bg-[#f4f8fd] ${planIso ? "border-line text-ink" : "border-transparent text-[#1e61b9]"}`}><CalendarClock size={18} className={planIso ? "text-[#1e61b9]" : ""} />{planIso ? chipShort(planIso) : "Schedule"}</button>
+          <button onClick={() => setFeedbackOpen(true)} aria-label="Feedback" title="Feedback" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} /><span className="hidden 2xl:inline">Feedback</span>{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
           <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Redo2 size={20} /></button>
-          <button onClick={() => setHistoryOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><History size={18} />History</button>
-          <button onClick={sendTest} className="pill-btn border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
-          <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
+          <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><History size={18} /><span className="hidden 2xl:inline">History</span></button>
+          <button onClick={sendTest} className="pill-btn shrink-0 whitespace-nowrap border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
+          <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn shrink-0 whitespace-nowrap ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
         </div>
       </header>
       {status ? <div className="bg-[#e8f5ee] px-5 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
