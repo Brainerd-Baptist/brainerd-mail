@@ -19,3 +19,7 @@ create table if not exists send_slots (
 create index if not exists send_slots_planned_idx on send_slots (planned_at);
 alter table send_slots enable row level security;
 create policy slots_read on send_slots for select to authenticated using (bm_is_staff());
+
+-- The tables from 0001 got these grants by default in this project; a later table does not.
+grant select, insert, update, delete on send_slots to service_role;
+grant select on send_slots to authenticated;
