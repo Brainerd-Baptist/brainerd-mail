@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History, Undo2, Redo2 } from "lucide-react";
+import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History, Undo2, Redo2, CalendarClock } from "lucide-react";
 import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc } from "@/lib/blocks";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
@@ -12,7 +12,8 @@ import { PolishPanel } from "@/components/PolishPanel";
 import { FeedbackSheet } from "@/components/FeedbackSheet";
 import { polish, readDismissed } from "@/lib/polish";
 import { MISSIONS_TEMPLATE } from "@/lib/templates/missions";
-import { SubmitSheet, HistorySheet } from "@/components/ApprovalSheets";
+import { SubmitSheet, HistorySheet, ScheduleSheet } from "@/components/ApprovalSheets";
+import { NavMenu } from "@/components/NavMenu";
 import { SENDING_ENABLED, when } from "@/lib/approval";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import { Area, Field } from "./fields";
@@ -45,6 +46,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const [plannedAt, setPlannedAt] = useState<string | null>(null);
   const [planErr, setPlanErr] = useState("");
   const [submitOpen, setSubmitOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const locked = rowStatus !== "draft";
   const lockedRef = useRef(false);
@@ -324,10 +326,23 @@ export default function Builder({ emailId }: { emailId: string }) {
       if (!r.ok) return j.error || "Could not send for approval.";
       versionRef.current = j.version;
       setRowStatus("pending_approval"); setSched({ at: sendAtIso, expedited: !!j.expedited }); setReviewNote(null); setSelected(null);
+      setPlannedAt(sendAtIso);
       setSubmitOpen(false); setSendOpen(false);
       setStatus("Sent for approval. You’ll get an email when it’s reviewed.");
       return null;
     } catch { return "Couldn’t reach the server. Try again."; }
+  }
+  async function savePlan(iso: string | null): Promise<string | null> {
+    try {
+      const r = await fetch(`/api/emails/${emailId}/plan`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plannedAt: iso }) });
+      if (!r.ok) return (await r.json().catch(() => ({}))).error || "Could not save the date.";
+      setPlannedAt(iso); setStatus(iso ? "Date saved. It’s on the calendar." : "Date removed.");
+      return null;
+    } catch { return "Couldn’t reach the server. Try again."; }
+  }
+  async function scheduleAndSubmit(iso: string): Promise<string | null> {
+    if (!confirmPhotos()) return "Cancelled. Check the photos, then try again.";
+    return submitForApproval(iso);
   }
   async function startEditing() {
     if (!confirm("Editing cancels the approval. You’ll need to send it for approval again. Continue?")) return;
@@ -505,6 +520,9 @@ export default function Builder({ emailId }: { emailId: string }) {
   );
   if (!loaded) return <div className="flex min-h-[100dvh] items-center justify-center bg-mist text-sm text-muted">Opening…</div>;
 
+  const planIso = locked ? sched.at : plannedAt;
+  const chipWhen = (iso: string) => new Date(iso).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
+
   const saveBanner = saveMsg && (saved === "conflict" || saved === "error") ? (
     <div role="alert" className="flex items-center justify-between gap-3 bg-[#fff3d6] px-4 py-2 text-sm text-[#5c3a00]">
       <span>{saveMsg}</span>
@@ -531,6 +549,7 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   const sheets = (
     <>
+      {scheduleOpen ? <ScheduleSheet onClose={() => setScheduleOpen(false)} initial={plannedAt} locked={locked} lockedAt={sched.at} onSave={savePlan} onSubmit={scheduleAndSubmit} blockedReason={blocking > 0 ? `Fix the ${blocking} item${blocking > 1 ? "s" : ""} in the checklist before sending for approval.` : undefined} /> : null}
       {submitOpen ? <SubmitSheet onClose={() => setSubmitOpen(false)} onSubmit={submitForApproval} softWarnings={0} initial={plannedAt} /> : null}
       {historyOpen ? <HistorySheet emailId={emailId} onClose={() => setHistoryOpen(false)} onRestore={restoreVersion} onSaveCopy={saveCopy} readOnly={locked} renderHtml={(d) => renderEmail(d as EmailDoc, baseOpts)} /> : null}
     </>
@@ -552,15 +571,16 @@ export default function Builder({ emailId }: { emailId: string }) {
       <div className="flex h-[100dvh] flex-col bg-mist">
         <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-line bg-white px-3">
           <div className="flex min-w-0 items-center gap-1">
-            <Link href="/emails" aria-label="Back to all emails" className="flex h-11 w-9 shrink-0 items-center justify-center text-brand"><ArrowLeft size={22} /></Link>
+            <NavMenu />
             <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: palette.button }} />
             <div className="min-w-0">
               <input aria-label="Email name" readOnly={locked} className="w-full min-w-0 truncate bg-transparent text-[16px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
-              <div className="-mt-0.5 text-xs text-muted">{palette.label} · {saveLabel}</div>
+              <div className="-mt-0.5 truncate text-xs text-muted">{palette.label} · {saveLabel}{planIso ? ` · ${chipWhen(planIso)}` : ""}</div>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1">
             {doc.ministry === "missions" ? <a href="/roster" aria-label="Edit members serving globally" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><Globe size={22} /></a> : null}
+            <button onClick={() => setScheduleOpen(true)} aria-label={planIso ? `Scheduled ${chipWhen(planIso)}. Change` : "Schedule"} className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><CalendarClock size={22} className={planIso ? "text-[#1e61b9]" : ""} /></button>
             <button onClick={() => setFeedbackOpen(true)} aria-label="Report a problem or share feedback" className="relative flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><LifeBuoy size={22} />{inboxNew ? <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#c8102e]" /> : null}</button>
 <button onClick={() => setHistoryOpen(true)} aria-label="Version history" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><History size={22} /></button>
             <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />{locked ? "Status" : "Send"}</button>
@@ -624,7 +644,7 @@ export default function Builder({ emailId }: { emailId: string }) {
     <div className="flex h-screen flex-col bg-mist">
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-line bg-white px-5">
         <div className="flex items-center gap-4">
-          <Link href="/emails" className="flex min-h-11 items-center gap-1 text-sm font-semibold text-brand"><ArrowLeft size={16} />Emails</Link>
+          <NavMenu />
                     {ministrySelect}
           <div>
             <input aria-label="Email name" readOnly={locked} className="w-64 bg-transparent text-[15px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
@@ -634,6 +654,7 @@ export default function Builder({ emailId }: { emailId: string }) {
         {deviceToggle(["phone", "desktop", "dark", "text"])}
         <div className="flex items-center gap-3">
           {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><Globe size={18} />Serving list</a> : null}
+          <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-sm font-semibold hover:bg-[#f4f8fd] ${planIso ? "border-line text-ink" : "border-transparent text-[#1e61b9]"}`}><CalendarClock size={18} className={planIso ? "text-[#1e61b9]" : ""} />{planIso ? chipWhen(planIso) : "Schedule"}</button>
           <button onClick={() => setFeedbackOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} />Feedback{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
           <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Redo2 size={20} /></button>
           <button onClick={() => setHistoryOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><History size={18} />History</button>

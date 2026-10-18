@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Eye, History, Pencil, RotateCcw, Send, Star, X } from "lucide-react";
+import { AlertTriangle, CalendarClock, Eye, History, Pencil, RotateCcw, Send, Star, X } from "lucide-react";
 import { LEAD_HOURS, MIN_SEND_MINUTES, REMINDER_HOURS, SENDING_ENABLED, isExpedited, leadHours, when } from "@/lib/approval";
 import { ago } from "@/lib/time";
 
@@ -53,6 +53,58 @@ export function SubmitSheet({ onClose, onSubmit, softWarnings, initial }: { onCl
       {!SENDING_ENABLED ? <p className="mb-4 text-sm text-muted">Sending isn’t switched on yet, so approval won’t send anything for now.</p> : null}
       {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
       <button disabled={!valid || busy} onClick={async () => { setBusy(true); setErr(""); const m = await onSubmit(sendAt.toISOString()); if (m) { setErr(m); setBusy(false); } }} className="pill-btn w-full bg-[#1e61b9] text-white disabled:opacity-50"><Send size={16} className="mr-1.5" />{busy ? "Sending…" : "Send for approval"}</button>
+    </Sheet>
+  );
+}
+
+// "When does this go out?": set the day and time right from the editor. Saving just the date puts it
+// on the calendar; sending for approval locks the time in and starts the 72-hour clock.
+export function ScheduleSheet({ onClose, initial, locked, lockedAt, onSave, onSubmit, blockedReason }: {
+  onClose: () => void; initial: string | null; locked: boolean; lockedAt: string | null;
+  onSave: (iso: string | null) => Promise<string | null>;
+  onSubmit: (iso: string) => Promise<string | null>;
+  blockedReason?: string;
+}) {
+  const [value, setValue] = useState(() => (initial && !isNaN(new Date(initial).getTime()) ? local(new Date(initial)) : defaultSendTime()));
+  const [busy, setBusy] = useState<"" | "save" | "submit" | "clear">("");
+  const [err, setErr] = useState("");
+  const at = useMemo(() => new Date(value), [value]);
+  const valid = !isNaN(at.getTime());
+  const submitOk = valid && at.getTime() >= Date.now() + MIN_SEND_MINUTES * 60000;
+  const hrs = valid ? leadHours(at) : 0;
+  const expedited = submitOk && isExpedited(at);
+  async function run(kind: "save" | "submit" | "clear") {
+    setBusy(kind); setErr("");
+    const m = kind === "clear" ? await onSave(null) : kind === "save" ? await onSave(at.toISOString()) : await onSubmit(at.toISOString());
+    if (m) { setErr(m); setBusy(""); } else onClose();
+  }
+
+  if (locked) {
+    return (
+      <Sheet title="Schedule" onClose={onClose}>
+        <p className="mb-3 flex items-start gap-2 text-[15px] text-ink"><CalendarClock size={20} className="mt-0.5 shrink-0 text-[#1e61b9]" /><span>{lockedAt ? <>Set to go out <b>{when(lockedAt)}</b>.</> : "This email already has a send time."}</span></p>
+        <p className="mb-4 text-sm text-muted">The time is locked while the email is waiting or approved. Use “Edit again” on the banner above to change it. That cancels the approval.</p>
+        <button onClick={onClose} className="pill-btn w-full border-2 border-navy text-navy">Close</button>
+      </Sheet>
+    );
+  }
+  return (
+    <Sheet title="Schedule" onClose={() => !busy && onClose()}>
+      <label className="mb-3 block">
+        <span className="label">Goes out</span>
+        <input type="datetime-local" className="field" value={value} onChange={(e) => setValue(e.target.value)} />
+        <span className="mt-1 block text-xs text-muted">{valid ? `${when(at.toISOString())}${at.getTime() > Date.now() ? `, ${hrs >= 48 ? `${Math.round(hrs / 24)} days` : `${Math.round(hrs)} hours`} from now` : ""}` : "Pick a day and time."}</span>
+      </label>
+      {submitOk && !expedited ? <p className="mb-4 rounded-xl bg-[#e8f5ee] p-3 text-sm text-[#0d3b2c]">That gives {LEAD_HOURS}+ hours of lead time for approval.</p> : null}
+      {expedited ? <p className="mb-4 flex gap-2 rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]"><AlertTriangle size={18} className="mt-0.5 shrink-0" /><span><b>Expedited.</b> Under {LEAD_HOURS} hours, so it needs explicit approval and will never send on its own.</span></p> : null}
+      {!SENDING_ENABLED ? <p className="mb-4 text-sm text-muted">Sending isn’t switched on yet. Scheduling sets the plan and the calendar entry, and nothing goes out on its own for now.</p> : null}
+      {blockedReason ? <p className="mb-4 rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]">{blockedReason}</p> : null}
+      {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
+      <div className="flex flex-col gap-2">
+        <button disabled={!submitOk || !!busy || !!blockedReason} onClick={() => run("submit")} className="pill-btn w-full bg-[#1e61b9] text-white disabled:opacity-50"><Send size={16} className="mr-1.5" />{busy === "submit" ? "Sending…" : "Send for approval at this time"}</button>
+        <button disabled={!valid || !!busy} onClick={() => run("save")} className="pill-btn w-full border-2 border-navy text-navy disabled:opacity-50">{busy === "save" ? "Saving…" : "Just save the date"}</button>
+        {initial ? <button disabled={!!busy} onClick={() => run("clear")} className="min-h-11 text-sm font-semibold text-muted underline">{busy === "clear" ? "Clearing…" : "Remove the date"}</button> : null}
+      </div>
     </Sheet>
   );
 }

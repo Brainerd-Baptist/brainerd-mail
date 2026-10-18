@@ -1,6 +1,7 @@
 "use client";
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { NavMenu } from "@/components/NavMenu";
 import { ArrowDown, ArrowLeft, ArrowUp, ExternalLink, Plus, Trash2 } from "lucide-react";
 import { Area, Field, ImageFields, Toggle } from "@/components/fields";
 import { REGIONS, type Member } from "@/lib/serving";
@@ -51,7 +52,7 @@ export function RosterEditor({ initial, version }: { initial: Member[]; version:
     <div className="min-h-full bg-mist pb-32">
       <header className="sticky top-0 z-10 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center gap-3">
-          <Link href="/emails" className="flex items-center gap-1 text-sm font-semibold text-brand"><ArrowLeft size={16} />Emails</Link>
+          <NavMenu />
           <h1 className="flex-1 truncate text-center font-serif text-lg font-semibold text-navy">Members serving globally</h1>
           <a href="/serving" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-semibold text-brand">View<ExternalLink size={14} /></a>
         </div>
