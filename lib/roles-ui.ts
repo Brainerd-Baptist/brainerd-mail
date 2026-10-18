@@ -3,7 +3,7 @@ export type Role = "owner" | "admin" | "approver" | "editor" | "viewer";
 export const ROLES: Role[] = ["owner", "admin", "approver", "editor", "viewer"];
 export const ROLE_LABEL: Record<Role, string> = { owner: "Owner", admin: "Admin", approver: "Approver", editor: "Editor", viewer: "Viewer" };
 export const ROLE_BLURB: Record<Role, string> = {
-  owner: "Everything, including changing Admins and handing off ownership. There is only one.",
+  owner: "Can do everything, including changing Admins and handing off ownership. There is only one.",
   admin: "Runs Mail day to day: invites people, edits and approves any ministry's email, reads the Feedback inbox.",
   approver: "Signs off on emails. Approves or sends back any ministry's email and can edit them. Can't manage people.",
   editor: "Builds emails for the ministries assigned to them: edit, schedule, send for approval. Can't approve.",

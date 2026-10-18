@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarDays, Globe, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Users, X } from "lucide-react";
@@ -47,7 +48,7 @@ export function NavMenu() {
   return (
     <>
       <button onClick={() => setOpen(true)} aria-label="Open menu" aria-expanded={open} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink active:bg-[#f4f8fd] lg:hover:bg-[#f4f8fd]"><Menu size={24} /></button>
-      {open ? (
+      {open ? createPortal(
         <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
           <nav className="absolute inset-y-0 left-0 flex w-[min(320px,86vw)] flex-col bg-white pb-[env(safe-area-inset-bottom)] shadow-xl">
@@ -66,7 +67,8 @@ export function NavMenu() {
               <button className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 text-[16px] font-semibold text-muted active:bg-[#f4f8fd]"><LogOut size={20} />Sign out</button>
             </form>
           </nav>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </>
   );
