@@ -13,7 +13,7 @@ export default async function TeamPage() {
   const sb = supabaseAdmin();
   const [{ data: people }, { data: invites }] = await Promise.all([
     sb.from("staff").select("user_id,email,name,role,ministries,disabled_at,created_at").order("created_at", { ascending: true }),
-    sb.from("invites").select("id,email,role,ministries,created_at,expires_at,last_sent_at").is("accepted_at", null).is("revoked_at", null).order("created_at", { ascending: false }),
+    sb.from("invites").select("id,email,first_name,last_name,role,ministries,created_at,expires_at,last_sent_at").is("accepted_at", null).is("revoked_at", null).order("created_at", { ascending: false }),
   ]);
   return <TeamManager me={{ userId: me.userId, role: me.role }} members={(people ?? []) as Member[]} invites={(invites ?? []) as Invite[]} />;
 }

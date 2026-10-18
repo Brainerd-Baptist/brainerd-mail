@@ -41,9 +41,9 @@ export async function GET(req: Request) {
   }
 
   // Everyone else needs a live invitation for this exact address.
-  const { data: inv } = await admin.from("invites").select("id,role,ministries,invited_by").ilike("email", email).is("accepted_at", null).is("revoked_at", null).gt("expires_at", new Date().toISOString()).maybeSingle();
+  const { data: inv } = await admin.from("invites").select("id,role,ministries,invited_by,first_name,last_name").ilike("email", email).is("accepted_at", null).is("revoked_at", null).gt("expires_at", new Date().toISOString()).maybeSingle();
   if (!inv) return denied();
-  const { error: e2 } = await admin.from("staff").insert({ user_id: user.id, email, name, role: inv.role, ministries: inv.ministries ?? [], invited_by: inv.invited_by });
+  const { error: e2 } = await admin.from("staff").insert({ user_id: user.id, email, name: `${inv.first_name ?? ""} ${inv.last_name ?? ""}`.trim() || name, role: inv.role, ministries: inv.ministries ?? [], invited_by: inv.invited_by });
   if (e2) return denied();
   await admin.from("invites").update({ accepted_at: new Date().toISOString(), accepted_user: user.id }).eq("id", inv.id);
   await admin.from("audit_log").insert({ actor: user.id, action: "accept_invite", detail: { email, role: inv.role, ministries: inv.ministries } });

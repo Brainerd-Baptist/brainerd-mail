@@ -15,14 +15,15 @@ const WHAT: Record<Role, string> = {
 };
 
 // The invitation: branded HTML plus a plain-text copy. Sign-in itself is with Google, so the button just opens the sign-in page.
-export async function sendInvite(a: { to: string; role: Role; ministries: string[]; inviterName: string; expiresAt: string }) {
+export async function sendInvite(a: { to: string; firstName?: string; role: Role; ministries: string[]; inviterName: string; expiresAt: string }) {
   const site = siteUrl();
   const url = `${site}/login`;
   const where = a.role === "editor" && a.ministries.length ? ` for ${a.ministries.map((m) => PALETTES[m]?.label ?? m).join(", ")}` : "";
   const label = ROLE_LABEL[a.role];
   const by = a.expiresAt ? new Date(a.expiresAt).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "America/New_York" }) : "";
   const head = "You're invited to Brainerd Mail";
-  const body = `${a.inviterName} added you to Brainerd Mail as ${A(a.role)} ${label}${where}. You'll be able to ${WHAT[a.role]}.`;
+  const hi = a.firstName ? `Hi ${a.firstName}. ` : "";
+  const body = `${hi}${a.inviterName} added you to Brainerd Mail as ${A(a.role)} ${label}${where}. You'll be able to ${WHAT[a.role]}.`;
   const how = `Sign in with your Brainerd Baptist Google account (${a.to}). This invitation is good until ${by}.`;
   const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"></head>
 <body style="margin:0;padding:0;background:#f1f5f9;">

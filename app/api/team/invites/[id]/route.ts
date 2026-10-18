@@ -24,7 +24,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     const expires = new Date(Date.now() + 14 * 86400000).toISOString();
     await sb.from("invites").update({ expires_at: expires, last_sent_at: new Date().toISOString() }).eq("id", inv.id);
     let emailed = true;
-    try { await sendInvite({ to: inv.email, role: inv.role, ministries: inv.ministries ?? [], inviterName: me.name || me.email.split("@")[0], expiresAt: expires }); } catch { emailed = false; }
+    try { await sendInvite({ to: inv.email, firstName: inv.first_name ?? "", role: inv.role, ministries: inv.ministries ?? [], inviterName: me.name || me.email.split("@")[0], expiresAt: expires }); } catch { emailed = false; }
     await sb.from("audit_log").insert({ actor: user.id, action: "resend_invite", detail: { email: inv.email } });
     return NextResponse.json({ ok: true, emailed });
   }

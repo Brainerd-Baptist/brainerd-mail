@@ -9,7 +9,7 @@ import { PALETTES, paletteFor } from "@/lib/ministries";
 import { ROLES, ROLE_BLURB, ROLE_LABEL, canManageTarget, rolesICanGrant, type Role } from "@/lib/roles-ui";
 
 export type Member = { user_id: string; email: string; name: string | null; role: Role; ministries: string[] | null; disabled_at: string | null; created_at: string };
-export type Invite = { id: string; email: string; role: Role; ministries: string[] | null; created_at: string; expires_at: string; last_sent_at: string };
+export type Invite = { id: string; email: string; first_name: string | null; last_name: string | null; role: Role; ministries: string[] | null; created_at: string; expires_at: string; last_sent_at: string };
 
 const PILL: Record<Role, string> = {
   owner: "bg-[#00205b] text-white",
@@ -144,7 +144,8 @@ export function TeamManager({ me, members, invites }: { me: { userId: string; ro
                 const can = canManageTarget(me.role, i.role);
                 return (
                   <li key={i.id} className="px-4 py-3">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><MailPlus size={16} className="text-muted" /><span className="truncate text-[15px] font-semibold text-ink">{i.email}</span><RolePill role={i.role} /></div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><MailPlus size={16} className="text-muted" /><span className="truncate text-[15px] font-semibold text-ink">{[i.first_name, i.last_name].filter(Boolean).join(" ") || i.email}</span><RolePill role={i.role} /></div>
+                    {i.first_name || i.last_name ? <div className="truncate text-sm text-muted">{i.email}</div> : null}
                     <div className="mt-0.5 text-xs text-muted">{scope(i.role, i.ministries)} · {expired ? <span className="font-semibold text-[#8a1020]">expired {day(i.expires_at)}</span> : <>sent {day(i.last_sent_at)}, good until {day(i.expires_at)}</>}</div>
                     {can ? (
                       <div className="mt-2 flex gap-2">
@@ -193,12 +194,18 @@ export function TeamManager({ me, members, invites }: { me: { userId: string; ro
 type Call = (url: string, init: RequestInit, key: string) => Promise<{ ok: boolean; data: any }>;
 
 function InviteSheet({ grant, onClose, onDone, call, busy, err }: { grant: Role[]; onClose: () => void; onDone: (msg: string) => void; call: Call; busy: string; err: string }) {
+  const [first, setFirst] = useState("");
+  const [last, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>(grant.includes("editor") ? "editor" : grant[0]);
   const [ministries, setMinistries] = useState<string[]>([]);
-  const valid = /^[^@\s]+@brainerdbaptist\.org$/i.test(email.trim()) && (role !== "editor" || ministries.length > 0);
+  const valid = !!first.trim() && !!last.trim() && /^[^@\s]+@brainerdbaptist\.org$/i.test(email.trim()) && (role !== "editor" || ministries.length > 0);
   return (
     <Sheet title="Invite someone" onClose={() => !busy && onClose()}>
+      <div className="mb-4 grid grid-cols-2 gap-3">
+        <label className="block"><span className="label">First name</span><input className="field" autoComplete="off" value={first} onChange={(e) => setFirst(e.target.value)} /></label>
+        <label className="block"><span className="label">Last name</span><input className="field" autoComplete="off" value={last} onChange={(e) => setLast(e.target.value)} /></label>
+      </div>
       <label className="mb-4 block"><span className="label">Church email</span>
         <input type="email" inputMode="email" autoCapitalize="none" autoComplete="off" className="field" placeholder="name@brainerdbaptist.org" value={email} onChange={(e) => setEmail(e.target.value)} />
         <span className="mt-1 block text-xs text-muted">Only @brainerdbaptist.org addresses. They sign in with Google.</span>
@@ -207,28 +214,36 @@ function InviteSheet({ grant, onClose, onDone, call, busy, err }: { grant: Role[
       <RolePicker value={role} onChange={setRole} options={grant} />
       {role === "editor" ? <div className="mt-4"><MinistryPicker value={ministries} onChange={setMinistries} /></div> : null}
       {err ? <p role="alert" className="mt-4 rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-      <button disabled={!valid || !!busy} onClick={async () => { const r = await call("/api/team/invites", { method: "POST", body: JSON.stringify({ email, role, ministries }) }, "invite"); if (r.ok) onDone(r.data.emailed === false ? `Invitation saved for ${email.trim()}, but the email didn't go out. Use Resend in a minute.` : `Invitation sent to ${email.trim()}.`); }} className="pill-btn mt-5 w-full bg-[#1e61b9] text-white disabled:bg-[#c4cfdc]">{busy === "invite" ? "Sending…" : "Send invitation"}</button>
+      <button disabled={!valid || !!busy} onClick={async () => { const r = await call("/api/team/invites", { method: "POST", body: JSON.stringify({ firstName: first, lastName: last, email, role, ministries }) }, "invite"); if (r.ok) onDone(r.data.emailed === false ? `Invitation saved for ${first.trim()}, but the email didn't go out. Use Resend in a minute.` : `Invitation sent to ${first.trim()} ${last.trim()} (${email.trim()}).`); }} className="pill-btn mt-5 w-full bg-[#1e61b9] text-white disabled:bg-[#c4cfdc]">{busy === "invite" ? "Sending…" : "Send invitation"}</button>
     </Sheet>
   );
 }
 
 function ManageSheet({ m, me, grant, onClose, onDone, call, busy, err }: { m: Member; me: { userId: string; role: Role }; grant: Role[]; onClose: () => void; onDone: (msg: string) => void; call: Call; busy: string; err: string }) {
+  const parts = nameOf(m).split(" ");
+  const [first, setFirst] = useState(parts[0] ?? "");
+  const [last, setLast] = useState(parts.slice(1).join(" "));
   const [role, setRole] = useState<Role>(m.role);
   const [ministries, setMinistries] = useState<string[]>(m.ministries ?? []);
   const [handoff, setHandoff] = useState(false);
   const [confirm, setConfirm] = useState("");
   const [off, setOff] = useState(false);
-  const changed = role !== m.role || (role === "editor" && JSON.stringify([...ministries].sort()) !== JSON.stringify([...(m.ministries ?? [])].sort()));
+  const fullName = `${first.trim()} ${last.trim()}`.trim();
+  const changed = (!!fullName && fullName !== nameOf(m)) || role !== m.role || (role === "editor" && JSON.stringify([...ministries].sort()) !== JSON.stringify([...(m.ministries ?? [])].sort()));
   const valid = role !== "editor" || ministries.length > 0;
   const url = `/api/team/members/${m.user_id}`;
   return (
     <Sheet title={nameOf(m)} onClose={() => !busy && onClose()}>
       <p className="-mt-2 mb-4 text-sm text-muted">{m.email}</p>
+      <div className="mb-4 grid grid-cols-2 gap-3">
+        <label className="block"><span className="label">First name</span><input className="field" value={first} onChange={(e) => setFirst(e.target.value)} /></label>
+        <label className="block"><span className="label">Last name</span><input className="field" value={last} onChange={(e) => setLast(e.target.value)} /></label>
+      </div>
       <span className="label">Role</span>
       <RolePicker value={role} onChange={setRole} options={grant} />
       {role === "editor" ? <div className="mt-4"><MinistryPicker value={ministries} onChange={setMinistries} /></div> : null}
       {err ? <p role="alert" className="mt-4 rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-      <button disabled={!changed || !valid || !!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ role, ministries }) }, "save"); if (r.ok) onDone(`Saved. ${nameOf(m)} is now ${role === "admin" || role === "approver" || role === "editor" ? "an" : "a"} ${ROLE_LABEL[role]}.`); }} className="pill-btn mt-5 w-full bg-[#1e61b9] text-white disabled:bg-[#c4cfdc]">{busy === "save" ? "Saving…" : "Save changes"}</button>
+      <button disabled={!changed || !valid || !!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ name: fullName, role, ministries }) }, "save"); if (r.ok) onDone(`Saved. ${fullName || nameOf(m)} is now ${role === "admin" || role === "approver" || role === "editor" ? "an" : "a"} ${ROLE_LABEL[role]}.`); }} className="pill-btn mt-5 w-full bg-[#1e61b9] text-white disabled:bg-[#c4cfdc]">{busy === "save" ? "Saving…" : "Save changes"}</button>
 
       <div className="mt-6 space-y-3 border-t border-line pt-4">
         {off ? (

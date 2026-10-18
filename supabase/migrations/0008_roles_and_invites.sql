@@ -40,3 +40,6 @@ create table if not exists invites (
 create unique index if not exists invites_one_pending on invites (lower(email)) where accepted_at is null and revoked_at is null;
 alter table invites enable row level security;
 grant select, insert, update, delete on invites to service_role;
+
+alter table invites add column if not exists first_name text;
+alter table invites add column if not exists last_name text;

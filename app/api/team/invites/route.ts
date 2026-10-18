@@ -12,6 +12,9 @@ export async function POST(req: Request) {
   const { me, sb, user } = w;
   if (!canManageTeam(me)) return NextResponse.json({ error: "Only the owner and admins can invite people." }, { status: 403 });
   const b = await req.json().catch(() => ({}));
+  const clip = (v: unknown) => (typeof v === "string" ? v.trim().replace(/\s+/g, " ").slice(0, 60) : "");
+  const first = clip(b.firstName), last = clip(b.lastName);
+  if (!first || !last) return NextResponse.json({ error: "Add their first and last name." }, { status: 400 });
   const email = typeof b.email === "string" ? b.email.trim().toLowerCase() : "";
   if (!isChurchEmail(email)) return NextResponse.json({ error: "Only @brainerdbaptist.org addresses can be invited." }, { status: 400 });
   if (!isRole(b.role) || !rolesICanGrant(me).includes(b.role)) return NextResponse.json({ error: "You can't give that role." }, { status: 403 });
@@ -26,14 +29,14 @@ export async function POST(req: Request) {
   const { data: pending } = await sb.from("invites").select("id").ilike("email", email).is("accepted_at", null).is("revoked_at", null).maybeSingle();
   let id = pending?.id as string | undefined;
   if (id) {
-    await sb.from("invites").update({ role: b.role, ministries, expires_at: expires, last_sent_at: now.toISOString(), invited_by: user.id }).eq("id", id);
+    await sb.from("invites").update({ first_name: first, last_name: last, role: b.role, ministries, expires_at: expires, last_sent_at: now.toISOString(), invited_by: user.id }).eq("id", id);
   } else {
-    const { data, error } = await sb.from("invites").insert({ email, role: b.role, ministries, invited_by: user.id, expires_at: expires }).select("id").single();
+    const { data, error } = await sb.from("invites").insert({ email, first_name: first, last_name: last, role: b.role, ministries, invited_by: user.id, expires_at: expires }).select("id").single();
     if (error || !data) return NextResponse.json({ error: "Could not save the invitation." }, { status: 502 });
     id = data.id as string;
   }
-  await sb.from("audit_log").insert({ actor: user.id, action: "invite_user", detail: { email, role: b.role, ministries } });
+  await sb.from("audit_log").insert({ actor: user.id, action: "invite_user", detail: { email, name: `${first} ${last}`, role: b.role, ministries } });
   let emailed = true;
-  try { await sendInvite({ to: email, role: b.role, ministries, inviterName: me.name || me.email.split("@")[0], expiresAt: expires }); } catch { emailed = false; }
+  try { await sendInvite({ to: email, firstName: first, role: b.role, ministries, inviterName: me.name || me.email.split("@")[0], expiresAt: expires }); } catch { emailed = false; }
   return NextResponse.json({ ok: true, id, emailed });
 }
