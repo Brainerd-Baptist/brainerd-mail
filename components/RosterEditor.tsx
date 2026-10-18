@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowDown, ArrowLeft, ArrowUp, ExternalLink, Plus, Trash2 } from "lucide-react";
 import { Area, Field, ImageFields, Toggle } from "@/components/fields";
@@ -7,10 +7,11 @@ import { REGIONS, type Member } from "@/lib/serving";
 
 const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : "00000000-0000-4000-8000-" + Math.random().toString(16).slice(2, 14).padEnd(12, "0"));
 
-export function RosterEditor({ initial }: { initial: Member[] }) {
+export function RosterEditor({ initial, version }: { initial: Member[]; version: string }) {
   const [list, setList] = useState<Member[]>(initial);
   const [saved, setSaved] = useState(JSON.stringify(initial));
   const [busy, setBusy] = useState(false);
+  const verRef = useRef(version);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
   const [open, setOpen] = useState<string | null>(null);
@@ -36,10 +37,10 @@ export function RosterEditor({ initial }: { initial: Member[] }) {
   async function save() {
     setBusy(true); setMsg(""); setErr("");
     try {
-      const r = await fetch("/api/roster", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ members: list }) });
+      const r = await fetch("/api/roster", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ members: list, version: verRef.current }) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) { setErr(j.error || "Could not save. Try again."); return; }
-      setSaved(JSON.stringify(list)); setMsg("Saved. The public page updates within a minute.");
+      if (j.version) verRef.current = j.version; setSaved(JSON.stringify(list)); setMsg("Saved. The public page updates within a minute.");
     } catch { setErr("Could not save. Check your connection and try again."); }
     finally { setBusy(false); }
   }

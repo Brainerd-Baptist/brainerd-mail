@@ -7,5 +7,5 @@ export const dynamic = "force-dynamic";
 // Signed-in staff only (middleware.ts). Edits the list shown at /serving.
 export default async function RosterPage() {
   const { data } = await supabaseAdmin().from("serving_members").select("*").order("sort", { ascending: true });
-  return <RosterEditor initial={((data ?? []) as Row[]).map(fromRow)} />;
+  return <RosterEditor initial={((data ?? []) as Row[]).map(fromRow)} version={((data ?? []) as { updated_at?: string }[]).reduce((a, r) => (r.updated_at && r.updated_at > a ? r.updated_at : a), "")} />;
 }

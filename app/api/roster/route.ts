@@ -29,6 +29,12 @@ export async function POST(req: Request) {
   }
 
   const sb = supabaseAdmin();
+  // Stale-copy guard: refuse to save over changes made since this page was opened.
+  const { data: latest } = await sb.from("serving_members").select("updated_at").order("updated_at", { ascending: false }).limit(1);
+  const current = latest?.[0]?.updated_at ? new Date(latest[0].updated_at).getTime() : 0;
+  const seen = typeof body?.version === "string" ? new Date(body.version).getTime() : NaN;
+  if (current && !(seen >= current)) return NextResponse.json({ error: "The list was changed somewhere else since you opened it. Reload this page, then make your edits again.", stale: true }, { status: 409 });
+
   const { error } = await sb.from("serving_members").upsert(rows);
   if (error) return NextResponse.json({ error: "Could not save" }, { status: 502 });
   const { data: existing } = await sb.from("serving_members").select("id");
@@ -36,5 +42,5 @@ export async function POST(req: Request) {
   const gone = (existing ?? []).map((e: { id: string }) => e.id).filter((id) => !keep.has(id));
   if (gone.length) await sb.from("serving_members").delete().in("id", gone);
   revalidatePath("/serving");
-  return NextResponse.json({ ok: true, saved: rows.length });
+  return NextResponse.json({ ok: true, saved: rows.length, version: now });
 }
