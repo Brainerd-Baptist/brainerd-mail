@@ -24,12 +24,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, id: made.id, created: true });
   }
 
+  // Starting from a repeating slot: begin as a copy of the last email in that series, so only what's new changes.
+  let seriesId: string | null = null;
+  if (typeof body.slotId === "string" && /^[0-9a-f-]{36}$/i.test(body.slotId) && typeof body.fromId !== "string") {
+    const { data: slot } = await sb.from("send_slots").select("series_id").eq("id", body.slotId).maybeSingle();
+    if (slot?.series_id) {
+      seriesId = slot.series_id;
+      const { data: last } = await sb.from("emails").select("id").eq("series_id", slot.series_id).order("updated_at", { ascending: false }).limit(1);
+      if (last && last[0]) body.fromId = last[0].id;
+    }
+  }
+
   let doc: EmailDoc;
   if (typeof body.fromId === "string") {
     const { data: src } = await sb.from("emails").select("doc,title").eq("id", body.fromId).maybeSingle();
     if (!src) return NextResponse.json({ error: "That email no longer exists." }, { status: 404 });
     doc = JSON.parse(JSON.stringify(src.doc));
-    doc.title = `${String(src.title || doc.title || "Untitled").replace(/ \(copy\)$/, "")} (copy)`;
+    doc.title = seriesId ? String(src.title || doc.title || "Untitled").replace(/ \(copy\)$/, "") : `${String(src.title || doc.title || "Untitled").replace(/ \(copy\)$/, "")} (copy)`;
   } else {
     const ministry = typeof body.ministry === "string" && PALETTES[body.ministry] ? body.ministry : "church-wide";
     doc = body.start === "october" ? octoberDoc(ministry) : body.start === "starter" || body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
@@ -37,7 +48,7 @@ export async function POST(req: Request) {
 
   // From the calendar: start an email for a day and time (and claim the open slot it came from).
   const plan = typeof body.plannedAt === "string" && !isNaN(new Date(body.plannedAt).getTime()) ? new Date(body.plannedAt).toISOString() : null;
-  const { data: row, error } = await sb.from("emails").insert({ ministry: doc.ministry, title: doc.title || "Untitled", doc, created_by: auth.user.id, planned_at: plan }).select("id").single();
+  const { data: row, error } = await sb.from("emails").insert({ ministry: doc.ministry, title: doc.title || "Untitled", doc, created_by: auth.user.id, planned_at: plan, series_id: seriesId }).select("id").single();
   if (error || !row) return NextResponse.json({ error: "Could not create the email." }, { status: 502 });
   if (typeof body.slotId === "string" && /^[0-9a-f-]{36}$/i.test(body.slotId)) await sb.from("send_slots").update({ email_id: row.id }).eq("id", body.slotId);
   await sb.from("audit_log").insert({ actor: auth.user.id, action: body.fromId ? "duplicate_email" : "create_email", email_id: row.id, detail: {} });

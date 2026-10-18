@@ -3,24 +3,26 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, ArrowLeft, Check, ChevronLeft, ChevronRight, CircleDashed, Clock, ExternalLink, Plus, Trash2, Undo2, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, ChevronLeft, ChevronRight, CircleDashed, Clock, ExternalLink, Pause, Play, Plus, Repeat, SkipForward, Trash2, Undo2, X } from "lucide-react";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import {
-  BADGE, LABEL, dayTitle, etKey, monthGrid, monthTitle, outcome, plannedFor, shiftMonth, shortTime, timeLabel, toLocalInput, whenOf,
+  BADGE, LABEL, approvalDeadline, dayDiff, dayTitle, etKey, monthGrid, monthTitle, outcome, plannedFor, shiftMonth, shortTime, timeLabel, timingNote, toLocalInput, whenOf,
   type CalEmail, type CalSlot, type Kind,
 } from "@/lib/calendar";
+import { describe, repeatOptions, type Series } from "@/lib/series";
 
 type Entry =
   | { type: "email"; at: string; kind: Kind; e: CalEmail }
   | { type: "slot"; at: string; kind: Kind; s: CalSlot };
 
 const ICON: Partial<Record<Kind, JSX.Element>> = {
-  on_time: <Check size={12} />, late: <Clock size={12} />, early: <Clock size={12} />, missed: <AlertTriangle size={12} />,
-  slot: <CircleDashed size={12} />, slot_missed: <AlertTriangle size={12} />, cancelled: <X size={12} />,
+  on_time: <Check size={12} />, late: <Clock size={12} />, missed: <AlertTriangle size={12} />,
+  slot: <CircleDashed size={12} />, slot_missed: <AlertTriangle size={12} />, cancelled: <X size={12} />, skipped: <SkipForward size={12} />,
 };
 const hrefFor = (e: CalEmail) => (e.status === "pending_approval" ? `/review/${e.id}` : `/editor?e=${e.id}`);
+const fullWhen = (iso: string) => new Date(iso).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
 
-export function CalendarView({ ym, today, emails, slots, undated }: { ym: string; today: string; emails: CalEmail[]; slots: CalSlot[]; undated: CalEmail[] }) {
+export function CalendarView({ ym, today, emails, slots, undated, series }: { ym: string; today: string; emails: CalEmail[]; slots: CalSlot[]; undated: CalEmail[]; series: Series[] }) {
   const router = useRouter();
   const [sel, setSel] = useState<string>(today.startsWith(ym) ? today : ym + "-01");
   const [filter, setFilter] = useState("all");
@@ -34,9 +36,11 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
   const [sMin, setSMin] = useState("church-wide");
   const [sAt, setSAt] = useState("");
   const [sLabel, setSLabel] = useState("");
+  const [sRepeat, setSRepeat] = useState("none");
 
   const now = Date.now();
   const grid = useMemo(() => monthGrid(ym), [ym]);
+  const seriesById = useMemo(() => new Map(series.map((s) => [s.id, s])), [series]);
 
   const byDay = useMemo(() => {
     const m = new Map<string, Entry[]>();
@@ -48,22 +52,23 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
     }
     for (const s of slots) {
       if (filter !== "all" && s.ministry !== filter) continue;
-      push(etKey(s.planned_at), { type: "slot", at: s.planned_at, kind: new Date(s.planned_at).getTime() < now - 2 * 3600000 ? "slot_missed" : "slot", s });
+      const kind: Kind = s.skipped ? "skipped" : dayDiff(etKey(s.planned_at), today) > 0 ? "slot_missed" : "slot";
+      push(etKey(s.planned_at), { type: "slot", at: s.planned_at, kind, s });
     }
     m.forEach((l) => l.sort((a, b) => new Date(a.at).getTime() - new Date(b.at).getTime()));
     return m;
-  }, [emails, slots, filter, now]);
+  }, [emails, slots, filter, now, today]);
 
   // Totals for the month on screen (days in the grid that belong to this month).
   const totals = useMemo(() => {
-    const t: Record<string, number> = { planned: 0, on_time: 0, late: 0, missed: 0 };
+    const t = { planned: 0, on_time: 0, late: 0, missed: 0 };
     byDay.forEach((l, k) => {
       if (!k.startsWith(ym)) return;
       for (const en of l) {
         if (en.kind === "on_time") t.on_time++;
-        else if (en.kind === "late" || en.kind === "early") t.late++;
+        else if (en.kind === "late") t.late++;
         else if (en.kind === "missed" || en.kind === "slot_missed") t.missed++;
-        else if (en.kind !== "cancelled") t.planned++;
+        else if (en.kind !== "cancelled" && en.kind !== "skipped") t.planned++;
       }
     });
     return t;
@@ -71,6 +76,7 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
 
   const ministryKeys = Object.keys(PALETTES);
   const dayList = byDay.get(sel) ?? [];
+  const repeatChoices = useMemo(() => (sAt ? repeatOptions(sAt.slice(0, 10)) : []), [sAt]);
 
   async function call(url: string, init: RequestInit, key: string) {
     setBusy(key); setErr("");
@@ -82,7 +88,8 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
     } catch (e: any) { setErr(e.message); return null; }
     finally { setBusy(null); }
   }
-  const post = (url: string, body: unknown, key: string) => call(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }, key);
+  const send = (method: string, url: string, body: unknown, key: string) => call(url, { method, headers: { "Content-Type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) }, key);
+  const post = (url: string, body: unknown, key: string) => send("POST", url, body, key);
 
   async function markSent(e: CalEmail) {
     const j = await post(`/api/emails/${e.id}/mark-sent`, { sentAt: markAt ? new Date(markAt).toISOString() : undefined }, e.id);
@@ -93,28 +100,49 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
     const j = await call(`/api/emails/${e.id}/mark-sent`, { method: "DELETE" }, e.id);
     if (j) router.refresh();
   }
-  async function move(e: CalEmail) {
+  async function moveEmail(e: CalEmail) {
     const j = await post(`/api/emails/${e.id}/plan`, { plannedAt: moveAt ? new Date(moveAt).toISOString() : null }, e.id);
+    if (j) { setMoveOpen(null); router.refresh(); }
+  }
+  async function moveSlot(s: CalSlot) {
+    if (!moveAt) return;
+    const j = await send("PATCH", `/api/calendar/slots/${s.id}`, { plannedAt: new Date(moveAt).toISOString() }, s.id);
     if (j) { setMoveOpen(null); router.refresh(); }
   }
   async function addSlot() {
     if (!sAt) { setErr("Pick a day and time."); return; }
-    const j = await post("/api/calendar/slots", { ministry: sMin, plannedAt: new Date(sAt).toISOString(), label: sLabel }, "slot");
-    if (j) { setAdding(false); setSLabel(""); router.refresh(); }
+    if (sRepeat !== "none" && !sLabel.trim()) { setErr("Give the repeating email a name, like “Monthly Kids update”."); return; }
+    const j = sRepeat === "none"
+      ? await post("/api/calendar/slots", { ministry: sMin, plannedAt: new Date(sAt).toISOString(), label: sLabel }, "slot")
+      : await post("/api/calendar/series", { ministry: sMin, label: sLabel, repeat: sRepeat, date: sAt.slice(0, 10), time: sAt.slice(11, 16) }, "slot");
+    if (j) { setAdding(false); setSLabel(""); setSRepeat("none"); router.refresh(); }
   }
   async function removeSlot(s: CalSlot) {
-    if (!confirm("Remove this open slot?")) return;
+    if (!confirm(s.series_id ? "Skip this one? The rest of the series stays." : "Remove this open slot?")) return;
     const j = await call(`/api/calendar/slots/${s.id}`, { method: "DELETE" }, s.id);
+    if (j) router.refresh();
+  }
+  async function restoreSlot(s: CalSlot) {
+    const j = await send("PATCH", `/api/calendar/slots/${s.id}`, { skipped: false }, s.id);
     if (j) router.refresh();
   }
   async function startEmail(s: CalSlot) {
     const j = await post("/api/emails", { ministry: s.ministry, start: "starter", plannedAt: s.planned_at, slotId: s.id }, s.id);
     if (j) router.push(`/editor?e=${j.id}`);
   }
+  async function pauseSeries(s: Series) {
+    const j = await send("PATCH", `/api/calendar/series/${s.id}`, { paused: !s.paused }, s.id);
+    if (j) router.refresh();
+  }
+  async function stopSeries(s: Series) {
+    if (!confirm(`Stop “${s.label}” repeating? Empty slots coming up are removed. Emails already started keep their dates.`)) return;
+    const j = await call(`/api/calendar/series/${s.id}`, { method: "DELETE" }, s.id);
+    if (j) router.refresh();
+  }
   function openAdd() {
     const d = new Date(sel + "T12:00:00");
     d.setHours(7, 0, 0, 0);
-    setSAt(toLocalInput(d)); setAdding(true); setErr("");
+    setSAt(toLocalInput(d)); setSRepeat("none"); setAdding(true); setErr("");
   }
 
   const present = Array.from(new Set([...emails.map((e) => e.ministry), ...slots.map((s) => s.ministry)]));
@@ -126,7 +154,7 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
           <Link href="/emails" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><ArrowLeft size={18} /><span className="hidden sm:inline">Emails</span></Link>
           <span className="flex items-center gap-3"><img src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={112} height={17} className="h-[17px] w-auto" /><span className="text-[15px] font-bold tracking-[0.16em] text-navy">MAIL</span></span>
           <span className="flex-1" />
-          <button onClick={openAdd} className="pill-btn bg-[#1e61b9] text-white"><Plus size={16} className="mr-1.5" />Reserve a slot</button>
+          <button onClick={openAdd} className="pill-btn bg-[#1e61b9] text-white"><Plus size={16} className="mr-1.5" />Plan an email</button>
         </div>
       </header>
 
@@ -141,7 +169,7 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <span className={`rounded-full px-3 py-1 ${BADGE.draft}`}>{totals.planned} coming up</span>
           <span className={`rounded-full px-3 py-1 ${BADGE.on_time}`}>{totals.on_time} sent on time</span>
-          <span className={`rounded-full px-3 py-1 ${BADGE.late}`}>{totals.late} sent early or late</span>
+          <span className={`rounded-full px-3 py-1 ${BADGE.late}`}>{totals.late} sent late</span>
           <span className={`rounded-full px-3 py-1 ${BADGE.missed}`}>{totals.missed} missed</span>
         </div>
 
@@ -153,7 +181,7 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
           </div>
         ) : null}
 
-        {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
+        {err && !adding ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
         <div className="overflow-hidden rounded-xl border border-line bg-white">
           <div className="grid grid-cols-7 border-b border-line bg-[#f7f9fc] text-center text-xs font-semibold text-muted">
@@ -193,7 +221,7 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
         <section aria-label={dayTitle(sel)} className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-serif text-xl font-semibold text-navy">{dayTitle(sel)}</h2>
-            <button onClick={openAdd} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-[#1e61b9] hover:bg-[#f4f8fd]"><Plus size={16} />Reserve a slot</button>
+            <button onClick={openAdd} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-[#1e61b9] hover:bg-[#f4f8fd]"><Plus size={16} />Plan an email</button>
           </div>
           {dayList.length === 0 ? (
             <div className="rounded-xl border border-dashed border-line bg-white p-6 text-center text-[15px] text-muted">Nothing planned for this day.</div>
@@ -203,6 +231,10 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
                 const m = en.type === "email" ? en.e.ministry : en.s.ministry;
                 const p = paletteFor(m);
                 const id = en.type === "email" ? en.e.id : en.s.id;
+                const plan = en.type === "email" ? plannedFor(en.e) : en.s.planned_at;
+                const note = en.type === "email" ? timingNote(en.e, now) : null;
+                const ser = en.type === "slot" && en.s.series_id ? seriesById.get(en.s.series_id) : en.type === "email" && en.e.series_id ? seriesById.get(en.e.series_id) : undefined;
+                const dueIso = plan && new Date(plan).getTime() > now ? approvalDeadline(plan) : null;
                 return (
                   <li key={id} className={`flex overflow-hidden rounded-xl border border-line bg-white ${busy === id ? "opacity-60" : ""}`}>
                     <span className="w-1.5 shrink-0" style={{ background: p.button }} />
@@ -210,6 +242,8 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                         <span className="font-semibold" style={{ color: p.dark }}>{p.label}</span>
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ${BADGE[en.kind]}`}>{ICON[en.kind]}{LABEL[en.kind]}</span>
+                        {note ? <span className={`font-semibold ${en.kind === "missed" || en.kind === "late" ? "text-[#8a3b00]" : "text-muted"}`}>{note}</span> : null}
+                        {ser ? <span className="inline-flex items-center gap-1 text-muted"><Repeat size={12} />{describe(ser)}</span> : null}
                       </div>
                       {en.type === "email" ? (
                         <>
@@ -219,6 +253,7 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
                             {plannedFor(en.e) ? <>Planned {timeLabel(plannedFor(en.e)!)} ET</> : "No planned time"}
                             {en.e.sent_at ? <> &middot; Sent {new Date(en.e.sent_at).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" })} at {timeLabel(en.e.sent_at)} ET</> : null}
                           </p>
+                          {en.e.status === "draft" && dueIso ? <p className="mt-1 text-sm text-muted">Send it for approval by {fullWhen(dueIso)} to allow 72 hours.</p> : null}
                           <div className="mt-3 flex flex-wrap gap-2">
                             <Link href={hrefFor(en.e)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold text-[#1e61b9]"><ExternalLink size={15} />Open email</Link>
                             {en.e.status !== "sent" && en.e.status !== "cancelled" ? (
@@ -238,18 +273,33 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
                           {moveOpen === en.e.id ? (
                             <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-[#f7f9fc] p-3">
                               <label className="block"><span className="label">Planned to go out</span><input type="datetime-local" className="field" value={moveAt} onChange={(ev) => setMoveAt(ev.target.value)} /></label>
-                              <button onClick={() => move(en.e)} disabled={busy === en.e.id} className="pill-btn bg-[#1e61b9] text-white disabled:opacity-60">Save</button>
+                              <button onClick={() => moveEmail(en.e)} disabled={busy === en.e.id} className="pill-btn bg-[#1e61b9] text-white disabled:opacity-60">Save</button>
                             </div>
                           ) : null}
                         </>
                       ) : (
                         <>
                           <p className="mt-1 truncate text-[16px] font-semibold text-ink">{en.s.label || "Open slot"}</p>
-                          <p className="mt-1 text-sm text-muted">Reserved for {timeLabel(en.s.planned_at)} ET. No email yet.</p>
+                          <p className="mt-1 text-sm text-muted">{en.s.skipped ? "Skipped. It won’t count as missed." : `Reserved for ${timeLabel(en.s.planned_at)} ET. No email yet.`}</p>
+                          {!en.s.skipped && dueIso ? <p className="mt-1 text-sm text-muted">Send it for approval by {fullWhen(dueIso)} to allow 72 hours.</p> : null}
+                          {!en.s.skipped && en.s.series_id ? <p className="mt-1 text-sm text-muted">Starting it copies the last email in this series, so you only update what’s new.</p> : null}
                           <div className="mt-3 flex flex-wrap gap-2">
-                            <button onClick={() => startEmail(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[#1e61b9] px-4 text-sm font-semibold text-white disabled:opacity-60"><Plus size={15} />Start the email</button>
-                            <button onClick={() => removeSlot(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted disabled:opacity-60"><Trash2 size={15} />Remove</button>
+                            {en.s.skipped ? (
+                              <button onClick={() => restoreSlot(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold text-ink disabled:opacity-60"><Undo2 size={15} />Restore</button>
+                            ) : (
+                              <>
+                                <button onClick={() => startEmail(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[#1e61b9] px-4 text-sm font-semibold text-white disabled:opacity-60"><Plus size={15} />Start the email</button>
+                                <button onClick={() => { setMoveOpen(moveOpen === en.s.id ? null : en.s.id); setMoveAt(toLocalInput(new Date(en.s.planned_at))); }} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted"><Clock size={15} />Change time</button>
+                                <button onClick={() => removeSlot(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted disabled:opacity-60">{en.s.series_id ? <><SkipForward size={15} />Skip this one</> : <><Trash2 size={15} />Remove</>}</button>
+                              </>
+                            )}
                           </div>
+                          {moveOpen === en.s.id ? (
+                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-[#f7f9fc] p-3">
+                              <label className="block"><span className="label">Goes out</span><input type="datetime-local" className="field" value={moveAt} onChange={(ev) => setMoveAt(ev.target.value)} /></label>
+                              <button onClick={() => moveSlot(en.s)} disabled={busy === en.s.id} className="pill-btn bg-[#1e61b9] text-white disabled:opacity-60">Save</button>
+                            </div>
+                          ) : null}
                         </>
                       )}
                     </div>
@@ -259,6 +309,28 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
             </ul>
           )}
         </section>
+
+        {series.length > 0 ? (
+          <section className="space-y-2 pt-2">
+            <h2 className="font-serif text-lg font-semibold text-navy">Repeating emails</h2>
+            <ul className="space-y-2">
+              {series.map((s) => {
+                const p = paletteFor(s.ministry);
+                return (
+                  <li key={s.id} className={`flex items-center gap-3 rounded-xl border border-line bg-white p-3 ${busy === s.id ? "opacity-60" : ""}`}>
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: p.button }} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[15px] font-semibold text-ink">{s.label}{s.paused ? " (paused)" : ""}</span>
+                      <span className="block truncate text-xs text-muted">{p.label} &middot; {describe(s)}{s.ends_on ? ` until ${s.ends_on}` : ""}</span>
+                    </span>
+                    <button onClick={() => pauseSeries(s)} disabled={!!busy} aria-label={s.paused ? "Resume" : "Pause"} title={s.paused ? "Resume" : "Pause"} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 disabled:opacity-40">{s.paused ? <Play size={18} /> : <Pause size={18} />}</button>
+                    <button onClick={() => stopSeries(s)} disabled={!!busy} aria-label="Stop repeating" title="Stop repeating" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-[#c8102e] disabled:opacity-40"><Trash2 size={18} /></button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : null}
 
         {undated.length > 0 ? (
           <section className="space-y-2 pt-2">
@@ -275,16 +347,22 @@ export function CalendarView({ ym, today, emails, slots, undated }: { ym: string
 
       {adding ? (
         <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={() => busy !== "slot" && setAdding(false)}>
-          <div className="w-full rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">Reserve a slot</h2><button aria-label="Close" onClick={() => setAdding(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
-            <p className="mb-4 text-sm text-muted">Hold a day and time for a ministry before the email exists, so everyone can see the plan.</p>
+          <div className="max-h-[92dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">Plan an email</h2><button aria-label="Close" onClick={() => setAdding(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
+            <p className="mb-4 text-sm text-muted">Hold a day and time for a ministry before the email exists, once or on a repeat, so everyone can see the plan.</p>
             <label className="mb-3 block"><span className="label">Ministry</span>
               <select className="field" value={sMin} onChange={(e) => setSMin(e.target.value)}>{ministryKeys.map((k) => <option key={k} value={k}>{PALETTES[k].label}</option>)}</select>
             </label>
             <label className="mb-3 block"><span className="label">Goes out</span><input type="datetime-local" className="field" value={sAt} onChange={(e) => setSAt(e.target.value)} /></label>
-            <label className="mb-5 block"><span className="label">What is it for? (optional)</span><input className="field" value={sLabel} maxLength={120} onChange={(e) => setSLabel(e.target.value)} placeholder="Weekly update, Fall Fest, …" /></label>
+            <label className="mb-3 block"><span className="label">Repeat</span>
+              <select className="field" value={sRepeat} onChange={(e) => setSRepeat(e.target.value)}>
+                <option value="none">Doesn’t repeat</option>
+                {repeatChoices.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </label>
+            <label className="mb-5 block"><span className="label">{sRepeat === "none" ? "What is it for? (optional)" : "Name"}</span><input className="field" value={sLabel} maxLength={120} onChange={(e) => setSLabel(e.target.value)} placeholder={sRepeat === "none" ? "Fall Fest announcement, …" : "Monthly Kids update"} /></label>
             {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
-            <button onClick={addSlot} disabled={busy === "slot"} className="pill-btn w-full bg-[#1e61b9] text-white disabled:opacity-60">{busy === "slot" ? "Saving…" : "Reserve slot"}</button>
+            <button onClick={addSlot} disabled={busy === "slot"} className="pill-btn w-full bg-[#1e61b9] text-white disabled:opacity-60">{busy === "slot" ? "Saving…" : sRepeat === "none" ? "Reserve slot" : "Start repeating"}</button>
           </div>
         </div>
       ) : null}
