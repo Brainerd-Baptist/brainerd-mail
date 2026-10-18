@@ -75,6 +75,7 @@ function photosOf(b: Block): { slot: string; img: Img }[] {
     case "hero": return b.showImage && b.image?.url ? [{ slot: "header", img: b.image }] : [];
     case "photo": return b.image.url ? [{ slot: "photo", img: b.image }] : [];
     case "partners": return b.showImages ? b.items.flatMap((i) => (i.image?.url ? [{ slot: i.id, img: i.image }] : [])) : [];
+    case "travel": return b.teams.flatMap((t) => (t.image?.url ? [{ slot: t.id, img: t.image }] : []));
     default: return [];
   }
 }

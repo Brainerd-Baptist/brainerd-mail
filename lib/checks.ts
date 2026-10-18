@@ -18,6 +18,7 @@ function images(b: Block): { alt: string; url: string }[] {
     case "hero": return b.showImage && b.image?.url ? [b.image] : [];
     case "photo": return b.image.url ? [b.image] : [];
     case "partners": return b.showImages ? b.items.filter((i) => i.image?.url).map((i) => i.image!) : [];
+    case "travel": return b.teams.filter((t) => t.image?.url).map((t) => t.image!);
     default: return [];
   }
 }

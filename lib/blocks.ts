@@ -11,7 +11,7 @@ export type HeroBlock = {
   image?: Img; showImage: boolean; button?: Btn;
 };
 export type TextBlock = { id: string; type: "text"; heading: string; body: string };
-export type TravelTeam = { id: string; name: string; dates: string; places: string; prayer: string[] };
+export type TravelTeam = { id: string; name: string; dates: string; places: string; prayer: string[]; image?: Img };
 export type TravelBlock = {
   id: string; type: "travel"; heading: string;
   teams: TravelTeam[]; layout: "side-by-side" | "stacked";

@@ -106,7 +106,7 @@ ${button(b.button, "primary", p, o, b.id)}
         `${b.heading ? `<h2 class="dm-head" style="margin:0 0 12px 0;font-family:${SERIF};font-weight:600;font-size:24px;line-height:1.2;color:${p.dark};">${esc(b.heading)}</h2>` : ""}${paragraphs(b.body, "#33445d")}`
       );
     case "travel": {
-      const cardOf = (t: (typeof b.teams)[number]) => `<table role="presentation" width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;height:100%;"><tr><td valign="top" style="padding:24px;">
+      const cardOf = (t: (typeof b.teams)[number]) => `<table role="presentation" width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;overflow:hidden;height:100%;">${t.image?.url ? `<tr><td style="line-height:0;font-size:0;">${image(t.image, o, "width:100%;height:auto;display:block;border:0;")}</td></tr>` : ""}<tr><td valign="top" style="padding:24px;">
 <h3 class="dm-head" style="margin:0 0 12px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(t.name)}</h3>
 <div style="margin:0 0 14px 0;"><span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(t.dates)}</span>${t.places ? `<span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(t.places)}</span>` : ""}</div>
 ${bullets(t.prayer, "PRAY FOR", "#33445d", p.button)}

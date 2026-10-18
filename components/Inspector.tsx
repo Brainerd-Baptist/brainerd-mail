@@ -43,6 +43,7 @@ export default function Inspector({ block, onChange }: P) {
               <Field label="Team name" value={t.name} onChange={(v) => upd(t.id, { name: v })} />
               <Field label="Dates" value={t.dates} onChange={(v) => upd(t.id, { dates: v })} />
               <Field label="Places or team initials" value={t.places} onChange={(v) => upd(t.id, { places: v })} />
+              <ImageFields label="Photo (optional, cropped to 3:2)" aspect={1.5} value={t.image} onChange={(v) => upd(t.id, { image: v })} />
               <Lines label="Pray for" value={t.prayer} onChange={(v) => upd(t.id, { prayer: v })} />
             </div>
           ))}
