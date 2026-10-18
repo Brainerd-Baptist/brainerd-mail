@@ -212,8 +212,9 @@ function stripe(color: string): string {
 }
 
 export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
-  const p = paletteFor(doc.ministry);
-  const mk = mark(o, p.key);
+  const pm = paletteFor(doc.ministry);
+  const p = doc.theme && doc.theme !== doc.ministry ? { ...paletteFor(doc.theme), label: pm.label, name: pm.name } : pm;
+  const mk = mark(o, pm.key);
   const masthead = (mk
     ? bar(p.dark, `<div style="line-height:0;font-size:0;">${mk}</div>`, "26px 40px")
     : bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px")) + "\n" + stripe(p.bright);

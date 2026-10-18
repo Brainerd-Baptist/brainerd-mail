@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PALETTES } from "@/lib/ministries";
-import { blankDoc, octoberDoc, templateDoc } from "@/lib/templates/blank";
+import { blankDoc, octoberDoc, templateDoc, OCTOBER } from "@/lib/templates/blank";
 import type { EmailDoc } from "@/lib/blocks";
 
 // Creates an email: blank, from the Missions template, or a copy of an existing one.
@@ -11,6 +11,18 @@ export async function POST(req: Request) {
   if (!auth.user) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
   const body = await req.json().catch(() => ({}));
   const sb = supabaseAdmin();
+
+  // Opens a ministry's own email: its most recent unsent one, or a fresh one if it has none.
+  if (typeof body.openMinistry === "string" && PALETTES[body.openMinistry]) {
+    const m: string = body.openMinistry;
+    const { data: found } = await sb.from("emails").select("id").eq("ministry", m).not("status", "in", "(sent,sending,cancelled)").order("updated_at", { ascending: false }).limit(1);
+    if (found && found[0]) return NextResponse.json({ ok: true, id: found[0].id, created: false });
+    const d = OCTOBER[m] ? octoberDoc(m) : templateDoc(m);
+    const { data: made, error: e2 } = await sb.from("emails").insert({ ministry: m, title: d.title || "Untitled", doc: d, created_by: auth.user.id }).select("id").single();
+    if (e2 || !made) return NextResponse.json({ error: "Could not open that ministry's email." }, { status: 502 });
+    await sb.from("audit_log").insert({ actor: auth.user.id, action: "create_email", email_id: made.id, detail: { via: "switcher" } });
+    return NextResponse.json({ ok: true, id: made.id, created: true });
+  }
 
   let doc: EmailDoc;
   if (typeof body.fromId === "string") {

@@ -37,6 +37,7 @@ export type Block = (
 
 export type EmailDoc = {
   ministry: string; // key into PALETTES
+  theme?: string; // optional color override (key into PALETTES); logo stays the ministry's
   title: string; // internal name
   subject: string;
   previewText: string;

@@ -75,7 +75,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const inflightRef = useRef(false);
   const stateRef = useRef<SaveState>("saved");
   const backupKey = `brainerd-mail:draft:${emailId}`;
-  const palette = paletteFor(doc.ministry);
+  const palette = paletteFor(doc.theme ?? doc.ministry);
 
   // Load this email from the database. A copy kept on this device is only used if edits
   // were made after the last successful save (for example, the phone lost signal).
@@ -305,10 +305,28 @@ export default function Builder({ emailId }: { emailId: string }) {
   const statusPill = blocking ? `${blocking} to fix` : warns ? `${warns} suggestion${warns > 1 ? "s" : ""}` : "All clear";
   const statusColor = blocking ? "text-[#c8102e]" : warns ? "text-[#9a5a00]" : "text-[#1e7a4c]";
 
+  const [switching, setSwitching] = useState(false);
+  async function openMinistry(key: string) {
+    if (key === doc.ministry || switching) return;
+    setSwitching(true);
+    try {
+      await flushSave();
+      const r = await fetch("/api/emails", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ openMinistry: key }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.id) router.push(`/editor?e=${j.id}`); else { setStatus(j.error || "Couldn’t open that email."); setSwitching(false); }
+    } catch { setStatus("Couldn’t open that email."); setSwitching(false); }
+  }
   const ministrySelect = (
-    <select aria-label="Ministry" className="rounded-full border border-line bg-white px-3 py-1.5 text-sm font-semibold" style={{ color: palette.dark }} value={doc.ministry} onChange={(e) => setDoc({ ...doc, ministry: e.target.value })}>
+    <select aria-label="Ministry email" disabled={switching} className="rounded-full border border-line bg-white px-3 py-1.5 text-sm font-semibold disabled:opacity-60" style={{ color: palette.dark }} value={doc.ministry} onChange={(e) => openMinistry(e.target.value)}>
       {Object.values(PALETTES).map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
     </select>
+  );
+  const colorSelect = (
+    <label className="block"><span className="label">Colors</span>
+      <select aria-label="Color theme" className="field" value={doc.theme ?? doc.ministry} onChange={(e) => setDoc({ ...doc, theme: e.target.value === doc.ministry ? undefined : e.target.value })}>
+        {Object.values(PALETTES).map((p) => <option key={p.key} value={p.key}>{p.label}{p.key === doc.ministry ? " (this ministry's own)" : ""}</option>)}
+      </select>
+    </label>
   );
 
   const deviceToggle = (kinds: Device[]) => (
@@ -348,6 +366,7 @@ export default function Builder({ emailId }: { emailId: string }) {
       <h2 className="font-serif text-xl font-semibold text-navy">Email details</h2>
       <Field label="Subject line" value={doc.subject} onChange={(v) => setDoc({ ...doc, subject: v })} hint={`${doc.subject.length} characters`} />
       <Area label="Preview text" value={doc.previewText} onChange={(v) => setDoc({ ...doc, previewText: v })} rows={2} hint="The gray line people see next to the subject" />
+      {colorSelect}
       <Area label="Footer note" value={doc.footerNote} onChange={(v) => setDoc({ ...doc, footerNote: v })} rows={3} />
     </div>
   );
