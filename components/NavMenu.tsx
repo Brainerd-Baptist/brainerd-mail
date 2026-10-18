@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Globe, LifeBuoy, LogOut, Mail, Menu, Users, X } from "lucide-react";
+import { CalendarDays, Globe, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Users, X } from "lucide-react";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { ROLE_LABEL, type Role } from "@/lib/roles-ui";
 
@@ -62,6 +62,7 @@ export function NavMenu() {
             </div>
             <form action="/auth/signout" method="post" className="border-t border-line p-3">
               {who ? <p className="px-4 pb-2 text-sm text-muted"><span className="font-semibold text-ink">{who.name}</span>{who.role ? ` · ${who.role}` : ""}</p> : null}
+              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-tour")); }} className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 text-[16px] font-semibold text-muted active:bg-[#f4f8fd]"><HelpCircle size={20} />Take the tour</button>
               <button className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 text-[16px] font-semibold text-muted active:bg-[#f4f8fd]"><LogOut size={20} />Sign out</button>
             </form>
           </nav>

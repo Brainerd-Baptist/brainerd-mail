@@ -63,7 +63,10 @@ function MinistryPicker({ value, onChange }: { value: string[]; onChange: (v: st
   );
 }
 
-export function TeamManager({ me, members, invites }: { me: { userId: string; role: Role }; members: Member[]; invites: Invite[] }) {
+const stamp = (iso: string) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
+const seen = (map: Record<string, string | null> | null, id: string) => (map ? (map[id] ? `Last signed in ${stamp(map[id]!)}` : "Has never signed in") : null);
+
+export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId: string; role: Role }; members: Member[]; invites: Invite[]; lastSignIn: Record<string, string | null> | null }) {
   const router = useRouter();
   const [inviteOpen, setInviteOpen] = useState(false);
   const [editing, setEditing] = useState<Member | null>(null);
@@ -126,6 +129,7 @@ export function TeamManager({ me, members, invites }: { me: { userId: string; ro
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="truncate text-[15px] font-semibold text-ink">{nameOf(m)}{mine ? " (you)" : ""}</span><RolePill role={m.role} /></div>
                     <div className="truncate text-sm text-muted">{m.email}</div>
                     <div className="truncate text-xs text-muted">{scope(m.role, m.ministries)} · joined {day(m.created_at)}</div>
+                    {lastSignIn ? <div className="truncate text-xs font-semibold text-[#00205b]">{seen(lastSignIn, m.user_id)}</div> : null}
                   </div>
                   {can ? <button onClick={() => { setErr(""); setNote(""); setEditing(m); }} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink">Manage</button>
                     : me.role === "owner" && !mine ? null : null}
@@ -161,13 +165,13 @@ export function TeamManager({ me, members, invites }: { me: { userId: string; ro
         ) : null}
 
         {off.length ? (
-          <section aria-label="Deactivated" className="overflow-hidden rounded-2xl border border-line bg-white">
-            <h2 className="border-b border-line px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">Deactivated · {off.length}</h2>
+          <section aria-label="Removed" className="overflow-hidden rounded-2xl border border-line bg-white">
+            <h2 className="border-b border-line px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">Removed · {off.length}</h2>
             <ul className="divide-y divide-line">
               {off.map((m) => (
                 <li key={m.user_id} className="flex items-center gap-3 px-4 py-3">
-                  <div className="min-w-0 flex-1"><div className="truncate text-[15px] font-semibold text-muted">{nameOf(m)}</div><div className="truncate text-sm text-muted">{m.email} · {ROLE_LABEL[m.role]}</div></div>
-                  {canManageTarget(me.role, m.role) ? <button disabled={!!busy} onClick={async () => { const r = await call(`/api/team/members/${m.user_id}`, { method: "PATCH", body: JSON.stringify({ disabled: false }) }, m.user_id); if (r.ok) { setNote(`${nameOf(m)} can sign in again.`); router.refresh(); } }} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink disabled:opacity-60">Reactivate</button> : null}
+                  <div className="min-w-0 flex-1"><div className="truncate text-[15px] font-semibold text-muted">{nameOf(m)}</div><div className="truncate text-sm text-muted">{m.email} · {ROLE_LABEL[m.role]}</div>{lastSignIn ? <div className="truncate text-xs text-muted">{seen(lastSignIn, m.user_id)}</div> : null}</div>
+                  {canManageTarget(me.role, m.role) ? <button disabled={!!busy} onClick={async () => { const r = await call(`/api/team/members/${m.user_id}`, { method: "PATCH", body: JSON.stringify({ disabled: false }) }, m.user_id); if (r.ok) { setNote(`${nameOf(m)} has access again.`); router.refresh(); } }} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink disabled:opacity-60">Restore access</button> : null}
                 </li>
               ))}
             </ul>
@@ -248,13 +252,13 @@ function ManageSheet({ m, me, grant, onClose, onDone, call, busy, err }: { m: Me
       <div className="mt-6 space-y-3 border-t border-line pt-4">
         {off ? (
           <div className="rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]">
-            <p><b>Deactivate {nameOf(m)}?</b> They are signed out on their next click and can't get back in until you reactivate them. Their past work stays.</p>
+            <p><b>Remove {nameOf(m)}'s access?</b> They are signed out on their next click and can't sign in again unless you restore access. Their name and past work stay on the history.</p>
             <div className="mt-3 flex gap-2">
-              <button disabled={!!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ disabled: true }) }, "off"); if (r.ok) onDone(`${nameOf(m)} was deactivated.`); }} className="pill-btn bg-[#c8102e] text-white disabled:opacity-60">{busy === "off" ? "Working…" : "Deactivate"}</button>
+              <button disabled={!!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ disabled: true }) }, "off"); if (r.ok) onDone(`${nameOf(m)} no longer has access.`); }} className="pill-btn bg-[#c8102e] text-white disabled:opacity-60">{busy === "off" ? "Working…" : "Remove access"}</button>
               <button onClick={() => setOff(false)} className="pill-btn text-muted">Keep them</button>
             </div>
           </div>
-        ) : <button onClick={() => { setOff(true); setHandoff(false); }} className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-semibold text-[#8a1020]">Deactivate…</button>}
+        ) : <button onClick={() => { setOff(true); setHandoff(false); }} className="inline-flex min-h-11 items-center rounded-full border border-line px-4 text-sm font-semibold text-[#8a1020]">Remove access…</button>}
 
         {me.role === "owner" ? (
           handoff ? (
