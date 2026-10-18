@@ -91,13 +91,13 @@ function section(inner: string, pad = "32px 40px 8px 40px"): string {
 function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
   switch (b.type) {
     case "hero": {
-      const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
+      const img = b.showImage ? image(b.image, o, "width:100%;max-width:260px;height:auto;display:block;border:0;border-radius:12px;") : "";
       const kicker = [p.name === "BRAINERD" ? "" : p.label, b.eyebrow].filter(Boolean).join("  ·  ");
       return `<tr><td class="px dm-hero" style="background:${p.tint};padding:30px 40px 34px 40px;">
 ${kicker ? `<div style="margin:0 0 10px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}
 <h1 class="h1 dm-head" style="margin:0 0 14px 0;font-family:${SERIF};font-weight:700;font-size:40px;line-height:1.1;color:${p.dark};">${esc(b.headline)}</h1>
 ${b.body ? `<p class="dm-text" style="margin:0 0 20px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:#33445d;max-width:500px;">${esc(b.body)}</p>` : ""}
-${img ? `<div style="margin:0 0 20px 0;">${img}</div>` : ""}
+${img ? `<div style="margin:0 0 18px 0;">${img}</div>` : ""}
 ${button(b.button, "primary", p, o, b.id)}
 </td></tr>`;
     }
@@ -185,7 +185,6 @@ function stripe(color: string): string {
 export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
   const p = paletteFor(doc.ministry);
   const masthead = bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px") + "\n" + stripe(p.bright);
-  const footBar = stripe(p.bright) + "\n" + bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px");
   const blocks = doc.blocks
     .filter((b) => !b.hidden)
     .map((b) => {
@@ -256,7 +255,6 @@ ${o.contactEmail ? `<p class="dm-text" style="margin:0 0 16px 0;font-family:${SA
 <div style="margin:0 0 16px 0;">${links}</div>
 <p class="dm-muted" style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:#5b6b80;">${esc(o.address)}</p>
 </td></tr>
-${footBar}
 </table>
 </td></tr></table>
 ${webScript}
