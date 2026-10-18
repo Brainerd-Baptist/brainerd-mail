@@ -87,7 +87,7 @@ const MARKS: Record<string, { w: number; h: number }> = {
   men: { w: 220, h: 22 },
   women: { w: 232, h: 24 },
   students: { w: 150, h: 39 },
-  bx: { w: 96, h: 42 },
+  bx: { w: 74, h: 32 },
 };
 function mark(o: RenderOpts, key: string): string | null {
   const m = MARKS[key];
