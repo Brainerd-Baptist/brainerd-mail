@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History } from "lucide-react";
+import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History, Undo2, Redo2 } from "lucide-react";
 import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc } from "@/lib/blocks";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
@@ -74,6 +74,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const dirtyRef = useRef(false);
   const inflightRef = useRef(false);
   const stateRef = useRef<SaveState>("saved");
+  const idleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const backupKey = `brainerd-mail:draft:${emailId}`;
   const palette = paletteFor(doc.theme ?? doc.ministry);
 
@@ -126,6 +127,8 @@ export default function Builder({ emailId }: { emailId: string }) {
         if (!r.ok) { dirtyRef.current = true; setSave("error", "Couldn’t save. Will keep trying."); return false; }
         versionRef.current = j.version;
         try { localStorage.setItem(backupKey, JSON.stringify({ base: j.version, doc: sent })); } catch {}
+        if (idleRef.current) clearTimeout(idleRef.current);
+        idleRef.current = setTimeout(() => { fetch(`/api/emails/${emailId}/versions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ note: "Auto-saved copy", auto: true }), keepalive: true }).catch(() => {}); }, 5 * 60000);
         if (!dirtyRef.current && docRef.current === sent) { setSave("saved"); return true; }
       }
       return true;
@@ -150,6 +153,56 @@ export default function Builder({ emailId }: { emailId: string }) {
     document.addEventListener("visibilitychange", flush);
     return () => document.removeEventListener("visibilitychange", flush);
   }, [saveNow]);
+
+  // Undo / redo: a stack of earlier states. Quick typing is grouped into one step.
+  const undoStack = useRef<EmailDoc[]>([]);
+  const redoStack = useRef<EmailDoc[]>([]);
+  const prevDoc = useRef<EmailDoc | null>(null);
+  const applying = useRef(false);
+  const lastEditAt = useRef(0);
+  const [, bump] = useState(0);
+  useEffect(() => {
+    if (!loaded) return;
+    if (prevDoc.current === null || applying.current) { applying.current = false; prevDoc.current = doc; return; }
+    if (prevDoc.current === doc) return;
+    const now = Date.now();
+    if (now - lastEditAt.current > 800) { undoStack.current.push(prevDoc.current); if (undoStack.current.length > 100) undoStack.current.shift(); }
+    redoStack.current = [];
+    lastEditAt.current = now;
+    prevDoc.current = doc;
+    bump((n) => n + 1);
+  }, [doc, loaded]);
+  const undo = useCallback(() => {
+    if (lockedRef.current || !undoStack.current.length) return;
+    redoStack.current.push(docRef.current);
+    applying.current = true; lastEditAt.current = 0;
+    setDocRaw(undoStack.current.pop()!); bump((n) => n + 1);
+  }, []);
+  const redo = useCallback(() => {
+    if (lockedRef.current || !redoStack.current.length) return;
+    undoStack.current.push(docRef.current);
+    applying.current = true; lastEditAt.current = 0;
+    setDocRaw(redoStack.current.pop()!); bump((n) => n + 1);
+  }, []);
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
+      const k = e.key.toLowerCase();
+      if (k === "z") { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
+      else if (k === "y") { e.preventDefault(); redo(); }
+    };
+    document.addEventListener("keydown", key);
+    return () => document.removeEventListener("keydown", key);
+  }, [undo, redo]);
+
+  // Warn before leaving the page while something hasn't reached the database yet.
+  useEffect(() => {
+    const warn = (e: BeforeUnloadEvent) => {
+      if (dirtyRef.current || stateRef.current === "saving" || stateRef.current === "error") { e.preventDefault(); e.returnValue = ""; }
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, []);
 
   const baseOpts = useMemo(
     () => ({
@@ -287,7 +340,7 @@ export default function Builder({ emailId }: { emailId: string }) {
     const j = await r.json().catch(() => ({}));
     if (r.ok) router.push(`/editor?e=${j.id}`); else setStatus(j.error || "Couldn’t duplicate this email.");
   }
-  async function saveCopy() { await flushSave(); await fetch(`/api/emails/${emailId}/versions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ note: "Saved copy" }) }); }
+  async function saveCopy(name = "") { await flushSave(); await fetch(`/api/emails/${emailId}/versions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ note: name || "Saved copy", named: !!name }) }); }
   async function restoreVersion(id: string): Promise<string | null> {
     const r = await fetch(`/api/emails/${emailId}/versions?v=${id}`, { cache: "no-store" });
     if (!r.ok) return "Couldn’t load that copy.";
@@ -463,7 +516,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const sheets = (
     <>
       {submitOpen ? <SubmitSheet onClose={() => setSubmitOpen(false)} onSubmit={submitForApproval} softWarnings={0} /> : null}
-      {historyOpen ? <HistorySheet emailId={emailId} onClose={() => setHistoryOpen(false)} onRestore={restoreVersion} onSaveCopy={saveCopy} readOnly={locked} /> : null}
+      {historyOpen ? <HistorySheet emailId={emailId} onClose={() => setHistoryOpen(false)} onRestore={restoreVersion} onSaveCopy={saveCopy} readOnly={locked} renderHtml={(d) => renderEmail(d as EmailDoc, baseOpts)} /> : null}
     </>
   );
 
@@ -493,7 +546,7 @@ export default function Builder({ emailId }: { emailId: string }) {
           <div className="flex shrink-0 items-center gap-1">
             {doc.ministry === "missions" ? <a href="/roster" aria-label="Edit members serving globally" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><Globe size={22} /></a> : null}
             <button onClick={() => setFeedbackOpen(true)} aria-label="Report a problem or share feedback" className="relative flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><LifeBuoy size={22} />{inboxNew ? <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#c8102e]" /> : null}</button>
-            <button onClick={() => setHistoryOpen(true)} aria-label="Version history" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><History size={22} /></button>
+<button onClick={() => setHistoryOpen(true)} aria-label="Version history" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><History size={22} /></button>
             <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />{locked ? "Status" : "Send"}</button>
           </div>
         </header>
@@ -515,7 +568,11 @@ export default function Builder({ emailId }: { emailId: string }) {
               {inspector ? (
                 <div className="max-h-[48dvh] shrink-0 overflow-y-auto rounded-t-2xl border-t border-line bg-[#f7f9fc] p-4 shadow-[0_-8px_24px_rgba(0,32,91,0.12)]">{inspector}</div>
               ) : (
-                <div className="shrink-0 border-t border-line bg-white px-4 py-2 text-center text-sm text-muted">Tap any part of the email to edit it</div>
+                <div className="flex shrink-0 items-center justify-between border-t border-line bg-white px-2 py-1 text-sm text-muted">
+                  <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" className="flex h-11 items-center gap-1 rounded-full px-3 font-semibold text-brand active:bg-[#f4f8fd] disabled:text-muted disabled:opacity-40"><Undo2 size={18} />Undo</button>
+                  <span className="px-1 text-center">Tap any part of the email to edit it</span>
+                  <button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" className="flex h-11 items-center gap-1 rounded-full px-3 font-semibold text-brand active:bg-[#f4f8fd] disabled:text-muted disabled:opacity-40"><Redo2 size={18} />Redo</button>
+                </div>
               )}
             </div>
           ) : null}
@@ -562,6 +619,7 @@ export default function Builder({ emailId }: { emailId: string }) {
         <div className="flex items-center gap-3">
           {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><Globe size={18} />Serving list</a> : null}
           <button onClick={() => setFeedbackOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} />Feedback{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+          <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Redo2 size={20} /></button>
           <button onClick={() => setHistoryOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><History size={18} />History</button>
           <button onClick={sendTest} className="pill-btn border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
           <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>

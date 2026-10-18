@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AlertTriangle, History, RotateCcw, Send, X } from "lucide-react";
+import { AlertTriangle, Eye, History, Pencil, RotateCcw, Send, Star, X } from "lucide-react";
 import { LEAD_HOURS, MIN_SEND_MINUTES, REMINDER_HOURS, SENDING_ENABLED, isExpedited, leadHours, when } from "@/lib/approval";
 import { ago } from "@/lib/time";
 
@@ -56,29 +56,64 @@ export function SubmitSheet({ onClose, onSubmit, softWarnings }: { onClose: () =
   );
 }
 
-type V = { id: string; created_at: string; note: string | null; subject: string | null };
+type V = { id: string; created_at: string; note: string | null; named?: boolean; by?: string | null; subject: string | null; summary?: string };
 
-export function HistorySheet({ emailId, onClose, onRestore, onSaveCopy, readOnly }: { emailId: string; onClose: () => void; onRestore: (id: string) => Promise<string | null>; onSaveCopy: () => Promise<void>; readOnly: boolean }) {
+export function HistorySheet({ emailId, onClose, onRestore, onSaveCopy, readOnly, renderHtml }: { emailId: string; onClose: () => void; onRestore: (id: string) => Promise<string | null>; onSaveCopy: (name: string) => Promise<void>; readOnly: boolean; renderHtml: (doc: unknown) => string }) {
   const [list, setList] = useState<V[] | null>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [open, setOpen] = useState<string | null>(null);
+  const [html, setHtml] = useState<string | null>(null);
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
   const load = () => fetch(`/api/emails/${emailId}/versions`, { cache: "no-store" }).then((r) => r.json()).then((j) => setList(j.versions ?? [])).catch(() => setErr("Couldn’t load the history."));
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [emailId]);
 
+  async function preview(id: string) {
+    if (open === id) { setOpen(null); setHtml(null); return; }
+    setOpen(id); setHtml(null);
+    const r = await fetch(`/api/emails/${emailId}/versions?v=${id}`, { cache: "no-store" });
+    if (!r.ok) { setErr("Couldn’t load that copy."); setOpen(null); return; }
+    const j = await r.json();
+    setHtml(renderHtml(j.doc));
+  }
+  async function saveName(id: string) {
+    setBusy(id);
+    await fetch(`/api/emails/${emailId}/versions?v=${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ note: draft }) });
+    setRenaming(null); await load(); setBusy(null);
+  }
+
   return (
     <Sheet title="Version history" onClose={onClose}>
-      <p className="mb-3 text-sm text-muted">Earlier copies of this email, saved automatically while you work and at key moments (a test, approval). Restoring brings an old copy back as your current version; your present one is saved first.</p>
-      <button disabled={busy !== null} onClick={async () => { setBusy("copy"); await onSaveCopy(); await load(); setBusy(null); }} className="pill-btn mb-4 w-full border-2 border-navy text-navy disabled:opacity-50"><History size={16} className="mr-1.5" />{busy === "copy" ? "Saving…" : "Save a copy now"}</button>
+      <p className="mb-3 text-sm text-muted">Earlier copies of this email, saved automatically when you pause and at key moments (a test, approval). Preview a copy to see exactly how it looked. Restoring brings it back as your current version; your present one is saved first. Named copies are kept permanently.</p>
+      <div className="mb-4 flex gap-2">
+        <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="Name this version (optional)" className="field min-w-0 flex-1" aria-label="Version name" />
+        <button disabled={busy !== null} onClick={async () => { setBusy("copy"); await onSaveCopy(name.trim()); setName(""); await load(); setBusy(null); }} className="pill-btn shrink-0 border-2 border-navy px-4 text-navy disabled:opacity-50"><History size={16} className="mr-1.5" />{busy === "copy" ? "Saving…" : "Save"}</button>
+      </div>
       {err ? <p role="alert" className="mb-3 text-sm text-[#8a1020]">{err}</p> : null}
       {list === null ? <p className="text-sm text-muted">Loading…</p> : list.length === 0 ? <p className="rounded-xl border border-dashed border-line p-4 text-sm text-muted">No earlier copies yet. They appear as you keep working.</p> : (
         <ul className="space-y-2">
           {list.map((v) => (
-            <li key={v.id} className="flex items-center gap-2 rounded-xl border border-line p-3">
-              <div className="min-w-0 flex-1">
-                <div className="text-[15px] font-semibold text-ink">{v.note || "Saved copy"}</div>
-                <div className="truncate text-xs text-muted">{new Date(v.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })} · {ago(v.created_at)}{v.subject ? ` · ${v.subject}` : ""}</div>
+            <li key={v.id} className="rounded-xl border border-line p-3">
+              <div className="flex items-start gap-2">
+                <div className="min-w-0 flex-1">
+                  {renaming === v.id ? (
+                    <div className="flex gap-2"><input autoFocus value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={80} className="field min-w-0 flex-1" aria-label="Rename version" /><button disabled={busy !== null} onClick={() => saveName(v.id)} className="pill-btn px-4 text-brand">Save</button></div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 text-[15px] font-semibold text-ink">{v.named ? <Star size={14} className="shrink-0 fill-[#e0a100] text-[#e0a100]" aria-label="Named version" /> : null}<span className="truncate">{v.note || "Saved copy"}</span>
+                      {!readOnly || true ? <button aria-label="Name this version" onClick={() => { setRenaming(v.id); setDraft(v.named ? v.note ?? "" : ""); }} className="shrink-0 text-muted"><Pencil size={13} /></button> : null}</div>
+                  )}
+                  <div className="text-xs text-muted">{new Date(v.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })} · {ago(v.created_at)}{v.by ? ` · ${v.by}` : ""}</div>
+                  {v.summary ? <div className="mt-0.5 text-xs text-[#33445d]">{v.summary}</div> : null}
+                  {v.subject ? <div className="truncate text-xs text-muted">Subject: {v.subject}</div> : null}
+                </div>
+                <div className="flex shrink-0 flex-col items-end">
+                  <button onClick={() => preview(v.id)} className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-brand active:bg-[#f4f8fd]"><Eye size={15} />{open === v.id ? "Hide" : "Preview"}</button>
+                  {!readOnly ? <button disabled={busy !== null} onClick={async () => { if (!confirm("Restore this copy? Your current version is saved first.")) return; setBusy(v.id); const m = await onRestore(v.id); if (m) { setErr(m); setBusy(null); } }} className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-brand active:bg-[#f4f8fd] disabled:opacity-50"><RotateCcw size={15} />{busy === v.id ? "…" : "Restore"}</button> : null}
+                </div>
               </div>
-              {!readOnly ? <button disabled={busy !== null} onClick={async () => { if (!confirm("Restore this copy? Your current version is saved first.")) return; setBusy(v.id); const m = await onRestore(v.id); if (m) { setErr(m); setBusy(null); } }} className="flex h-11 shrink-0 items-center gap-1 rounded-full px-3 text-sm font-semibold text-brand active:bg-[#f4f8fd] disabled:opacity-50"><RotateCcw size={16} />{busy === v.id ? "…" : "Restore"}</button> : null}
+              {open === v.id ? (html ? <iframe title="Preview of this copy" srcDoc={html} sandbox="" className="mt-3 h-[420px] w-full rounded-lg border border-line bg-white" /> : <p className="mt-3 text-sm text-muted">Loading preview…</p>) : null}
             </li>
           ))}
         </ul>
