@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { Camera, ClipboardPaste, ImagePlus } from "lucide-react";
 import type { Btn, Img } from "@/lib/blocks";
 import { uploadPhoto } from "@/lib/image";
+import { PhotoEditor } from "@/components/PhotoEditor";
 
 export function Field({ label, value, onChange, placeholder, hint }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; hint?: string }) {
   return (
@@ -104,13 +105,14 @@ export function ImageFields({ label = "Photo", value, onChange, aspect }: { labe
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
+  const [editing, setEditing] = useState(false);
 
   async function pick(file?: File | null) {
     if (!file) return;
     setBusy(true); setNote("");
     try {
       const r = await uploadPhoto(file, aspect);
-      onChange({ ...v, url: r.url, quality: r.quality });
+      onChange({ ...v, url: r.url, quality: r.quality, original: r.original, edit: undefined });
       setNote(r.local ? "Preview only. Photos upload for real once storage is connected." : `Added (${Math.round(r.bytes / 1024)} KB)`);
     } catch { setNote("That photo could not be read. Try another."); }
     finally { setBusy(false); if (input.current) input.current.value = ""; }
@@ -127,9 +129,18 @@ export function ImageFields({ label = "Photo", value, onChange, aspect }: { labe
       <input ref={input} type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
       <div className="flex gap-2">
         <button type="button" onClick={() => input.current?.click()} disabled={busy} className="pill-btn flex-1 border-2 border-navy text-navy"><Camera size={18} className="mr-1.5" />{busy ? "Adding…" : v.url ? "Change photo" : "Choose or take a photo"}</button>
-        {v.url ? <button type="button" onClick={() => onChange({ ...v, url: "", quality: undefined })} className="pill-btn px-4 text-muted">Remove</button> : null}
+        {v.url ? <button type="button" onClick={() => setEditing(true)} className="pill-btn px-4 text-brand">Adjust</button> : null}
+        {v.url ? <button type="button" onClick={() => onChange({ ...v, url: "", quality: undefined, original: undefined, edit: undefined })} className="pill-btn px-4 text-muted">Remove</button> : null}
       </div>
       {note ? <span className="block text-xs text-muted">{note}</span> : null}
+      {v.url && (v.quality?.dark || v.quality?.soft || v.quality?.small) ? (
+        <span className="block rounded-lg bg-[#fff6e5] px-3 py-2 text-xs text-[#7a4a00]">{v.quality.dark ? "This photo looks dark. Tap Adjust to brighten it. " : ""}{v.quality.soft ? "It looks a little blurry. " : ""}{v.quality.small ? "It's small, so it may look soft on new phones." : ""}</span>
+      ) : null}
+      {editing && v.url ? (
+        <PhotoEditor source={v.original ?? v.url} aspect={aspect} initial={v.edit} quality={v.quality}
+          onCancel={() => setEditing(false)}
+          onSave={(r) => { onChange({ ...v, url: r.url, original: v.original ?? v.url, edit: r.edit, quality: r.quality }); setEditing(false); setNote(r.local ? "Preview only. Photos upload for real once storage is connected." : "Photo adjusted"); }} />
+      ) : null}
       <Field label="Description for screen readers" value={v.alt} onChange={(x) => onChange({ ...v, alt: x })} hint="Say what is in the photo, in a few words" />
     </div>
   );

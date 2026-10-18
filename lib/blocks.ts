@@ -1,7 +1,8 @@
 // The email is a list of blocks. Staff add, reorder and fill in blocks;
 // they never place things by pixel. Every block has `id` and may be hidden.
 
-export type Img = { url: string; alt: string; quality?: { dark?: boolean; soft?: boolean; small?: boolean; brightness?: number; sharpness?: number } };
+import type { PhotoEdit } from "./photo-edit";
+export type Img = { url: string; alt: string; original?: string; edit?: PhotoEdit; quality?: { dark?: boolean; soft?: boolean; small?: boolean; brightness?: number; sharpness?: number } };
 export type Btn = { label: string; url: string };
 
 export type HeroBlock = {

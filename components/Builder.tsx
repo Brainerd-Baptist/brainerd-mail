@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X } from "lucide-react";
+import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy } from "lucide-react";
 import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc } from "@/lib/blocks";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
 import { runChecks } from "@/lib/checks";
 import { PolishPanel } from "@/components/PolishPanel";
+import { FeedbackSheet } from "@/components/FeedbackSheet";
 import { polish, readDismissed } from "@/lib/polish";
 import { MISSIONS_TEMPLATE } from "@/lib/templates/missions";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
@@ -40,6 +41,7 @@ export default function Builder() {
   const [origin, setOrigin] = useState("");
   const [tab, setTab] = useState<Tab>("edit");
   const [sendOpen, setSendOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const isDesktop = useIsDesktop();
   const prevSel = useRef<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -205,6 +207,10 @@ export default function Builder() {
     </div>
   );
 
+  const feedbackSheet = feedbackOpen ? (
+    <FeedbackSheet onClose={() => setFeedbackOpen(false)} context={{ ministry: doc.ministry, emailTitle: doc.title, tab, device, selectedBlock: selected ? doc.blocks.find((b) => b.id === selected)?.type : null, page: typeof location !== "undefined" ? location.pathname : "", build: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) }} />
+  ) : null;
+
   const detailsPanel = (
     <div className="space-y-4">
       <h2 className="font-serif text-xl font-semibold text-navy">Email details</h2>
@@ -292,9 +298,13 @@ export default function Builder() {
               <div className="-mt-0.5 text-xs text-muted">{palette.label} · {saved === "saving" ? "Saving…" : "Saved"}</div>
             </div>
           </div>
-          <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />Send</button>
+          <div className="flex shrink-0 items-center gap-1">
+            <button onClick={() => setFeedbackOpen(true)} aria-label="Report a problem or share feedback" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><LifeBuoy size={22} /></button>
+            <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />Send</button>
+          </div>
         </header>
         {status ? <div className="bg-[#e8f5ee] px-4 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
+        {feedbackSheet}
 
         <div className="min-h-0 flex-1 overflow-hidden">
           {tab === "edit" ? (
@@ -354,11 +364,13 @@ export default function Builder() {
         </div>
         {deviceToggle(["phone", "desktop", "dark", "text"])}
         <div className="flex items-center gap-3">
+          <button onClick={() => setFeedbackOpen(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} />Feedback</button>
           <button onClick={sendTest} className="pill-btn border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
           <button onClick={() => { if (!confirmPhotos()) return; }} disabled={blocking > 0} className={`pill-btn ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
         </div>
       </header>
       {status ? <div className="bg-[#e8f5ee] px-5 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
+      {feedbackSheet}
       <div className="grid min-h-0 flex-1 grid-cols-[280px_minmax(0,1fr)_360px]">
         <aside className="overflow-y-auto border-r border-line bg-white p-4">{blocksPanel}</aside>
         <main className="min-w-0 overflow-auto p-6">
