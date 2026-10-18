@@ -33,5 +33,5 @@ export async function GET(req: Request) {
     allowed = !!row;
   }
   if (!allowed) { await supabase.auth.signOut(); return NextResponse.redirect(`${base}/login?error=denied`); }
-  return NextResponse.redirect(`${base}/editor`);
+  return NextResponse.redirect(`${base}/emails`);
 }

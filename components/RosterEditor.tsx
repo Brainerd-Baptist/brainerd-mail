@@ -51,7 +51,7 @@ export function RosterEditor({ initial, version }: { initial: Member[]; version:
     <div className="min-h-full bg-mist pb-32">
       <header className="sticky top-0 z-10 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center gap-3">
-          <Link href="/editor" className="flex items-center gap-1 text-sm font-semibold text-brand"><ArrowLeft size={16} />Emails</Link>
+          <Link href="/emails" className="flex items-center gap-1 text-sm font-semibold text-brand"><ArrowLeft size={16} />Emails</Link>
           <h1 className="flex-1 truncate text-center font-serif text-lg font-semibold text-navy">Members serving globally</h1>
           <a href="/serving" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-semibold text-brand">View<ExternalLink size={14} /></a>
         </div>

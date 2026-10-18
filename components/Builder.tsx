@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe } from "lucide-react";
+import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft } from "lucide-react";
 import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc } from "@/lib/blocks";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
@@ -27,16 +28,19 @@ function useIsDesktop(): boolean | null {
   }, []);
   return v;
 }
-const STORE_KEY = "brainerd-mail:draft:missions";
 const ADDRESS = CHURCH_ADDRESS;
 const ADDABLE: BlockType[] = ["hero", "text", "photo", "event", "travel", "partners", "cta", "card", "divider"];
 
-export default function Builder() {
+type SaveState = "saved" | "saving" | "error" | "conflict";
+
+export default function Builder({ emailId }: { emailId: string }) {
   const [doc, setDoc] = useState<EmailDoc>(MISSIONS_TEMPLATE);
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [device, setDevice] = useState<Device>("phone");
-  const [saved, setSaved] = useState<"saved" | "saving">("saved");
+  const [saved, setSaved] = useState<SaveState>("saved");
+  const [loadErr, setLoadErr] = useState("");
+  const [saveMsg, setSaveMsg] = useState("");
   const [status, setStatus] = useState<string>("");
   const [origin, setOrigin] = useState("");
   const [tab, setTab] = useState<Tab>("edit");
@@ -49,27 +53,88 @@ export default function Builder() {
   const isDesktop = useIsDesktop();
   const prevSel = useRef<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const emailIdRef = useRef<string | undefined>(undefined);
+  const emailIdRef = useRef<string | undefined>(emailId);
+  const versionRef = useRef("");
+  const docRef = useRef<EmailDoc>(doc);
+  docRef.current = doc;
+  const dirtyRef = useRef(false);
+  const inflightRef = useRef(false);
+  const stateRef = useRef<SaveState>("saved");
+  const backupKey = `brainerd-mail:draft:${emailId}`;
   const palette = paletteFor(doc.ministry);
 
+  // Load this email from the database. A copy kept on this device is only used if edits
+  // were made after the last successful save (for example, the phone lost signal).
   useEffect(() => {
     setOrigin(window.location.origin);
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (raw) setDoc(JSON.parse(raw));
-    } catch {}
-    setLoaded(true);
-  }, []);
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`/api/emails/${emailId}`, { cache: "no-store" });
+        if (r.status === 404) { if (!cancelled) setLoadErr("This email doesn’t exist any more. It may have been deleted."); return; }
+        if (!r.ok) throw new Error();
+        const j = await r.json();
+        if (cancelled) return;
+        versionRef.current = j.version;
+        let next: EmailDoc = j.doc;
+        try {
+          const raw = localStorage.getItem(backupKey);
+          if (raw) {
+            const b = JSON.parse(raw);
+            if (b?.base === j.version && b.doc && JSON.stringify(b.doc) !== JSON.stringify(j.doc)) { next = b.doc; dirtyRef.current = true; }
+          }
+        } catch {}
+        setDoc(next);
+        if (j.status !== "draft") { stateRef.current = "conflict"; setSaved("conflict"); setSaveMsg("This email has already gone out, so it can’t be changed. Duplicate it from the Emails list to make a new version."); }
+        setLoaded(true);
+      } catch { if (!cancelled) setLoadErr("Couldn’t open this email. Check your connection and try again."); }
+    })();
+    return () => { cancelled = true; };
+  }, [emailId, backupKey]);
 
+  const setSave = (st: SaveState, msg = "") => { stateRef.current = st; setSaved(st); setSaveMsg(msg); };
+
+  // Save to the database. One save at a time; if edits arrive meanwhile, save again right after.
+  const saveNow = useCallback(async (): Promise<boolean> => {
+    if (stateRef.current === "conflict") return false;
+    if (inflightRef.current) return false;
+    inflightRef.current = true;
+    try {
+      for (let i = 0; i < 3; i++) {
+        dirtyRef.current = false;
+        const sent = docRef.current;
+        let r: Response;
+        try { r = await fetch(`/api/emails/${emailId}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ doc: sent, version: versionRef.current }), keepalive: true }); }
+        catch { dirtyRef.current = true; setSave("error", "Offline. Your changes are kept on this device and will save when you’re back."); return false; }
+        const j = await r.json().catch(() => ({}));
+        if (r.status === 409 || r.status === 404) { setSave("conflict", j.error || "This email can’t be saved from here."); return false; }
+        if (!r.ok) { dirtyRef.current = true; setSave("error", "Couldn’t save. Will keep trying."); return false; }
+        versionRef.current = j.version;
+        try { localStorage.setItem(backupKey, JSON.stringify({ base: j.version, doc: sent })); } catch {}
+        if (!dirtyRef.current && docRef.current === sent) { setSave("saved"); return true; }
+      }
+      return true;
+    } finally { inflightRef.current = false; }
+  }, [emailId, backupKey]);
+
+  const firstRun = useRef(true);
   useEffect(() => {
     if (!loaded) return;
-    setSaved("saving");
-    const t = setTimeout(() => {
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(doc)); } catch {}
-      setSaved("saved");
-    }, 500);
+    if (firstRun.current) { firstRun.current = false; if (!dirtyRef.current) return; }
+    dirtyRef.current = true;
+    if (stateRef.current === "conflict") return;
+    try { localStorage.setItem(backupKey, JSON.stringify({ base: versionRef.current, doc })); } catch {}
+    setSave("saving");
+    const t = setTimeout(() => { saveNow(); }, 1200);
     return () => clearTimeout(t);
-  }, [doc, loaded]);
+  }, [doc, loaded, saveNow, backupKey]);
+
+  // Phone switched apps or tab hidden: save right away.
+  useEffect(() => {
+    const flush = () => { if (document.visibilityState === "hidden" && dirtyRef.current) saveNow(); };
+    document.addEventListener("visibilitychange", flush);
+    return () => document.removeEventListener("visibilitychange", flush);
+  }, [saveNow]);
 
   const baseOpts = useMemo(
     () => ({
@@ -164,14 +229,17 @@ export default function Builder() {
     testingRef.current = true;
     setStatus("Sending a test to you…");
     try {
+      if (dirtyRef.current || stateRef.current === "saving") { while (inflightRef.current) await new Promise((r) => setTimeout(r, 100)); await saveNow(); }
+      if (stateRef.current === "conflict") { setStatus(saveMsg || "Reload this email before sending a test."); return; }
       const res = await fetch("/api/test-send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ doc, emailId: emailIdRef.current }) });
       const j = await res.json();
-      if (j.emailId) emailIdRef.current = j.emailId;
+      if (j.version) versionRef.current = j.version;
       setStatus(res.ok ? `Test sent to ${j.to}. Check your inbox and phone.` : j.error || "Could not send the test.");
     } catch { setStatus("Could not send the test."); }
     finally { testingRef.current = false; }
   }
 
+  const saveLabel = saved === "saving" ? "Saving…" : saved === "error" ? "Not saved yet" : saved === "conflict" ? "Not saved" : "Saved";
   const isPhoneLayout = isDesktop === false;
   const frameWidth = device === "phone" ? 390 : 760;
   const statusPill = blocking ? `${blocking} to fix` : warns ? `${warns} suggestion${warns > 1 ? "s" : ""}` : "All clear";
@@ -281,6 +349,20 @@ export default function Builder() {
   ) : null;
 
   if (isDesktop === null) return null;
+  if (loadErr) return (
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-mist p-6 text-center">
+      <p className="max-w-sm text-[16px] text-ink">{loadErr}</p>
+      <div className="flex gap-3"><Link href="/emails" className="pill-btn border-2 border-navy text-navy">All emails</Link><button onClick={() => location.reload()} className="pill-btn bg-[#1e61b9] text-white">Try again</button></div>
+    </div>
+  );
+  if (!loaded) return <div className="flex min-h-[100dvh] items-center justify-center bg-mist text-sm text-muted">Opening…</div>;
+
+  const saveBanner = saveMsg && (saved === "conflict" || saved === "error") ? (
+    <div role="alert" className="flex items-center justify-between gap-3 bg-[#fff3d6] px-4 py-2 text-sm text-[#5c3a00]">
+      <span>{saveMsg}</span>
+      {saved === "conflict" ? <button onClick={() => location.reload()} className="shrink-0 font-semibold underline">Reload</button> : null}
+    </div>
+  ) : null;
 
   const sendActions = (
     <div className="flex flex-col gap-3">
@@ -295,11 +377,12 @@ export default function Builder() {
     return (
       <div className="flex h-[100dvh] flex-col bg-mist">
         <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-line bg-white px-3">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 items-center gap-1">
+            <Link href="/emails" aria-label="Back to all emails" className="flex h-11 w-9 shrink-0 items-center justify-center text-brand"><ArrowLeft size={22} /></Link>
             <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: palette.button }} />
             <div className="min-w-0">
               <input aria-label="Email name" className="w-full min-w-0 truncate bg-transparent text-[16px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
-              <div className="-mt-0.5 text-xs text-muted">{palette.label} · {saved === "saving" ? "Saving…" : "Saved"}</div>
+              <div className="-mt-0.5 text-xs text-muted">{palette.label} · {saveLabel}</div>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -309,6 +392,7 @@ export default function Builder() {
           </div>
         </header>
         {status ? <div className="bg-[#e8f5ee] px-4 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
+        {saveBanner}
         {feedbackSheet}
 
         <div className="min-h-0 flex-1 overflow-hidden">
@@ -359,12 +443,13 @@ export default function Builder() {
     <div className="flex h-screen flex-col bg-mist">
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-line bg-white px-5">
         <div className="flex items-center gap-4">
+          <Link href="/emails" className="flex min-h-11 items-center gap-1 text-sm font-semibold text-brand"><ArrowLeft size={16} />Emails</Link>
           <span className="flex items-center gap-3"><img src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={112} height={17} className="h-[17px] w-auto" /><span className="text-[15px] font-bold tracking-[0.16em] text-navy">MAIL</span></span>
           <span className="h-7 w-px bg-line" />
           {ministrySelect}
           <div>
             <input aria-label="Email name" className="w-64 bg-transparent text-[15px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
-            <div className="text-xs text-muted">{saved === "saving" ? "Saving…" : "Draft saved"}</div>
+            <div className="text-xs text-muted">{saveLabel}</div>
           </div>
         </div>
         {deviceToggle(["phone", "desktop", "dark", "text"])}
@@ -376,6 +461,7 @@ export default function Builder() {
         </div>
       </header>
       {status ? <div className="bg-[#e8f5ee] px-5 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
+      {saveBanner}
       {feedbackSheet}
       <div className="grid min-h-0 flex-1 grid-cols-[280px_minmax(0,1fr)_360px]">
         <aside className="overflow-y-auto border-r border-line bg-white p-4">{blocksPanel}</aside>

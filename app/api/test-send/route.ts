@@ -28,14 +28,15 @@ export async function POST(req: Request) {
     const admin = supabaseAdmin();
     let emailId: string | undefined = body.emailId;
     let slug = "";
+    let version = "";
     if (emailId) {
-      const { data: row } = await admin.from("emails").update({ doc, title: doc.title, ministry: doc.ministry, updated_at: new Date().toISOString() }).eq("id", emailId).select("id,slug").maybeSingle();
-      if (row) slug = row.slug; else emailId = undefined;
+      const { data: row } = await admin.from("emails").update({ doc, title: doc.title, ministry: doc.ministry, updated_at: new Date().toISOString() }).eq("id", emailId).select("id,slug,updated_at").maybeSingle();
+      if (row) { slug = row.slug; version = row.updated_at; } else emailId = undefined;
     }
     if (!emailId) {
-      const { data: row, error } = await admin.from("emails").insert({ ministry: doc.ministry, title: doc.title || "Untitled", doc, created_by: user.id }).select("id,slug").single();
+      const { data: row, error } = await admin.from("emails").insert({ ministry: doc.ministry, title: doc.title || "Untitled", doc, created_by: user.id }).select("id,slug,updated_at").single();
       if (error || !row) throw new Error("Could not save the draft");
-      emailId = row.id; slug = row.slug;
+      emailId = row.id; slug = row.slug; version = row.updated_at;
     }
 
     const site = siteUrl();
@@ -51,7 +52,7 @@ export async function POST(req: Request) {
     await admin.from("recipients").update({ status: "sent", sent_at: new Date().toISOString() }).eq("id", rcpt!.id);
     await admin.from("sends").update({ finished_at: new Date().toISOString() }).eq("id", send!.id);
     await admin.from("audit_log").insert({ actor: user.id, action: "test_send", email_id: emailId, detail: { to: user.email } });
-    return NextResponse.json({ ok: true, to: user.email, emailId, webUrl: `${site}/w/${slug}` });
+    return NextResponse.json({ ok: true, to: user.email, emailId, version, webUrl: `${site}/w/${slug}` });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? "Test send failed" }, { status: 502 });
   }

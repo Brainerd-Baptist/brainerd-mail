@@ -2,7 +2,7 @@
   "name": "Brainerd Mail",
   "short_name": "Brainerd Mail",
   "description": "Newsletters and texts for Brainerd Baptist ministries",
-  "start_url": "/editor",
+  "start_url": "/emails",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
