@@ -105,6 +105,12 @@ function footLogo(o: RenderOpts, w: number): string {
 function image(img: Img | undefined, o: RenderOpts, style = "width:100%;height:auto;display:block;border:0;"): string {
   if (!img?.url) return "";
   const src = img.url.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + img.url : img.url;
+  if (img.shape === "circle") {
+    return `<div style="text-align:center;padding:24px 0 0 0;line-height:0;font-size:0;"><img src="${esc(src)}" alt="${esc(img.alt)}" width="180" height="180" style="display:inline-block;width:180px;height:180px;border-radius:50%;border:0;"></div>`;
+  }
+  if (img.shape === "tall") {
+    return `<div style="text-align:center;line-height:0;font-size:0;"><img src="${esc(src)}" alt="${esc(img.alt)}" width="360" style="display:inline-block;width:70%;max-width:360px;height:auto;border:0;border-radius:12px;"></div>`;
+  }
   return `<img src="${esc(src)}" alt="${esc(img.alt)}" width="100%" style="${style}">`;
 }
 

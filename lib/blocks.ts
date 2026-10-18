@@ -2,7 +2,7 @@
 // they never place things by pixel. Every block has `id` and may be hidden.
 
 import type { PhotoEdit } from "./photo-edit";
-export type Img = { url: string; alt: string; original?: string; edit?: PhotoEdit; quality?: { dark?: boolean; soft?: boolean; small?: boolean; brightness?: number; sharpness?: number } };
+export type Img = { url: string; alt: string; shape?: "banner" | "standard" | "square" | "tall" | "circle"; original?: string; edit?: PhotoEdit; quality?: { dark?: boolean; soft?: boolean; small?: boolean; brightness?: number; sharpness?: number } };
 export type Btn = { label: string; url: string };
 
 export type HeroBlock = {

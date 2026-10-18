@@ -2,20 +2,22 @@
 import { useEffect, useRef, useState } from "react";
 import { X, RotateCw, Sun, Wand2, RotateCcw } from "lucide-react";
 import { renderToCanvas, renderEdit, loadImage, uploadBlob } from "@/lib/image";
-import { DEFAULT_EDIT, autoGamma, cropRect, type PhotoEdit } from "@/lib/photo-edit";
+import { DEFAULT_EDIT, SHAPES, autoGamma, cropRect, shapeAspect, type PhotoEdit, type Shape } from "@/lib/photo-edit";
 import type { PhotoQuality } from "@/lib/image-quality";
 
 // Three small tools: choose what shows (drag + zoom), brighten, rotate.
 // Always works from the original, so nothing is ever lost.
-export function PhotoEditor({ source, aspect, initial, quality, onCancel, onSave }: {
-  source: string; aspect?: number; initial?: PhotoEdit; quality?: PhotoQuality;
+export function PhotoEditor({ source, shape: shape0, initial, quality, onCancel, onSave }: {
+  source: string; shape: Shape; initial?: PhotoEdit; quality?: PhotoQuality;
   onCancel: () => void;
-  onSave: (r: { url: string; local: boolean; edit: PhotoEdit; quality: PhotoQuality }) => void;
+  onSave: (r: { url: string; local: boolean; edit: PhotoEdit; quality: PhotoQuality; shape: Shape }) => void;
 }) {
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [err, setErr] = useState("");
   const [edit, setEdit] = useState<PhotoEdit>(initial ?? DEFAULT_EDIT);
   const [busy, setBusy] = useState(false);
+  const [shape, setShape] = useState<Shape>(shape0);
+  const aspect = shapeAspect(shape);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drag = useRef<{ x: number; y: number; fx: number; fy: number } | null>(null);
 
@@ -62,7 +64,7 @@ export function PhotoEditor({ source, aspect, initial, quality, onCancel, onSave
     try {
       const { blob, quality: q } = await renderEdit(img, edit, aspect, 1600, 0.85);
       const up = await uploadBlob(blob);
-      onSave({ url: up.url, local: up.local, edit, quality: q });
+      onSave({ url: up.url, local: up.local, edit, quality: q, shape });
     } catch { setErr("Could not save that. Try again."); setBusy(false); }
   }
 
@@ -76,12 +78,21 @@ export function PhotoEditor({ source, aspect, initial, quality, onCancel, onSave
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-3">
         {err ? <p className="text-sm text-[#ffb4b4]">{err}</p> : !img ? <p className="text-sm text-white/70">Opening photo…</p> : (
           <>
-            <canvas ref={canvasRef} onPointerDown={down} onPointerMove={move} onPointerUp={() => (drag.current = null)} onPointerCancel={() => (drag.current = null)} className="max-h-full w-full max-w-[560px] cursor-grab touch-none rounded-lg bg-black" />
+            <canvas ref={canvasRef} onPointerDown={down} onPointerMove={move} onPointerUp={() => (drag.current = null)} onPointerCancel={() => (drag.current = null)} className={`max-h-full cursor-grab touch-none bg-black ${shape === "circle" ? "aspect-square w-auto max-w-[360px] rounded-full object-cover" : "w-full max-w-[560px] rounded-lg"}`} />
             <p className="mt-2 text-xs text-white/60">Drag the photo to choose what shows.</p>
           </>
         )}
       </div>
       <div className="shrink-0 space-y-4 px-5 pb-8 pt-3">
+        <div>
+          <span className="mb-1 block text-sm font-semibold">Shape</span>
+          <div className="flex flex-wrap gap-2">
+            {SHAPES.map((x) => (
+              <button key={x.key} type="button" onClick={() => { setShape(x.key); setEdit((e) => ({ ...e, fx: 0.5, fy: 0.5 })); }}
+                className={`min-h-9 rounded-full border px-3.5 text-sm font-semibold ${shape === x.key ? "border-white bg-white text-[#0b1220]" : "border-white/30"}`}>{x.label}</button>
+            ))}
+          </div>
+        </div>
         <label className="block text-sm"><span className="mb-1 block font-semibold">Zoom</span>
           <input type="range" min={1} max={3} step={0.01} value={edit.zoom} onChange={(e) => setEdit({ ...edit, zoom: Number(e.target.value) })} className="w-full accent-[#6aa6ff]" />
         </label>
