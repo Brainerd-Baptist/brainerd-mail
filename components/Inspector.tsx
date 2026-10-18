@@ -66,7 +66,7 @@ export default function Inspector({ block, onChange }: P) {
               <Field label="Heading" value={it.heading} onChange={(v) => upd(it.id, { heading: v })} />
               <Area label="Update" value={it.body} onChange={(v) => upd(it.id, { body: v })} rows={5} />
               <Lines label="Prayer requests" value={it.prayer} onChange={(v) => upd(it.id, { prayer: v })} />
-              {block.showImages ? <ImageFields value={it.image} onChange={(v) => upd(it.id, { image: v })} /> : null}
+              {block.showImages ? <ImageFields label="Photo (cropped to a 3:2 shape)" aspect={1.5} value={it.image} onChange={(v) => upd(it.id, { image: v })} /> : null}
               <ButtonFields value={it.button} onChange={(v) => upd(it.id, { button: v })} />
             </div>
           ))}

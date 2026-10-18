@@ -128,11 +128,10 @@ ${o.mode === "web" ? `<div style="margin-top:14px;"><a href="#" class="pray" dat
     }
     case "partners": {
       const items = b.items.map((it) => {
-        const img = b.showImages && it.image?.url ? image(it.image, o, "width:100%;height:100%;min-height:200px;object-fit:cover;display:block;border:0;") : "";
+        const img = b.showImages && it.image?.url ? image(it.image, o, "width:100%;height:auto;display:block;border:0;") : "";
         const text = `${eyebrow(it.label, p.button)}<h3 class="dm-head" style="margin:0 0 10px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(it.heading)}</h3>${paragraphs(it.body, "#33445d", 15)}${bullets(it.prayer, "PRAYER REQUESTS", "#33445d", p.button)}${button(it.button, "secondary", p, o, it.id)}`;
-        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;overflow:hidden;margin:0 0 16px 0;"><tr>
-${img ? `<td class="stack" width="180" valign="top" style="width:180px;">${img}</td>` : ""}
-<td class="stack" valign="top" style="padding:24px;">${text}</td></tr></table>`;
+        return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;overflow:hidden;margin:0 0 16px 0;">${img ? `<tr><td style="line-height:0;font-size:0;">${img}</td></tr>` : ""}
+<tr><td valign="top" style="padding:24px;">${text}</td></tr></table>`;
       });
       return section(`${eyebrow(b.heading, p.button)}${items.join("")}`, "24px 40px 0 40px");
     }
@@ -225,7 +224,6 @@ a{color:inherit;}
  .h1{font-size:30px!important;}
  .stack{display:block!important;width:100%!important;box-sizing:border-box;padding-left:0!important;padding-right:0!important;}
  .btn{display:block!important;width:100%!important;}
- .stack img{max-height:220px!important;height:220px!important;object-fit:cover!important;}
  .wrap{border-radius:0!important;width:100%!important;max-width:100%!important;}
  .outer{padding:0!important;}
 }
