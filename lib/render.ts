@@ -83,9 +83,9 @@ function logo(o: RenderOpts, w: number, key: string): string {
 // keep the baked Brainerd header image.
 const MARKS: Record<string, { w: number; h: number }> = {
   missions: { w: 220, h: 22 },
-  kids: { w: 220, h: 23 },
+  kids: { w: 206, h: 22 },
   men: { w: 220, h: 22 },
-  women: { w: 210, h: 22 },
+  women: { w: 232, h: 24 },
   students: { w: 150, h: 39 },
   bx: { w: 96, h: 42 },
 };
