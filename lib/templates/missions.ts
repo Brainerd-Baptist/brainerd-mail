@@ -5,6 +5,21 @@ import type { EmailDoc } from "../blocks";
 // Content mirrors the October 2026 Canva newsletter, tightened for a phone.
 const CANVA = "https://brainerdbaptistkidsnews.my.canva.site/brainerd-baptist-missions-newsletter-october-2026/_assets/media";
 
+const ROSTER = [
+  { region: "South America", who: "Ignacio, Lauren, Ali Greis, Sofia, Nicolas, Eleonora & Tobías", place: "Ecuador", deployed: "July 2017", note: "" },
+  { region: "South America", who: "John, Aimee, Leia, Clara, Micah & Makayla", place: "Panama", deployed: "2009", note: "Pray for their ministry of sharing, equipping and encouraging." },
+  { region: "South America", who: "Jim, Mandy, Micah & Ellie", place: "Peru", deployed: "November 2014", note: "" },
+  { region: "Europe / Middle East", who: "Jeremy", place: "Eastern Europe", deployed: "", note: "Pray as he trains and serves with pastors and church planters in Eastern Europe and leads our International Community Connection ministry." },
+  { region: "Europe / Middle East", who: "R, A, C, L", place: "", deployed: "September 2019", note: "" },
+  { region: "Europe / Middle East", who: "Jeff, Jennifer, Parker, Reece, Riley & Braxton", place: "Germany", deployed: "2023", note: "Serving as a NAMB chaplain for the US Armed Forces." },
+  { region: "Africa", who: "Laura", place: "Togo", deployed: "December 2022", note: "" },
+  { region: "North America", who: "Dave & Mollie", place: "Tempe, AZ", deployed: "July 2018", note: "NAMB church planters of Salt River Community Church." },
+  { region: "South Asia", who: "Brain, Stephanie, Matthew & Caleb", place: "South Asia", deployed: "March 2015", note: "Pray for believers in South Asia who are facing persecution and opposition as a result of placing their faith in Jesus." },
+  { region: "South Asia", who: "Jett & Morgan Bates", place: "South Asia", deployed: "March 2026", note: "Pray for a smooth transition to their new home, language learning, new friendships and a fruitful ministry." },
+  { region: "South Asia", who: "Greg", place: "South Asia", deployed: "", note: "Pray for Greg’s ministry work in South Asia, that hearts and minds may be receptive to the Good News." },
+  { region: "Southeast Asia", who: "Nathan, Amber, Reese & Zella Kate", place: "Asia Pacific Rim", deployed: "October 2013", note: "Pray for the people of Southeast Asia who are still waiting to hear the Good News." },
+];
+
 export const MISSIONS_TEMPLATE: EmailDoc = {
   ministry: "missions",
   title: "October Global Update",
@@ -56,15 +71,22 @@ export const MISSIONS_TEMPLATE: EmailDoc = {
       ],
     },
     {
+      id: "card1", type: "card", heading: "Sent from Brainerd",
+      body: "Our church has sent many members to serve around the world. They need our ongoing prayer as they share Christ’s love and face the challenges of cross-cultural ministry. Pray for their strength, provision, and open doors for the Gospel. Let’s faithfully support those we’ve sent as partners in the Great Commission.",
+      button: { label: "See the full list", url: "https://mail.brainerdhq.app/serving" },
+    },
+    {
+      id: "roster1", type: "partners", heading: "WHO WE’VE SENT", showImages: false,
+      items: ROSTER.map((r, n) => ({
+        id: `m${n}`, label: [r.region, r.place].filter(Boolean).join(" · ").toUpperCase(), heading: r.who,
+        body: [r.deployed && `Deployed ${r.deployed}.`, r.note].filter(Boolean).join(" "), prayer: [],
+      })),
+    },
+    {
       id: "cta1", type: "cta", heading: "Give to Missions",
       body: "If God has put missions on your heart, consider giving toward the Kingdom work happening around the world. Your generosity supports our missionary partners overseas, sends teams from Brainerd to serve alongside them, and helps equip believers in other nations. Give regularly or toward a specific project; every gift advances the Gospel globally.",
       button: { label: "Give to Missions", url: "https://app.securegive.com/brainerdbaptist/main/donate/category?cats=47305&amts=false&recurring=true" },
       note: "Questions? missions@brainerdbaptist.org",
-    },
-    {
-      id: "card1", type: "card", heading: "Sent from Brainerd",
-      body: "Our church has sent many members to serve around the world. They need our ongoing prayer as they share Christ’s love and face the challenges of cross-cultural ministry. Pray for their strength, provision, and open doors for the Gospel. Let’s faithfully support those we’ve sent as partners in the Great Commission.",
-      button: { label: "See everyone serving globally", url: "https://mail.brainerdhq.app/serving" },
     },
   ],
 };
