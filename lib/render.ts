@@ -82,12 +82,12 @@ function logo(o: RenderOpts, w: number, key: string): string {
 // Heights are tuned per mark so the visual weight matches; ministries not listed
 // keep the baked Brainerd header image.
 const MARKS: Record<string, { w: number; h: number }> = {
-  missions: { w: 300, h: 30 },
-  kids: { w: 300, h: 32 },
-  men: { w: 300, h: 30 },
-  women: { w: 280, h: 29 },
-  students: { w: 190, h: 50 },
-  bx: { w: 150, h: 65 },
+  missions: { w: 220, h: 22 },
+  kids: { w: 220, h: 23 },
+  men: { w: 220, h: 22 },
+  women: { w: 210, h: 22 },
+  students: { w: 150, h: 39 },
+  bx: { w: 96, h: 42 },
 };
 function mark(o: RenderOpts, key: string): string | null {
   const m = MARKS[key];
@@ -216,7 +216,7 @@ export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
   const p = doc.theme && doc.theme !== doc.ministry ? { ...paletteFor(doc.theme), label: pm.label, name: pm.name } : pm;
   const mk = mark(o, pm.key);
   const masthead = (mk
-    ? bar(p.dark, `<div style="line-height:0;font-size:0;">${mk}</div>`, "26px 40px")
+    ? bar(p.dark, `<div style="line-height:0;font-size:0;">${mk}</div>`, "22px 40px")
     : bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px")) + "\n" + stripe(p.bright);
   const churchFoot = mk ? footLogo(o, 150) : "";
   const blocks = doc.blocks
