@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { HeaderBrand } from "@/components/HeaderBrand";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Check, ChevronLeft, ChevronRight, CircleDashed, Clock, ExternalLink, Pause, Play, Plus, Repeat, SkipForward, Trash2, Undo2, X } from "lucide-react";
 import { PALETTES, paletteFor } from "@/lib/ministries";
@@ -185,12 +186,12 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
 
   return (
     <div className="min-h-full bg-mist pb-16">
-      <header className="sticky top-0 z-10 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-[#00abc9]/15 bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center gap-3">
           <Link href="/emails" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><ArrowLeft size={18} /><span className="hidden sm:inline">Emails</span></Link>
-          <span className="flex items-center gap-3"><img src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={112} height={17} className="h-[17px] w-auto" /><span className="text-[15px] font-bold tracking-[0.16em] text-navy">MAIL</span></span>
+          <HeaderBrand label="Mail" />
           <span className="flex-1" />
-          <button onClick={openAdd} className="pill-btn bg-[#1e61b9] text-white"><Plus size={16} className="mr-1.5" />Plan an email</button>
+          <button onClick={openAdd} className="pill-btn shrink-0 whitespace-nowrap bg-[#1e61b9] text-white"><Plus size={16} className="mr-1.5" /><span className="sm:hidden">Plan</span><span className="hidden sm:inline">Plan an email</span></button>
         </div>
       </header>
 
