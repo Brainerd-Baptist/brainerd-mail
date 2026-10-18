@@ -24,4 +24,18 @@ const must = ["tidy", "subject-caps", "preview-same", "headline-long", "headline
 const miss = must.filter((r) => !found.some((s) => s.rule === r));
 if (miss.length) { console.error("MISSING RULES:", miss); process.exit(1); }
 if (polish(d).some((s) => s.kind === "mechanical")) { console.error("mechanical fixes did not clear"); process.exit(1); }
+import { measure, judge } from "../lib/image-quality";
+const W = 64, H = 64;
+const flat = (v: number) => { const a = new Uint8ClampedArray(W * H * 4); for (let i = 0; i < W * H; i++) { a[i*4] = v; a[i*4+1] = v; a[i*4+2] = v; a[i*4+3] = 255; } return a; };
+const checker = () => { const a = flat(0); for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const v = (x + y) % 2 ? 230 : 120; const i = (y * W + x) * 4; a[i] = a[i+1] = a[i+2] = v; } return a; };
+const jd = judge(measure(flat(30), W, H), 1600);
+const jb = judge(measure(checker(), W, H), 1600);
+const js = judge(measure(checker(), W, H), 600);
+if (!jd.dark || !jd.soft) { console.error("flat dark image should be dark and soft", jd); process.exit(1); }
+if (jb.dark || jb.soft || jb.small) { console.error("bright detailed image should pass", jb); process.exit(1); }
+if (!js.small) { console.error("narrow source should be small", js); process.exit(1); }
+const ph: any = { ...MISSIONS_TEMPLATE, blocks: [{ id: "p1", type: "photo", image: { url: "https://x/y/abc123.jpg", alt: "a", quality: jd }, caption: "" }] };
+const pr = polish(ph).filter((s) => s.kind === "photo").map((s) => s.rule);
+if (!pr.includes("photo-dark") || !pr.includes("photo-soft")) { console.error("photo rules missing", pr); process.exit(1); }
+console.log("photo rules:", pr);
 console.log("ok");

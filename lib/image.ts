@@ -3,7 +3,13 @@
 // email-friendly JPEG before it ever leaves the phone.
 // With `aspect` (width / height, e.g. 3 for a wide banner) the photo is
 // center-cropped to that shape so every email's header image matches.
+import { measure, judge, type PhotoQuality } from "./image-quality";
+
 export async function prepareImage(file: File, maxEdge = 1600, quality = 0.85, aspect?: number): Promise<Blob> {
+  return (await prepareImageQ(file, maxEdge, quality, aspect)).blob;
+}
+
+export async function prepareImageQ(file: File, maxEdge = 1600, quality = 0.85, aspect?: number): Promise<{ blob: Blob; quality: PhotoQuality }> {
   const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
   let sx = 0, sy = 0, sw = bmp.width, sh = bmp.height;
   if (aspect) {
@@ -17,7 +23,18 @@ export async function prepareImage(file: File, maxEdge = 1600, quality = 0.85, a
   const ctx = canvas.getContext("2d")!;
   ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
   ctx.drawImage(bmp, sx, sy, sw, sh, 0, 0, w, h);
-  return await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("resize failed"))), "image/jpeg", quality));
+  // Look at a small copy of the part that will actually be shown.
+  let q: PhotoQuality = {};
+  try {
+    const tw = Math.min(320, w), th = Math.max(1, Math.round((h * tw) / w));
+    const small = document.createElement("canvas");
+    small.width = tw; small.height = th;
+    const sctx = small.getContext("2d", { willReadFrequently: true })!;
+    sctx.drawImage(canvas, 0, 0, tw, th);
+    q = judge(measure(sctx.getImageData(0, 0, tw, th).data, tw, th), sw);
+  } catch {}
+  const blob = await new Promise<Blob>((res, rej) => canvas.toBlob((b) => (b ? res(b) : rej(new Error("resize failed"))), "image/jpeg", quality));
+  return { blob, quality: q };
 }
 
 export function blobToDataUrl(b: Blob): Promise<string> {
@@ -26,13 +43,13 @@ export function blobToDataUrl(b: Blob): Promise<string> {
 
 // Uploads to Brainerd Mail's storage. If storage isn't connected yet (dev),
 // falls back to an in-browser preview that checks will refuse to send.
-export async function uploadPhoto(file: File, aspect?: number): Promise<{ url: string; local: boolean; bytes: number }> {
-  const blob = await prepareImage(file, 1600, 0.85, aspect);
+export async function uploadPhoto(file: File, aspect?: number): Promise<{ url: string; local: boolean; bytes: number; quality: PhotoQuality }> {
+  const { blob, quality } = await prepareImageQ(file, 1600, 0.85, aspect);
   const fd = new FormData();
   fd.append("file", blob, "photo.jpg");
   try {
     const r = await fetch("/api/upload", { method: "POST", body: fd });
-    if (r.ok) { const j = await r.json(); return { url: j.url, local: false, bytes: blob.size }; }
+    if (r.ok) { const j = await r.json(); return { url: j.url, local: false, bytes: blob.size, quality }; }
   } catch {}
-  return { url: await blobToDataUrl(blob), local: true, bytes: blob.size };
+  return { url: await blobToDataUrl(blob), local: true, bytes: blob.size, quality };
 }

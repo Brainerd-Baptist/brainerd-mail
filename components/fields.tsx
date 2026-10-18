@@ -110,7 +110,7 @@ export function ImageFields({ label = "Photo", value, onChange, aspect }: { labe
     setBusy(true); setNote("");
     try {
       const r = await uploadPhoto(file, aspect);
-      onChange({ ...v, url: r.url });
+      onChange({ ...v, url: r.url, quality: r.quality });
       setNote(r.local ? "Preview only. Photos upload for real once storage is connected." : `Added (${Math.round(r.bytes / 1024)} KB)`);
     } catch { setNote("That photo could not be read. Try another."); }
     finally { setBusy(false); if (input.current) input.current.value = ""; }
@@ -127,7 +127,7 @@ export function ImageFields({ label = "Photo", value, onChange, aspect }: { labe
       <input ref={input} type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
       <div className="flex gap-2">
         <button type="button" onClick={() => input.current?.click()} disabled={busy} className="pill-btn flex-1 border-2 border-navy text-navy"><Camera size={18} className="mr-1.5" />{busy ? "Adding…" : v.url ? "Change photo" : "Choose or take a photo"}</button>
-        {v.url ? <button type="button" onClick={() => onChange({ ...v, url: "" })} className="pill-btn px-4 text-muted">Remove</button> : null}
+        {v.url ? <button type="button" onClick={() => onChange({ ...v, url: "", quality: undefined })} className="pill-btn px-4 text-muted">Remove</button> : null}
       </div>
       {note ? <span className="block text-xs text-muted">{note}</span> : null}
       <Field label="Description for screen readers" value={v.alt} onChange={(x) => onChange({ ...v, alt: x })} hint="Say what is in the photo, in a few words" />

@@ -74,7 +74,7 @@ export function PolishPanel({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d
                   <div className="mt-2 flex flex-wrap gap-2">
                     {s.fix ? <button onClick={() => setDoc(s.fix!.apply(doc))} className="min-h-9 rounded-full bg-brand px-3.5 text-sm font-semibold text-white">{s.fix.label}</button> : null}
                     {s.blockId ? <button onClick={() => onShow(s.blockId!)} className="flex min-h-9 items-center gap-1 rounded-full border border-line px-3 text-sm font-semibold text-ink"><Eye size={14} />Show me</button> : null}
-                    <button onClick={() => remember(s.id)} className="min-h-9 px-2 text-sm font-semibold text-muted">Dismiss</button>
+                    <button onClick={() => remember(s.id)} className="min-h-9 px-2 text-sm font-semibold text-muted">{s.kind === "photo" ? "Use it anyway" : "Dismiss"}</button>
                   </div>
                 </div>
               </div>

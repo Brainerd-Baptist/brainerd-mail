@@ -7,6 +7,7 @@ import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
 import { runChecks } from "@/lib/checks";
 import { PolishPanel } from "@/components/PolishPanel";
+import { polish, readDismissed } from "@/lib/polish";
 import { MISSIONS_TEMPLATE } from "@/lib/templates/missions";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import { Area, Field } from "./fields";
@@ -143,6 +144,15 @@ export default function Builder() {
   const warns = checks.filter((c) => !c.ok && c.severity === "warn").length;
 
   const testingRef = useRef(false);
+  // Photos that look dark, blurry or small: warn, and ask before sending.
+  const photoWarnings = useMemo(() => polish(doc).filter((s) => s.kind === "photo"), [doc]);
+  function confirmPhotos(): boolean {
+    const skip = readDismissed(doc.ministry);
+    const open = photoWarnings.filter((s) => !skip.includes(s.id));
+    if (!open.length) return true;
+    const what = Array.from(new Set(open.map((s) => s.title.replace("This photo ", "").replace("is ", "").replace("looks ", "")))).join(", ");
+    return confirm(`${open.length} photo${open.length === 1 ? "" : "s"} may not look their best (${what}). Look at the Check tab, or send for approval anyway?`);
+  }
   async function sendTest() {
     if (testingRef.current) return;
     testingRef.current = true;
@@ -265,7 +275,7 @@ export default function Builder() {
   const sendActions = (
     <div className="flex flex-col gap-3">
       <button onClick={sendTest} className="pill-btn w-full border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
-      <button disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
+      <button onClick={() => { if (!confirmPhotos()) return; }} disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
       {blocking ? <p className="text-center text-xs text-muted">Fix the {blocking} item{blocking > 1 ? "s" : ""} in the checklist first.</p> : null}
     </div>
   );
@@ -345,7 +355,7 @@ export default function Builder() {
         {deviceToggle(["phone", "desktop", "dark", "text"])}
         <div className="flex items-center gap-3">
           <button onClick={sendTest} className="pill-btn border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
-          <button disabled={blocking > 0} className={`pill-btn ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
+          <button onClick={() => { if (!confirmPhotos()) return; }} disabled={blocking > 0} className={`pill-btn ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
         </div>
       </header>
       {status ? <div className="bg-[#e8f5ee] px-5 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}

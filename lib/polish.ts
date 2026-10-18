@@ -1,4 +1,4 @@
-import type { EmailDoc, Block } from "./blocks";
+import type { EmailDoc, Block, Img } from "./blocks";
 
 // Polish: advice that keeps the author's words and nudges the email toward the
 // premium look. Rules are plain functions over the block list (no HTML), so
@@ -9,7 +9,7 @@ export type Suggestion = {
   id: string; // stable, used to remember dismissals
   rule: string;
   level: "improve" | "tip";
-  kind: "mechanical" | "wording" | "structure";
+  kind: "mechanical" | "wording" | "structure" | "photo";
   blockId?: string;
   title: string;
   detail?: string;
@@ -70,6 +70,20 @@ function buttons(b: Block): { label: string }[] {
   }
 }
 
+function photosOf(b: Block): { slot: string; img: Img }[] {
+  switch (b.type) {
+    case "hero": return b.showImage && b.image?.url ? [{ slot: "header", img: b.image }] : [];
+    case "photo": return b.image.url ? [{ slot: "photo", img: b.image }] : [];
+    case "partners": return b.showImages ? b.items.flatMap((i) => (i.image?.url ? [{ slot: i.id, img: i.image }] : [])) : [];
+    default: return [];
+  }
+}
+
+export const dismissedKey = (ministry: string) => `brainerd-mail:polish-dismissed:${ministry}`;
+export function readDismissed(ministry: string): string[] {
+  try { return JSON.parse(localStorage.getItem(dismissedKey(ministry)) || "[]"); } catch { return []; }
+}
+
 export function polish(doc: EmailDoc): Suggestion[] {
   const out: Suggestion[] = [];
   const visible = doc.blocks.filter((b) => !b.hidden);
@@ -113,6 +127,17 @@ export function polish(doc: EmailDoc): Suggestion[] {
     }
     if (ts.some((t) => /\bvenue\b/i.test(t.text))) {
       add({ rule: "venue", level: "improve", kind: "wording", blockId: b.id, title: "House style avoids the word “venue”", detail: "Try the building or room name." });
+    }
+
+    for (const { slot, img } of photosOf(b)) {
+      const q = img.quality;
+      if (!q) continue;
+      const tail = img.url.slice(-14);
+      const warn = (flag: string, title: string, detail: string) =>
+        add({ id: `photo-${flag}:${b.id}:${slot}:${tail}`, rule: `photo-${flag}`, level: "improve", kind: "photo", blockId: b.id, title, detail });
+      if (q.dark) warn("dark", "This photo is dark", "It may be hard to see on a phone. A brighter shot, or one taken near a window or outdoors, will look better.");
+      if (q.soft) warn("soft", "This photo looks blurry", "Motion or low light can smear details. A sharper shot will look more finished.");
+      if (q.small) warn("small", "This photo is small", "It may look soft on newer phones. A larger original will stay crisp.");
     }
 
     if (b.type === "hero") {
