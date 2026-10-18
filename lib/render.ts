@@ -92,15 +92,13 @@ function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
   switch (b.type) {
     case "hero": {
       const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
-      return `<tr><td class="px" style="background:${p.dark};background-image:linear-gradient(${p.dark},${p.dark});padding:28px 40px 40px 40px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-<td style="font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;color:${p.soft};">${logo(o, 150, p.key)}${p.name === "BRAINERD" ? "" : `<span class="hdr-label" style="display:inline-block;vertical-align:middle;margin-left:14px;padding-left:14px;border-left:1px solid ${p.soft};line-height:30px;">${esc(p.label.toUpperCase())}</span>`}</td>
-<td align="right" style="font-family:${SANS};font-size:13px;font-weight:600;letter-spacing:0.14em;color:${p.soft};">${esc(b.eyebrow)}</td>
-</tr></table>
-<h1 class="h1" style="margin:28px 0 14px 0;font-family:${SERIF};font-weight:700;font-size:42px;line-height:1.1;color:#f6faf8;">${esc(b.headline)}</h1>
-${b.body ? `<p style="margin:0 0 20px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:${p.soft};max-width:500px;">${esc(b.body)}</p>` : ""}
-${img ? `<div style="margin:0 0 20px 0;">${img}</div>` : ""}
-${button(b.button, "onDark", p, o, b.id)}
+      const kicker = [p.name === "BRAINERD" ? "" : p.label, b.eyebrow].filter(Boolean).join("  ·  ");
+      return `<tr><td class="px dm-hero" style="background:${p.tint};padding:36px 40px 40px 40px;">
+${kicker ? `<div style="margin:0 0 14px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}
+<h1 class="h1 dm-head" style="margin:0 0 14px 0;font-family:${SERIF};font-weight:700;font-size:42px;line-height:1.1;color:${p.dark};">${esc(b.headline)}</h1>
+${b.body ? `<p class="dm-text" style="margin:0 0 22px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:#33445d;max-width:500px;">${esc(b.body)}</p>` : ""}
+${img ? `<div style="margin:0 0 22px 0;">${img}</div>` : ""}
+${button(b.button, "primary", p, o, b.id)}
 </td></tr>`;
     }
     case "text":
@@ -174,8 +172,20 @@ ${button(b.button, "primary", p, o, b.id)}
   }
 }
 
+// Brand bars hold only the logo image (no live text), so they look identical
+// in light and dark mode. The background is locked with a background-image
+// because Gmail's dark mode inverts plain background colors but not images.
+function bar(color: string, inner: string, pad: string): string {
+  return `<tr><td class="px" style="background:${color};background-image:linear-gradient(${color},${color});padding:${pad};">${inner}</td></tr>`;
+}
+function stripe(color: string): string {
+  return `<tr><td style="height:4px;line-height:4px;font-size:1px;background:${color};background-image:linear-gradient(${color},${color});">&nbsp;</td></tr>`;
+}
+
 export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
   const p = paletteFor(doc.ministry);
+  const masthead = bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px") + "\n" + stripe(p.bright);
+  const footBar = stripe(p.bright) + "\n" + bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px");
   const blocks = doc.blocks
     .filter((b) => !b.hidden)
     .map((b) => {
@@ -184,7 +194,7 @@ export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
     })
     .join("\n");
   const footerLink = (url: string, label: string, id: string) =>
-    `<a href="${esc(o.wrap(url, id, label))}" style="color:#f6faf8;text-decoration:underline;font-family:${SANS};font-size:14px;font-weight:600;margin-right:20px;">${esc(label)}</a>`;
+    `<a href="${esc(o.wrap(url, id, label))}" style="color:${p.dark};text-decoration:underline;font-family:${SANS};font-size:14px;font-weight:600;margin-right:20px;">${esc(label)}</a>`;
   const links = [
     o.mode === "email" && o.webUrl ? footerLink(o.webUrl, "View in browser", "footer-web") : "",
     footerLink(o.preferencesUrl, "Manage preferences", "footer-prefs"),
@@ -212,8 +222,7 @@ body{margin:0;padding:0;-webkit-text-size-adjust:100%;}
 table{border-collapse:collapse;}
 img{-ms-interpolation-mode:bicubic;}
 a{color:inherit;}
-@media (max-width:620px){.hdr-label{display:block!important;margin:10px 0 0 0!important;padding:0!important;border:0!important;line-height:1.2!important;}
- .px{padding-left:20px!important;padding-right:20px!important;}
+@media (max-width:620px){.px{padding-left:20px!important;padding-right:20px!important;}
  .h1{font-size:32px!important;}
  .stack{display:block!important;width:100%!important;box-sizing:border-box;padding-left:0!important;padding-right:0!important;}
  .btn{display:block!important;width:100%!important;}
@@ -224,6 +233,8 @@ a{color:inherit;}
 @media (prefers-color-scheme:dark){
  .dm-bg{background:#0f141b!important;}
  .dm-wrap{background:#17202b!important;}
+ .dm-hero{background:#1d2836!important;}
+ .dm-foot{background:#111821!important;}
  .dm-card{background:#1d2836!important;border-color:#33425a!important;}
  .dm-panel{background:#1d2836!important;}
  .dm-head{color:#ffffff!important;}
@@ -236,15 +247,16 @@ a{color:inherit;}
 ${preview}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-bg" style="background:#e6ecf2;"><tr><td align="center" class="outer" style="padding:32px 12px;">
 <table role="presentation" class="wrap dm-wrap" width="640" cellpadding="0" cellspacing="0" border="0" style="width:640px;max-width:640px;background:#ffffff;border-radius:12px;overflow:hidden;">
+${masthead}
 ${blocks}
 <tr><td style="height:32px;line-height:32px;font-size:1px;">&nbsp;</td></tr>
-<tr><td class="px" style="background:${p.dark};background-image:linear-gradient(${p.dark},${p.dark});padding:36px 40px;">
-<div style="margin:0 0 16px 0;">${logo(o, 150, p.key)}</div>
-<p style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">${esc(doc.footerNote)}</p>
-${o.contactEmail ? `<p style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:${p.soft};">Questions? Write us at <a href="mailto:${esc(o.contactEmail)}" style="color:#f6faf8;text-decoration:underline;">${esc(o.contactEmail)}</a></p>` : ""}
+<tr><td class="px dm-foot" style="background:#f1f5f9;padding:28px 40px 36px 40px;">
+<p class="dm-text" style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">${esc(doc.footerNote)}</p>
+${o.contactEmail ? `<p class="dm-text" style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">Questions? Write us at <a href="mailto:${esc(o.contactEmail)}" style="color:${p.dark};text-decoration:underline;font-weight:600;">${esc(o.contactEmail)}</a></p>` : ""}
 <div style="margin:0 0 16px 0;">${links}</div>
-<p style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:${p.soft};">${esc(o.address)}</p>
+<p class="dm-muted" style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:#5b6b80;">${esc(o.address)}</p>
 </td></tr>
+${footBar}
 </table>
 </td></tr></table>
 ${webScript}
