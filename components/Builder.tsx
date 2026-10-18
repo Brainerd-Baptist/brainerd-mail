@@ -6,6 +6,7 @@ import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc 
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
 import { runChecks } from "@/lib/checks";
+import { PolishPanel } from "@/components/PolishPanel";
 import { MISSIONS_TEMPLATE } from "@/lib/templates/missions";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import { Area, Field } from "./fields";
@@ -175,6 +176,7 @@ export default function Builder() {
   );
 
   const checksPanel = (
+    <div className="space-y-4">
     <div className="rounded-xl border border-line bg-white p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-[15px] font-bold text-ink">Before you send</h3>
@@ -188,6 +190,8 @@ export default function Builder() {
           </li>
         ))}
       </ul>
+    </div>
+    <PolishPanel doc={doc} setDoc={setDoc} onShow={(id) => { setSelected(id); setTab("edit"); }} />
     </div>
   );
 

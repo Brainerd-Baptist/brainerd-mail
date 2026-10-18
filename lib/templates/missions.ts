@@ -8,7 +8,7 @@ export const MISSIONS_TEMPLATE: EmailDoc = {
   subject: "Kingdom work around the globe",
   previewText: "Who is traveling, who we are praying for, and how God is working around the world.",
   monthLabel: "OCTOBER 2026",
-  footerNote: "You're receiving this email because you're part of our church family or signed up for our regular newsletter.",
+  footerNote: "You’re receiving this email because you’re part of our church family or signed up for our regular newsletter.",
   blocks: [
     {
       id: "hero1", type: "hero", eyebrow: "OCTOBER 2026",
@@ -30,14 +30,14 @@ export const MISSIONS_TEMPLATE: EmailDoc = {
       items: [
         {
           id: "p1", label: "SERVING IN SOUTH ASIA", heading: "Update from the Fricks",
-          body: "Before heading to their stateside assignment, they celebrated God's faithfulness with local Baptist pastors. One of their ministry partners, Rahtee, visited the states and shared how God is working in her life with churches and communities.",
+          body: "Before heading to their stateside assignment, they celebrated God’s faithfulness with local Baptist pastors. One of their ministry partners, Rahtee, visited the states and shared how God is working in her life with churches and communities.",
           prayer: ["Praise God for how He provided for Rahtee and used her sharing to impact churches", "Continued growth as the girls learn in classroom settings during stateside time", "Meaningful time with parents and rest before returning to ministry overseas"],
           image: { url: "/sample/photo-a.svg", alt: "The Frick family with local pastors" },
           button: { label: "Read more from the Fricks", url: "https://brainerdbaptist.org/missions/fricks" },
         },
         {
           id: "p2", label: "SERVING IN TOGO", heading: "Update from Laura",
-          body: "Laura's first term overseas is wrapping up, and what a journey it has been. From her first words of French in a chilly studio to delivering babies and sharing Jesus in Togo, she has seen God's faithfulness every step of the way.",
+          body: "Laura’s first term overseas is wrapping up, and what a journey it has been. From her first words of French in a chilly studio to delivering babies and sharing Jesus in Togo, she has seen God’s faithfulness every step of the way.",
           prayer: ["People in Togo to accept Jesus, and gospel workers to pursue Kingdom work", "Laura and Will as they travel to the States and prepare for marriage", "The maintenance team as they work to restore the oxygen concentrator"],
           image: { url: "/sample/photo-b.svg", alt: "Laura at the clinic in Togo" },
           button: { label: "Read more from Laura", url: "https://brainerdbaptist.org/missions/laura" },
