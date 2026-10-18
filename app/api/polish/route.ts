@@ -33,7 +33,16 @@ export async function POST(req: Request) {
         messages: [{ role: "user", content: userMessage(doc) }],
       }),
     });
-    if (!res.ok) return NextResponse.json({ error: "The writing helper is unavailable right now. Try again in a minute." }, { status: 502 });
+    if (!res.ok) {
+      const detail = (await res.text().catch(() => "")).slice(0, 400);
+      console.error("polish: Anthropic API returned", res.status, detail);
+      const msg =
+        res.status === 401 ? "The Anthropic key isn’t being accepted. Check ANTHROPIC_API_KEY in Vercel."
+        : /credit|billing/i.test(detail) ? "The Anthropic account is out of credit. Add billing in the Anthropic Console."
+        : res.status === 404 ? "The writing model name isn’t recognized. Set ANTHROPIC_MODEL in Vercel."
+        : "The writing helper is unavailable right now. Try again in a minute.";
+      return NextResponse.json({ error: msg, status: res.status }, { status: 502 });
+    }
     const j = await res.json();
     const use = (j.content || []).find((c: any) => c.type === "tool_use");
     return NextResponse.json({ edits: validateEdits(doc, use?.input?.edits) });
