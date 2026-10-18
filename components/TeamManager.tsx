@@ -65,7 +65,7 @@ function MinistryPicker({ value, onChange }: { value: string[]; onChange: (v: st
 }
 
 const stamp = (iso: string) => new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) + " ET";
-const seen = (map: Record<string, string | null> | null, id: string) => (map ? (map[id] ? `Last signed in ${stamp(map[id]!)}` : "Has never signed in") : null);
+const seen = (map: Record<string, string | null> | null, id: string) => (map ? (map[id] ? `Last active ${stamp(map[id]!)}` : "No activity yet") : null);
 
 export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId: string; role: Role }; members: Member[]; invites: Invite[]; lastSignIn: Record<string, string | null> | null }) {
   const router = useRouter();

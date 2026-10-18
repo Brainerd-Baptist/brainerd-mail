@@ -4,6 +4,19 @@ import { createServerClient } from "@supabase/ssr";
 // Everything needs a signed-in staff member except the public pages readers use.
 const PUBLIC = ["/login", "/auth", "/brand/", "/w/", "/r/", "/u/", "/api/pray", "/manifest.webmanifest", "/icons/", "/sample/", "/_next/", "/favicon"];
 
+// Record "last active" (at most once every 5 minutes per person). Skips background prefetches so only real use counts.
+async function touch(req: NextRequest, userId: string, last: string | null) {
+  try {
+    if (req.headers.get("next-router-prefetch") || req.headers.get("purpose") === "prefetch") return;
+    if (last && Date.now() - new Date(last).getTime() < 5 * 60 * 1000) return;
+    await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/staff?user_id=eq.${userId}`, {
+      method: "PATCH",
+      headers: { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ last_active_at: new Date().toISOString() }),
+    });
+  } catch {}
+}
+
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   if (PUBLIC.some((p) => path.startsWith(p)) || path === "/serving") return NextResponse.next();
@@ -27,7 +40,8 @@ export async function middleware(req: NextRequest) {
   const { data } = await supabase.auth.getUser();
   if (data.user) {
     // Signed in is not enough: they must still be an active member of the team (removed or deactivated people are bounced on their next click).
-    const { data: row, error } = await supabase.from("staff").select("disabled_at").eq("user_id", data.user.id).maybeSingle();
+    const { data: row, error } = await supabase.from("staff").select("disabled_at,last_active_at").eq("user_id", data.user.id).maybeSingle();
+    if (!error && row && !row.disabled_at) await touch(req, data.user.id, row.last_active_at);
     if (error || (row && !row.disabled_at)) return res;
     if (path.startsWith("/api/")) return NextResponse.json({ error: "Your access to Brainerd Mail has changed." }, { status: 403 });
     const back = req.nextUrl.clone();

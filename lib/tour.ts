@@ -49,7 +49,7 @@ export function tourFor(role: Role, name: string): TourStep[] {
       { title: "When someone leaves", body: "Open them in Team, tap Manage, then Remove access. They're signed out on their next click and can't get back in. Their past work stays on the history, and you can restore access later.", hint: "Team → Manage → Remove access" },
       { title: "Feedback inbox", body: "Notes people send from the editor land in the Feedback inbox. Mark them seen, planned, or done.", hint: "Menu → Feedback inbox" },
     );
-    if (role === "owner") steps.push({ title: "Owner only", body: "Only you can see when each person last signed in (in Team), change Admins, or hand ownership to someone else with Make owner. There is only ever one owner." , hint: "Team" });
+    if (role === "owner") steps.push({ title: "Owner only", body: "Only you can see when each person was last active (in Team), change Admins, or hand ownership to someone else with Make owner. There is only ever one owner." , hint: "Team" });
   }
   steps.push(help, replay);
   return steps;

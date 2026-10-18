@@ -15,14 +15,12 @@ export default async function TeamPage() {
     sb.from("staff").select("user_id,email,name,role,ministries,disabled_at,created_at").order("created_at", { ascending: true }),
     sb.from("invites").select("id,email,first_name,last_name,role,ministries,created_at,expires_at,last_sent_at").is("accepted_at", null).is("revoked_at", null).order("created_at", { ascending: false }),
   ]);
-  // Owner only: when each person last signed in (read from the sign-in system, never sent to anyone else).
+  // Owner only: when each person was last active in Mail (their most recent click, not their sign-in, since people can stay signed in for weeks). Never sent to anyone else.
   let lastSignIn: Record<string, string | null> | null = null;
   if (me.role === "owner") {
     lastSignIn = {};
-    const rows = await Promise.all((people ?? []).map(async (p) => {
-      try { const { data } = await sb.auth.admin.getUserById(p.user_id as string); return [p.user_id as string, data.user?.last_sign_in_at ?? null] as const; } catch { return [p.user_id as string, null] as const; }
-    }));
-    for (const [k, v] of rows) lastSignIn[k] = v;
+    const { data: act } = await sb.from("staff").select("user_id,last_active_at");
+    for (const r of act ?? []) lastSignIn[r.user_id as string] = (r.last_active_at as string | null) ?? null;
   }
   return <TeamManager me={{ userId: me.userId, role: me.role }} members={(people ?? []) as Member[]} invites={(invites ?? []) as Invite[]} lastSignIn={lastSignIn} />;
 }
