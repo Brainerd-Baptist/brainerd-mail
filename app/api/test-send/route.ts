@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     const { data: rcpt } = await admin.from("recipients").insert({ send_id: send!.id, email: user.email, channel: "email" }).select("token,id").single();
     const out = renderFor(doc, linkIds, rcpt!.token, slug);
 
-    await sendEmail({ to: user.email, subject: `[TEST] ${doc.subject}`, html: out.html, text: out.text, unsubscribeUrl: out.unsubscribeUrl });
+    await sendEmail({ to: user.email, subject: `[TEST ${new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })}] ${doc.subject}`, html: out.html, text: out.text, unsubscribeUrl: out.unsubscribeUrl });
     await admin.from("recipients").update({ status: "sent", sent_at: new Date().toISOString() }).eq("id", rcpt!.id);
     await admin.from("sends").update({ finished_at: new Date().toISOString() }).eq("id", send!.id);
     await admin.from("audit_log").insert({ actor: user.id, action: "test_send", email_id: emailId, detail: { to: user.email } });

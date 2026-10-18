@@ -93,11 +93,11 @@ function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
     case "hero": {
       const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
       const kicker = [p.name === "BRAINERD" ? "" : p.label, b.eyebrow].filter(Boolean).join("  ·  ");
-      return `<tr><td class="px dm-hero" style="background:${p.tint};padding:36px 40px 40px 40px;">
-${kicker ? `<div style="margin:0 0 14px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}
-<h1 class="h1 dm-head" style="margin:0 0 14px 0;font-family:${SERIF};font-weight:700;font-size:42px;line-height:1.1;color:${p.dark};">${esc(b.headline)}</h1>
-${b.body ? `<p class="dm-text" style="margin:0 0 22px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:#33445d;max-width:500px;">${esc(b.body)}</p>` : ""}
-${img ? `<div style="margin:0 0 22px 0;">${img}</div>` : ""}
+      return `<tr><td class="px dm-hero" style="background:${p.tint};padding:30px 40px 34px 40px;">
+${kicker ? `<div style="margin:0 0 10px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}
+<h1 class="h1 dm-head" style="margin:0 0 14px 0;font-family:${SERIF};font-weight:700;font-size:40px;line-height:1.1;color:${p.dark};">${esc(b.headline)}</h1>
+${b.body ? `<p class="dm-text" style="margin:0 0 20px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:#33445d;max-width:500px;">${esc(b.body)}</p>` : ""}
+${img ? `<div style="margin:0 0 20px 0;">${img}</div>` : ""}
 ${button(b.button, "primary", p, o, b.id)}
 </td></tr>`;
     }
@@ -223,7 +223,7 @@ table{border-collapse:collapse;}
 img{-ms-interpolation-mode:bicubic;}
 a{color:inherit;}
 @media (max-width:620px){.px{padding-left:20px!important;padding-right:20px!important;}
- .h1{font-size:32px!important;}
+ .h1{font-size:30px!important;}
  .stack{display:block!important;width:100%!important;box-sizing:border-box;padding-left:0!important;padding-right:0!important;}
  .btn{display:block!important;width:100%!important;}
  .stack img{max-height:220px!important;height:220px!important;object-fit:cover!important;}
