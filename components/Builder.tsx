@@ -36,6 +36,13 @@ function useIsDesktop(): boolean | null {
   return v;
 }
 const ADDRESS = CHURCH_ADDRESS;
+function blockHint(b: any): string {
+  const t = (v: unknown) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
+  const first = t(b.heading) || t(b.title) || t(b.headline) || t(b.body) || t(b.text) || t(b.name) || t(b.label)
+    || t(b.teams?.[0]?.name) || t(b.items?.[0]?.heading) || t(b.button?.label) || t(b.alt) || t(b.caption);
+  return first.slice(0, 60);
+}
+
 const ADDABLE: BlockType[] = ["hero", "text", "photo", "event", "travel", "partners", "cta", "card", "map", "divider"];
 
 type SaveState = "saved" | "saving" | "error" | "conflict";
@@ -506,13 +513,18 @@ export default function Builder({ emailId }: { emailId: string }) {
       <ol className="space-y-1.5">
         {doc.blocks.map((b, i) => (
           <li key={b.id}>
-            <div className={`flex items-center gap-0.5 rounded-xl border px-2 py-1 text-sm transition ${selected === b.id ? "border-brand bg-[#f4f8fd]" : "border-line bg-white"}`}>
-              <button className={`min-h-11 min-w-0 flex-1 truncate text-left text-[15px] font-semibold ${b.hidden ? "text-muted line-through" : "text-ink"}`} onClick={() => { setSelected(b.id); if (isPhoneLayout) setTab("edit"); }}>{BLOCK_LABELS[b.type]}</button>
-              <IconBtn label={b.hidden ? "Show" : "Hide"} onClick={() => setBlocks((bs) => bs.map((x) => (x.id === b.id ? { ...x, hidden: !x.hidden } : x)))}>{b.hidden ? <EyeOff size={18} /> : <Eye size={18} />}</IconBtn>
-              <IconBtn label="Move up" disabled={i === 0} onClick={() => move(b.id, -1)}><ChevronUp size={18} /></IconBtn>
-              <IconBtn label="Move down" disabled={i === doc.blocks.length - 1} onClick={() => move(b.id, 1)}><ChevronDown size={18} /></IconBtn>
-              <IconBtn label="Duplicate" onClick={() => dup(b.id)}><Copy size={16} /></IconBtn>
-              <IconBtn label="Delete" danger onClick={() => { if (confirm("Remove this block?")) del(b.id); }}><Trash2 size={16} /></IconBtn>
+            <div className={`rounded-xl border px-2 pb-1 pt-1 text-sm transition ${selected === b.id ? "border-brand bg-[#f4f8fd]" : "border-line bg-white"}`}>
+              <button className={`block min-h-11 w-full min-w-0 px-1 text-left ${b.hidden ? "text-muted line-through" : "text-ink"}`} onClick={() => { setSelected(b.id); if (isPhoneLayout) setTab("edit"); }}>
+                <span className="block truncate text-[15px] font-semibold"><span className="mr-1.5 text-muted">{i + 1}.</span>{BLOCK_LABELS[b.type]}</span>
+                {blockHint(b) ? <span className="block truncate text-[13px] font-normal text-muted">{blockHint(b)}</span> : null}
+              </button>
+              <div className="flex items-center justify-end gap-0.5 border-t border-line/60 pt-0.5">
+                <IconBtn label={b.hidden ? "Show" : "Hide"} onClick={() => setBlocks((bs) => bs.map((x) => (x.id === b.id ? { ...x, hidden: !x.hidden } : x)))}>{b.hidden ? <EyeOff size={18} /> : <Eye size={18} />}</IconBtn>
+                <IconBtn label="Move up" disabled={i === 0} onClick={() => move(b.id, -1)}><ChevronUp size={18} /></IconBtn>
+                <IconBtn label="Move down" disabled={i === doc.blocks.length - 1} onClick={() => move(b.id, 1)}><ChevronDown size={18} /></IconBtn>
+                <IconBtn label="Duplicate" onClick={() => dup(b.id)}><Copy size={16} /></IconBtn>
+                <IconBtn label="Delete" danger onClick={() => { if (confirm("Remove this block?")) del(b.id); }}><Trash2 size={16} /></IconBtn>
+              </div>
             </div>
           </li>
         ))}
