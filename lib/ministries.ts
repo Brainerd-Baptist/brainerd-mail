@@ -17,7 +17,7 @@ export type Palette = {
 };
 
 export const PALETTES: Record<string, Palette> = {
-  "church-wide": { key: "church-wide", name: "BRAINERD", label: "Church-Wide", dark: "#00205b", button: "#1e61b9", btnText: "#ffffff", bright: "#acdceb", tint: "#e8eff9", soft: "#c9d9f0" },
+  "church-wide": { key: "church-wide", name: "BRAINERD", label: "Church-Wide", dark: "#00205b", bar: "#00abc9", button: "#008299", btnText: "#ffffff", bright: "#acdceb", tint: "#e0f5f9", soft: "#d6f1f7" },
   kids: { key: "kids", name: "KIDS", label: "Kids", dark: "#0b4452", button: "#007b90", btnText: "#ffffff", bright: "#00abc9", tint: "#e0f5f9", soft: "#bfe7ef" },
   students: { key: "students", name: "STUDENTS", label: "Students", dark: "#6e2f0c", button: "#b84d0a", btnText: "#ffffff", bright: "#f79648", tint: "#f4f5f7", soft: "#fbd5b3" },
   missions: { key: "missions", name: "MISSIONS", label: "Missions", dark: "#00205b", button: "#1e61b9", btnText: "#ffffff", bright: "#acdceb", tint: "#e8eff9", soft: "#c9d9f0" },
