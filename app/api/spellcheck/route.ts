@@ -16,7 +16,8 @@ export async function POST(req: Request) {
     if (w.me.role === "viewer") return NextResponse.json({ error: "Viewers can't change the shared word list." }, { status: 403 });
     const word = body.ignore.trim().toLowerCase();
     if (!/^[\p{L}'’-]{2,40}$/u.test(word)) return NextResponse.json({ error: "That doesn't look like a word." }, { status: 400 });
-    await w.sb.from("spell_words").upsert({ word, added_by: w.user.id }, { onConflict: "word" });
+    const { error } = await w.sb.from("spell_words").upsert({ word, added_by: w.user.id }, { onConflict: "word" });
+    if (error) return NextResponse.json({ error: "Could not save that word for the team." }, { status: 502 });
     return NextResponse.json({ ok: true });
   }
 

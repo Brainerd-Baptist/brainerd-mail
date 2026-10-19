@@ -5,3 +5,4 @@ create table if not exists public.spell_words (
   added_at timestamptz not null default now()
 );
 alter table public.spell_words enable row level security;
+grant all on public.spell_words to service_role;
