@@ -450,6 +450,16 @@ export async function emailReport(me: Perm, f: Filters, emailId: string, people:
     for (const c of clicks) if (c.recipient_id) { const x = clickBy.get(c.recipient_id) ?? clickBy.set(c.recipient_id, { n: 0, links: new Set(), last: c.at }).get(c.recipient_id)!; x.n++; x.links.add(linkLabel.get(c.link_id) ?? "link"); if (c.at > x.last) x.last = c.at; }
     const { data: st } = await sb.from("staff").select("email,name");
     const nameOf = new Map((st ?? []).filter((x) => x.name && String(x.name).trim()).map((x) => [String(x.email).toLowerCase(), String(x.name).trim()]));
+    // Fall back to names from the latest ClearStream audience check (a copy Mail already saved; nothing is sent back).
+    const { data: snaps } = await sb.from("audience_snapshots").select("ministry,taken_at,members").order("taken_at", { ascending: false }).limit(40);
+    const seenMin = new Set<string>();
+    for (const sn of snaps ?? []) {
+      if (seenMin.has(sn.ministry as string)) continue; seenMin.add(sn.ministry as string);
+      for (const m of (sn.members as { n?: string; e?: string }[]) ?? []) {
+        const k = String(m.e ?? "").toLowerCase(); const n = String(m.n ?? "").trim();
+        if (k && n && n !== "(no name)" && !nameOf.has(k)) nameOf.set(k, n);
+      }
+    }
     const sendOf = new Map(sends.map((x) => [x.id, x]));
     const openCount = new Map<string, number>();
     for (const o of opens) if (o.recipient_id) openCount.set(o.recipient_id, (openCount.get(o.recipient_id) ?? 0) + 1);
