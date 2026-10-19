@@ -52,6 +52,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [testOpen, setTestOpen] = useState(false);
+  const [testMenu, setTestMenu] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [canEdit, setCanEdit] = useState(true);
   const [role, setRole] = useState("");
@@ -716,8 +717,18 @@ export default function Builder({ emailId }: { emailId: string }) {
           <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Redo2 size={20} /></button>
           <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><History size={18} /><span className="hidden 2xl:inline">History</span></button>
           <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><Monitor size={18} /><span className="hidden 2xl:inline">Live preview</span></a>
-          <button onClick={() => { sendTest().catch(() => {}); }} className="pill-btn shrink-0 whitespace-nowrap border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
-          <button onClick={() => setTestOpen(true)} aria-label="Send a test to others" title="Send a test to others" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><Users size={18} /><span className="hidden 2xl:inline">Test to others</span></button>
+          <div className="relative shrink-0">
+            <button onClick={() => setTestMenu((v) => !v)} aria-haspopup="menu" aria-expanded={testMenu} disabled={testBusy} className="pill-btn whitespace-nowrap border-2 border-navy text-navy disabled:opacity-60"><FlaskConical size={16} className="mr-1.5" />{testBusy ? "Sending…" : "Send a test"}<ChevronDown size={16} className="ml-1" /></button>
+            {testMenu ? (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setTestMenu(false)} />
+                <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-line bg-white py-1 shadow-lg">
+                  <button role="menuitem" onClick={() => { setTestMenu(false); sendTest().catch(() => {}); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-[#f4f8fd]"><FlaskConical size={18} className="text-muted" />Send to me</button>
+                  <button role="menuitem" onClick={() => { setTestMenu(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-[#f4f8fd]"><Users size={18} className="text-muted" />Send to others…</button>
+                </div>
+              </>
+            ) : null}
+          </div>
           <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn shrink-0 whitespace-nowrap ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
         </div>
       </header>
