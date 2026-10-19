@@ -6,6 +6,9 @@ html, body { height: 100%; }
 body { background: #f1f5f9; color: #1b2a41; font-family: Barlow, system-ui, sans-serif; }
 
 .field { @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-[16px] text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20; }
+/* iPhone Safari lets date/time inputs grow past their box and centers the text; keep them inside the column, left-aligned, same height as other fields. */
+input[type="datetime-local"], input[type="date"], input[type="time"] { display: block; -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; max-width: 100%; min-height: 44px; box-sizing: border-box; text-align: left; }
+input[type="datetime-local"]::-webkit-date-and-time-value, input[type="date"]::-webkit-date-and-time-value, input[type="time"]::-webkit-date-and-time-value { text-align: left; min-height: 1.5em; }
 .label { @apply mb-1 block text-xs font-bold uppercase tracking-[0.12em] text-muted; }
 .pill-btn { @apply inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold transition; }
 
