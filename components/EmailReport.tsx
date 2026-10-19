@@ -20,6 +20,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
   const [who, setWho] = useState<"all" | "clicked" | "opened" | "quiet" | "problem">("all");
   const [shown, setShown] = useState(25);
   const [open, setOpen] = useState<string | null>(null);
+  const [openLink, setOpenLink] = useState<string | null>(null);
 
   useEffect(() => {
     const ac = new AbortController();
@@ -90,12 +91,18 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                     <ul className="divide-y divide-line">
                       {r.links.filter((l) => l.inEmail || l.clicks > 0).map((l) => (
                         <li key={l.linkId} className="py-3 first:pt-0 last:pb-0">
+                          <button type="button" disabled={!(people && l.clicks)} onClick={() => setOpenLink(openLink === l.linkId ? null : l.linkId)} aria-expanded={openLink === l.linkId} className="block w-full text-left">
                           <div className="flex items-baseline justify-between gap-3">
                             <div className="min-w-0"><div className="truncate font-semibold text-ink">{l.label}</div><div className="truncate text-[12px] text-muted">{l.inEmail ? `${l.blockType} · block ${l.position}` : "Removed from this email since"} · {l.url.replace(/^https?:\/\/(www\.)?/, "")}</div></div>
                             <div className="shrink-0 text-right"><div className="font-semibold tabular-nums text-navy">{num(l.clicks)} <span className="text-[12px] font-normal text-muted">click{l.clicks === 1 ? "" : "s"}</span></div><div className="text-[12px] text-muted">{num(l.unique)} {l.unique === 1 ? "person" : "people"}{l.shareOfDelivered !== null ? ` · ${pct(l.shareOfDelivered)}` : ""}</div></div>
-                          </div>
+                          </div></button>
                           <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eaf0f7]"><div className="h-full rounded-full bg-[#1e61b9]" style={{ width: `${Math.max(l.clicks ? 2 : 0, (l.clicks / maxClicks) * 100)}%` }} /></div>
                           {l.clicks > 0 && (l.phone || l.desktop || l.tablet) ? <div className="mt-1 text-[12px] text-muted">{[l.phone ? `${l.phone} phone` : "", l.desktop ? `${l.desktop} desktop` : "", l.tablet ? `${l.tablet} tablet` : ""].filter(Boolean).join(" · ")}</div> : null}
+                          {people && l.clicks > 0 ? <div className="mt-1 text-[12px] font-semibold text-brand">{openLink === l.linkId ? "Hide who tapped" : "See who tapped"}</div> : null}
+                          {openLink === l.linkId && r.linkWho?.[l.linkId] ? (
+                            <ul className="mt-2 space-y-1 border-l-2 border-line pl-3 text-[13px]">
+                              {r.linkWho[l.linkId].map((w, i) => <li key={i} className="flex justify-between gap-3"><span className="min-w-0 truncate text-ink">{w.name || w.email}</span><span className="shrink-0 text-muted"><span className="font-semibold text-navy">{w.clicks} tap{w.clicks === 1 ? "" : "s"}</span> · last {etDate(w.last, true)}</span></li>)}
+                            </ul>) : null}
                         </li>))}
                     </ul>
                   ) : <p className="text-[13px] text-muted">This email has no tracked links.</p>}
@@ -114,7 +121,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
 
                 {people && r.recipients ? (
                   <Card title={`People · ${people_.length}`} note="Only the Owner and Admins can see this. Please keep it inside the church."
-                    right={<button onClick={() => downloadCsv("brainerd-mail-recipients.csv", ["Name", "Email", "Times sent", "Channel", "Status", "Opened (est.)", "Clicks", "Links clicked"], people_.map((p) => [p.name ?? "", p.email, p.receivedCount, p.channel, p.status, p.opened ? "yes" : "no", p.clicks, p.links.join("; ")]))} className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><Download size={14} />CSV</button>}>
+                    right={<button onClick={() => downloadCsv("brainerd-mail-recipients.csv", ["Name", "Email", "Times sent", "Channel", "Status", "Opens (est.)", "Clicks", "Links clicked"], people_.map((p) => [p.name ?? "", p.email, p.receivedCount, p.channel, p.status, p.opens, p.clicks, p.links.join("; ")]))} className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><Download size={14} />CSV</button>}>
                     <div className="mb-3 flex flex-wrap gap-2">
                       {([["all", "Everyone"], ["clicked", "Clicked"], ["opened", "Opened"], ["quiet", "No activity"], ["problem", "Bounced or failed"]] as const).map(([v, l]) => <button key={v} onClick={() => { setWho(v); setShown(25); }} aria-pressed={who === v} className={`min-h-9 rounded-full border px-3 text-[13px] font-semibold ${who === v ? "border-navy bg-navy text-white" : "border-line bg-white text-ink"}`}>{l}</button>)}
                     </div>
@@ -122,7 +129,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                       {people_.slice(0, shown).map((p) => {
                         const key = p.email || String(p.lastActivity);
                         const isOpen = open === key;
-                        const sub = p.links.length ? `Tapped ${p.links.join(", ")}` : p.opened ? "Opened, no taps" : p.status === "bounced" ? "Bounced" : "No activity";
+                        const sub = [p.opens ? `Opened ${p.opens} time${p.opens === 1 ? "" : "s"}` : p.status === "bounced" ? "Bounced" : "Not opened", p.clicks ? `tapped ${p.links.join(", ")}` : "no taps"].join(" · ");
                         return (
                           <li key={key} className="py-1 first:pt-0">
                             <button onClick={() => setOpen(isOpen ? null : key)} aria-expanded={isOpen} className="flex w-full items-start justify-between gap-3 rounded-lg py-2 text-left hover:bg-[#f4f8fd]">
@@ -140,7 +147,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                               <div className="mb-2 ml-1 space-y-2 border-l-2 border-line pl-3">
                                 {p.receipts.map((rc, j) => (
                                   <div key={j} className="text-[13px]">
-                                    <div className="flex flex-wrap items-center gap-x-2 text-ink"><span className="font-semibold">Sent {rc.at ? etDate(rc.at, true) : ""}</span>{rc.kind === "test" ? <Chip tone="amber">Test</Chip> : null}<span className="text-muted">{["bounced", "complained", "failed"].includes(rc.status) ? rc.status : rc.opened ? `opened ${rc.openedAt ? etDate(rc.openedAt, true) : ""}` : "not opened yet"}</span></div>
+                                    <div className="flex flex-wrap items-center gap-x-2 text-ink"><span className="font-semibold">Sent {rc.at ? etDate(rc.at, true) : ""}</span>{rc.kind === "test" ? <Chip tone="amber">Test</Chip> : null}<span className="text-muted">{["bounced", "complained", "failed"].includes(rc.status) ? rc.status : rc.opened ? `opened ${rc.openCount} time${rc.openCount === 1 ? "" : "s"}, first ${rc.openedAt ? etDate(rc.openedAt, true) : ""}` : "not opened yet"}</span></div>
                                     {rc.taps.length ? <ul className="mt-1 space-y-0.5">{rc.taps.map((t, k) => <li key={k} className="flex justify-between gap-3 text-muted"><span className="min-w-0 truncate text-ink">{t.label}</span><span className="shrink-0">{etDate(t.at, true)}{t.device ? ` · ${t.device}` : ""}</span></li>)}</ul> : <div className="text-muted">No taps</div>}
                                   </div>))}
                               </div>) : null}

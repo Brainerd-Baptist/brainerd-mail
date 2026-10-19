@@ -368,9 +368,9 @@ function bucketLabel(b: string, g: Filters["group"]) {
 
 // ---------- one email ----------
 export type PersonRow = {
-  email: string; name: string | null; channel: string; status: string; opened: boolean; clicks: number; links: string[]; lastActivity: string | null;
+  email: string; name: string | null; channel: string; status: string; opened: boolean; opens: number; clicks: number; links: string[]; lastActivity: string | null;
   receivedCount: number; // how many times this address was sent the email
-  receipts: { at: string; kind: string; status: string; opened: boolean; openedAt: string | null; taps: { label: string; at: string; device: string | null }[] }[];
+  receipts: { at: string; kind: string; status: string; opened: boolean; openedAt: string | null; openCount: number; taps: { linkId: string; label: string; at: string; device: string | null }[] }[];
 };
 export type EmailReport = {
   email: { id: string; title: string; subject: string; ministry: string; ministryLabel: string; status: string; slug: string | null };
@@ -385,6 +385,7 @@ export type EmailReport = {
   timeToClick: { label: string; n: number }[];
   unsubscribes: number; webViews: number; prayers: number;
   recipients: PersonRow[] | null;
+  linkWho: Record<string, { name: string | null; email: string; clicks: number; last: string }[]> | null;
 };
 
 export async function emailReport(me: Perm, f: Filters, emailId: string, people: boolean): Promise<EmailReport | null> {
@@ -440,6 +441,7 @@ export async function emailReport(me: Perm, f: Filters, emailId: string, people:
   const { count: pr } = e.slug ? await sb.from("prays").select("id", { count: "exact", head: true }).eq("issue_slug", e.slug) : { count: 0 };
 
   let recipients: EmailReport["recipients"] = null;
+  let linkWho: EmailReport["linkWho"] = null;
   if (people) {
     const linkLabel = new Map(raw.links.map((l) => [l.id, l.label]));
     const openedBy = new Map<string, string>();
@@ -449,25 +451,35 @@ export async function emailReport(me: Perm, f: Filters, emailId: string, people:
     const { data: st } = await sb.from("staff").select("email,name");
     const nameOf = new Map((st ?? []).filter((x) => x.name && String(x.name).trim()).map((x) => [String(x.email).toLowerCase(), String(x.name).trim()]));
     const sendOf = new Map(sends.map((x) => [x.id, x]));
-    const tapsBy = new Map<string, { label: string; at: string; device: string | null }[]>();
-    for (const c of clicks) if (c.recipient_id) (tapsBy.get(c.recipient_id) ?? tapsBy.set(c.recipient_id, []).get(c.recipient_id)!).push({ label: linkLabel.get(c.link_id) ?? "Link", at: c.at, device: c.device });
+    const openCount = new Map<string, number>();
+    for (const o of opens) if (o.recipient_id) openCount.set(o.recipient_id, (openCount.get(o.recipient_id) ?? 0) + 1);
+    const tapsBy = new Map<string, { linkId: string; label: string; at: string; device: string | null }[]>();
+    for (const c of clicks) if (c.recipient_id) (tapsBy.get(c.recipient_id) ?? tapsBy.set(c.recipient_id, []).get(c.recipient_id)!).push({ linkId: c.link_id, label: linkLabel.get(c.link_id) ?? "Link", at: c.at, device: c.device });
     const byPerson = new Map<string, PersonRow>();
     for (const r of raw.rcpts.filter((x) => rcptOK(x, f))) {
       const key = (r.email || r.id).toLowerCase();
       const taps = (tapsBy.get(r.id) ?? []).sort((x, y) => x.at.localeCompare(y.at));
       const op = openedBy.get(r.id) ?? null;
-      const row = byPerson.get(key) ?? { email: r.email ?? "", name: nameOf.get(key) ?? null, channel: r.channel, status: r.status, opened: false, clicks: 0, links: [], lastActivity: null, receivedCount: 0, receipts: [] };
+      const row = byPerson.get(key) ?? { email: r.email ?? "", name: nameOf.get(key) ?? null, channel: r.channel, status: r.status, opened: false, opens: 0, clicks: 0, links: [], lastActivity: null, receivedCount: 0, receipts: [] };
       row.receivedCount++;
       row.opened = row.opened || !!op;
       row.clicks += taps.length;
+      row.opens += openCount.get(r.id) ?? 0;
       for (const t of taps) if (!row.links.includes(t.label)) row.links.push(t.label);
       const last = [taps[taps.length - 1]?.at, op].filter(Boolean).sort().slice(-1)[0] ?? null;
       if (last && (!row.lastActivity || last > row.lastActivity)) row.lastActivity = last;
       // keep the best status across sends: a delivery wins over an old bounce
       if (["delivered", "sent"].includes(r.status) || row.receivedCount === 1) row.status = r.status;
-      row.receipts.push({ at: sendOf.get(r.send_id)?.started_at ?? r.sent_at ?? "", kind: sendOf.get(r.send_id)?.kind ?? "real", status: r.status, opened: !!op, openedAt: op, taps });
+      row.receipts.push({ at: sendOf.get(r.send_id)?.started_at ?? r.sent_at ?? "", kind: sendOf.get(r.send_id)?.kind ?? "real", status: r.status, opened: !!op, openedAt: op, openCount: openCount.get(r.id) ?? 0, taps });
       byPerson.set(key, row);
     }
+    linkWho = {};
+    for (const p of byPerson.values()) {
+      const per = new Map<string, { clicks: number; last: string }>();
+      for (const rc of p.receipts) for (const t of rc.taps) { const x = per.get(t.linkId) ?? per.set(t.linkId, { clicks: 0, last: t.at }).get(t.linkId)!; x.clicks++; if (t.at > x.last) x.last = t.at; }
+      for (const [lid, x] of per) (linkWho[lid] ??= []).push({ name: p.name, email: p.email, clicks: x.clicks, last: x.last });
+    }
+    for (const lid of Object.keys(linkWho)) linkWho[lid].sort((a, b) => b.clicks - a.clicks || b.last.localeCompare(a.last));
     recipients = [...byPerson.values()].map((p) => ({ ...p, receipts: p.receipts.sort((x, y) => y.at.localeCompare(x.at)) }))
       .sort((a, b) => b.clicks - a.clicks || (a.name || a.email || "").localeCompare(b.name || b.email || "")).slice(0, 1000);
   }
@@ -478,7 +490,7 @@ export async function emailReport(me: Perm, f: Filters, emailId: string, people:
     sends: sends.map((s) => ({ id: s.id, kind: s.kind, channel: s.channel, at: s.started_at, recipients: raw.rcpts.filter((r) => r.send_id === s.id).length })).sort((a, b) => b.at.localeCompare(a.at)),
     t, funnel, links,
     devices: { phone: dev("phone"), desktop: dev("desktop"), tablet: dev("tablet"), unknown: clicks.filter((c) => !["phone", "desktop", "tablet"].includes(c.device ?? "")).length },
-    hours, firstDays, timeToClick, unsubscribes: t.unsubs, webViews: wv ?? 0, prayers: pr ?? 0, recipients,
+    hours, firstDays, timeToClick, unsubscribes: t.unsubs, webViews: wv ?? 0, prayers: pr ?? 0, recipients, linkWho,
   };
 }
 
