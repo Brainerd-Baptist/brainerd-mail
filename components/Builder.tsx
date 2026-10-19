@@ -296,6 +296,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const warns = checks.filter((c) => !c.ok && c.severity === "warn").length;
 
   const testingRef = useRef(false);
+  const [testBusy, setTestBusy] = useState(false);
   // Photos that look dark, blurry or small: warn, and ask before sending.
   const photoWarnings = useMemo(() => polish(doc).filter((s) => s.kind === "photo"), [doc]);
   function confirmPhotos(): boolean {
@@ -308,6 +309,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   async function sendTest(extra: string[] = [], includeMe = true) {
     if (testingRef.current) return;
     testingRef.current = true;
+    setTestBusy(true);
     setStatus(extra.length ? `Sending a test to ${extra.length + (includeMe ? 1 : 0)} people…` : "Sending a test to you…");
     try {
       if (dirtyRef.current || stateRef.current === "saving") { while (inflightRef.current) await new Promise((r) => setTimeout(r, 100)); await saveNow(); }
@@ -318,7 +320,7 @@ export default function Builder({ emailId }: { emailId: string }) {
       setStatus(res.ok ? `Test sent to ${j.to}.${j.failed?.length ? ` Couldn't reach ${j.failed.join(", ")}.` : " Check your inbox and phone."}` : j.error || "Could not send the test.");
       if (!res.ok) throw new Error(j.error || "Could not send the test.");
     } catch (e: any) { setStatus(e?.message || "Could not send the test."); throw e; }
-    finally { testingRef.current = false; }
+    finally { testingRef.current = false; setTestBusy(false); }
   }
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -588,7 +590,8 @@ export default function Builder({ emailId }: { emailId: string }) {
     <p className="text-sm text-muted">This email is {rowStatus === "pending_approval" ? "waiting for approval" : rowStatus.replace("_", " ")}. Use “Edit again” above to change it.</p>
   ) : (
     <div className="flex flex-col gap-3">
-      <button onClick={() => { sendTest().catch(() => {}); }} className="pill-btn w-full border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
+      <button onClick={() => { sendTest().catch(() => {}); }} disabled={testBusy} className="pill-btn w-full border-2 border-navy text-navy disabled:opacity-60"><FlaskConical size={16} className="mr-1.5" />{testBusy ? "Sending…" : "Send me a test"}</button>
+      {status && /test/i.test(status) ? <p role="status" className="rounded-xl bg-[#e8f5ee] px-3 py-2 text-center text-sm text-navy">{status}</p> : null}
       <button onClick={() => setTestOpen(true)} className="min-h-10 text-center text-[14px] font-semibold text-brand">Send a test to others…</button>
       <button onClick={() => { if (!confirmPhotos()) return; setSendOpen(false); setSubmitOpen(true); }} disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
       {blocking ? <p className="text-center text-xs text-muted">Fix the {blocking} item{blocking > 1 ? "s" : ""} in the checklist first.</p> : null}
