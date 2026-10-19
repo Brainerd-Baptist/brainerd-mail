@@ -86,6 +86,7 @@ const MARKS: Record<string, { w: number; h: number }> = {
   missions: { w: 220, h: 22 },
   kids: { w: 206, h: 22 },
   men: { w: 220, h: 22 },
+  "life-groups": { w: 240, h: 38 },
   women: { w: 232, h: 24 },
   students: { w: 150, h: 39 },
   bx: { w: 74, h: 32 },
