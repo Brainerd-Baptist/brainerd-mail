@@ -36,6 +36,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 
   await snapshot(sb, params.id, doc, user.id, "Sent for approval");
   await sb.from("audit_log").insert({ actor: user.id, action: "submit_for_approval", email_id: params.id, detail: { sendAt: sendAt.toISOString(), expedited } });
-  await notify(await approverEmails(), { kind: "submitted", emailId: params.id, title: row.title, subject: doc.subject, ministry: paletteFor(row.ministry).label, sendAt: sendAt.toISOString(), expedited });
+  await notify(await approverEmails(), { kind: "submitted", emailId: params.id, title: row.title, subject: doc.subject, ministry: paletteFor(row.ministry).label, sendAt: sendAt.toISOString(), expedited, submittedAt: now });
   return NextResponse.json({ ok: true, expedited, version: now });
 }

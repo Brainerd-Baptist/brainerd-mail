@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     const sendAt = r.scheduled_at ? new Date(r.scheduled_at).getTime() : 0;
     const waited = (Date.now() - new Date(r.submitted_at).getTime()) / 3600000;
     const sent: number[] = r.reminders_sent ?? [];
-    const base = { emailId: r.id, title: r.title, subject: doc.subject, ministry: paletteFor(r.ministry).label, sendAt: r.scheduled_at, expedited: r.expedited };
+    const base = { emailId: r.id, title: r.title, subject: doc.subject, ministry: paletteFor(r.ministry).label, sendAt: r.scheduled_at, expedited: r.expedited, submittedAt: r.submitted_at as string };
 
     if (sendAt && Date.now() >= sendAt) {
       if (autoOn && !r.expedited && blockingChecks(doc).length === 0) {

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 // Everything needs a signed-in staff member except the public pages readers use.
-const PUBLIC = ["/login", "/auth", "/brand/", "/w/", "/r/", "/u/", "/o/", "/api/pray", "/manifest.webmanifest", "/icons/", "/sample/", "/_next/", "/favicon"];
+const PUBLIC = ["/login", "/auth", "/brand/", "/w/", "/r/", "/u/", "/o/", "/a/", "/api/a/", "/api/pray", "/manifest.webmanifest", "/icons/", "/sample/", "/_next/", "/favicon"];
 
 // Record "last active" (at most once every 5 minutes per person). Skips background prefetches so only real use counts.
 async function touch(req: NextRequest, userId: string, last: string | null) {
