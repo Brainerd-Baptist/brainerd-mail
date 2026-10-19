@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CalendarDays, Globe, Compass, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Users, X } from "lucide-react";
+import { BarChart3, CalendarDays, Globe, Compass, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Send, UsersRound, Users, X } from "lucide-react";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { ROLE_LABEL, type Role } from "@/lib/roles-ui";
 
@@ -60,6 +60,8 @@ export function NavMenu() {
             <div className="flex-1 space-y-1 overflow-y-auto p-3">
               {ITEMS.filter((i) => i.href !== "/roster" || roster).map((i) => link(i.href, i.label, i.icon, i.match(path)))}
               {team ? link("/team", "Team", Users, path.startsWith("/team")) : null}
+              {team ? link("/audience", "Audiences", UsersRound, path.startsWith("/audience")) : null}
+              {team ? link("/sending", "Sending", Send, path.startsWith("/sending")) : null}
               {admin ? link("/feedback", "Feedback inbox", LifeBuoy, path.startsWith("/feedback"), fresh) : null}
             </div>
             <form action="/auth/signout" method="post" className="border-t border-line p-3">
