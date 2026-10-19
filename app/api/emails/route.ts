@@ -1,3 +1,4 @@
+import { homegoingDoc } from "@/lib/templates/homegoing";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { PALETTES } from "@/lib/ministries";
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
     doc.title = seriesId ? String(src.title || doc.title || "Untitled").replace(/ \(copy\)$/, "") : `${String(src.title || doc.title || "Untitled").replace(/ \(copy\)$/, "")} (copy)`;
   } else {
     const ministry = typeof body.ministry === "string" && PALETTES[body.ministry] ? body.ministry : "church-wide";
-    doc = body.start === "october" ? octoberDoc(ministry) : body.start === "starter" || body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
+    doc = body.start === "homegoing" ? homegoingDoc() : body.start === "october" ? octoberDoc(ministry) : body.start === "starter" || body.start === "template" ? templateDoc(ministry) : blankDoc(ministry);
   }
 
   { const deny = needBuild(me, doc.ministry); if (deny) return deny; }
