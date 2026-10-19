@@ -310,7 +310,7 @@ ${preview}
 ${masthead}
 ${blocks}
 <tr><td style="height:32px;line-height:32px;font-size:1px;">&nbsp;</td></tr>
-<tr><td class="px dm-foot" style="background:#f1f5f9;background-image:linear-gradient(#f1f5f9,#f1f5f9);padding:28px 40px 36px 40px;">
+<tr><td class="px dm-foot" style="background:#f1f5f9;padding:28px 40px 36px 40px;">
 ${churchFoot}<p class="dm-text" style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">${esc(doc.footerNote)}</p>
 ${o.contactEmail ? `<p class="dm-text" style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">Questions? Write us at <a class="dm-lk" href="mailto:${esc(o.contactEmail)}" style="color:${p.dark};text-decoration:underline;font-weight:600;">${esc(o.contactEmail)}</a></p>` : ""}
 <div style="margin:0 0 16px 0;">${links}</div>
