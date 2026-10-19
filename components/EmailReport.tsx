@@ -5,6 +5,7 @@ import { ArrowLeft, Download, ExternalLink, Info } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { HelpButton } from "@/components/HelpButton";
+import { EmailInsights } from "@/components/EmailInsights";
 import { C, Card, Chip, Funnel, HBars, Split, Tile, VBars, downloadCsv, etDate, hourName, num, pct } from "@/components/charts";
 import type { EmailReport as Report } from "@/lib/analytics";
 
@@ -71,6 +72,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
               <div className="rounded-2xl border border-line bg-white p-8 text-center"><h2 className="font-serif text-xl font-semibold text-navy">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
             ) : (
               <>
+                <EmailInsights id={id} />
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Tile label="People emailed" value={num(r.t.recipients)} sub={`${num(r.t.delivered)} delivered`} />
                   <Tile label="Click rate" value={pct(r.t.clickRate)} sub={`${num(r.t.clickers)} people`} />
