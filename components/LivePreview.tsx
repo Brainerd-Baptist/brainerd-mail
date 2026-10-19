@@ -78,7 +78,7 @@ export default function LivePreview({ emailId }: { emailId: string }) {
   const html = useMemo(() => {
     if (!doc) return "";
     let h = renderEmail(doc, { mode: "email", wrap: (u: string) => u, webUrl: `${origin}/w/preview`, unsubscribeUrl: "#unsubscribe", preferencesUrl: "#preferences", address: CHURCH_ADDRESS, contactEmail: CONTACT_EMAIL, siteUrl: origin });
-    if (dark) h = h.replace("@media (prefers-color-scheme:dark)", "@media all");
+    h = h.replace("@media (prefers-color-scheme:dark)", dark ? "@media all" : "@media not all");
     return h.replace("</body>", `<script>document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(a)e.preventDefault();});</script></body>`);
   }, [doc, dark, origin]);
 
