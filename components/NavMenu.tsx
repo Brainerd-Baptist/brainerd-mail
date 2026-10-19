@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CalendarDays, Globe, Compass, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Send, UsersRound, Users, X } from "lucide-react";
+import { BarChart3, CalendarDays, Globe, Map as MapIcon, Compass, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Send, UsersRound, Users, X } from "lucide-react";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { ROLE_LABEL, type Role } from "@/lib/roles-ui";
 
@@ -13,6 +13,7 @@ const ITEMS = [
   { href: "/emails", label: "Emails", icon: Mail, match: (p: string) => p === "/emails" || p.startsWith("/editor") || p.startsWith("/review") },
   { href: "/calendar", label: "Calendar", icon: CalendarDays, match: (p: string) => p.startsWith("/calendar") },
   { href: "/analytics", label: "Analytics", icon: BarChart3, match: (p: string) => p.startsWith("/analytics") },
+  { href: "/missions", label: "Missions map", icon: MapIcon, match: (p: string) => p.startsWith("/missions") },
   { href: "/roster", label: "Serving list", icon: Globe, match: (p: string) => p.startsWith("/roster") },
 ];
 

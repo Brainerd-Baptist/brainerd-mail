@@ -111,6 +111,23 @@ export default function Inspector({ block, onChange }: P) {
           <ButtonFields value={block.button} onChange={(v) => set({ button: v })} />
         </div>
       );
+    case "map":
+      return (
+        <div className="space-y-4">
+          <p className="text-sm text-muted">A picture of the live Missions map. It always shows the map as it is now, so it can change after the email is sent. Update it in Missions.</p>
+          <Field label="Small label" value={block.heading} onChange={(v) => set({ heading: v })} />
+          <Area label="Short note (optional)" value={block.body} onChange={(v) => set({ body: v })} rows={3} />
+          <Segmented label="Colors" value={String(block.level) as "0" | "1" | "2" | "3"} options={[{ value: "0", label: "All levels" }, { value: "1", label: "Level 1" }, { value: "2", label: "Level 2" }, { value: "3", label: "Level 3" }]} onChange={(v) => set({ level: Number(v) as 0 | 1 | 2 | 3 })} />
+          <Toggle label="Show the color key under the map" checked={block.showLegend} onChange={(v) => set({ showLegend: v })} />
+          {block.showLegend ? (
+            <div className="space-y-3">
+              {[0, 1, 2].map((i) => <Field key={i} label={`Key for Level ${i + 1}`} value={block.legend?.[i] ?? ""} onChange={(v) => { const l = [...(block.legend ?? ["", "", ""])]; l[i] = v; set({ legend: l }); }} />)}
+              <button type="button" className="pill-btn border-2 border-navy text-navy" onClick={async () => { try { const j = await (await fetch("/api/public/missions")).json(); if (Array.isArray(j.levels)) set({ legend: j.levels.map((x: { label: string }) => x.label) }); } catch {} }}>Use the names from Missions</button>
+            </div>
+          ) : null}
+          <ButtonFields value={block.button} onChange={(v) => set({ button: v })} />
+        </div>
+      );
     case "divider":
       return <p className="text-sm text-muted">A thin line between sections. Nothing to edit.</p>;
   }

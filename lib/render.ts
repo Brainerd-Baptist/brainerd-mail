@@ -206,6 +206,17 @@ ${button(b.button, "primary", p, o, b.id)}
 </td></tr></table>`,
         "24px 40px 8px 40px"
       );
+    case "map": {
+      const base = (o.siteUrl || "https://mail.brainerdhq.app").replace(/\/+$/, "");
+      const src = `${base}/api/public/missions-map.png${b.level ? `?level=${b.level}` : ""}`;
+      const pic0 = `<img src="${esc(src)}" alt="World map showing the countries where Brainerd is engaged in missions, colored by level" width="100%" style="width:100%;height:auto;display:block;border:0;border-radius:12px;">`;
+      const link = b.button?.url ? esc(o.wrap(b.button.url, b.id, "Map picture")) : "";
+      const pic = link ? `<a href="${link}" style="text-decoration:none;display:block;">${pic0}</a>` : pic0;
+      const dots = ["#00abc9", "#33bc53", "#ff4a53"];
+      const keys = (b.legend ?? []).slice(0, 3).map((t, i) => ({ t: (t ?? "").trim(), c: dots[i], on: !b.level || b.level === i + 1 })).filter((k) => k.t && k.on);
+      const legend = b.showLegend && keys.length ? `<div style="margin:12px 0 0 0;">${keys.map((k) => `<span class="dm-text" style="display:inline-block;margin:0 18px 6px 0;font-family:${SANS};font-size:14px;line-height:1.4;color:#33445d;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${k.c};margin-right:7px;vertical-align:middle;"></span>${esc(k.t)}</span>`).join("")}</div>` : "";
+      return section(`${eyebrow(b.heading, p.accent ?? p.button)}${paragraphs(b.body, "#33445d")}${pic}${legend}${b.button?.url ? `<div style="margin-top:16px;">${button(b.button, "primary", p, o, b.id)}</div>` : ""}`, "24px 40px 8px 40px");
+    }
     case "divider":
       return section(`<div style="height:1px;background:#dbe3ec;line-height:1px;font-size:1px;">&nbsp;</div>`, "24px 40px 8px 40px");
   }
@@ -325,6 +336,7 @@ export function renderPlainText(doc: EmailDoc, o: RenderOpts): string {
       case "photo": lines.push(b.caption, b.enlarge !== false && b.image?.url ? `Full size: ${b.image.url.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + b.image.url : b.image.url}` : ""); break;
       case "event": lines.push(b.title, b.body, [b.date, b.place].filter(Boolean).join(" · "), link(b.button)); break;
       case "divider": lines.push("----"); break;
+      case "map": lines.push(b.heading, b.body, link(b.button)); break;
     }
     lines.push("");
   }

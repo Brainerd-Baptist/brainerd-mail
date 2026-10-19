@@ -18,8 +18,11 @@ export const MISSIONS_TEMPLATE: EmailDoc = {
       id: "hero1", type: "hero", eyebrow: "GLOBAL UPDATE",
       headline: "Kingdom work around the globe.",
       body: "Explore a map of where Brainerd is involved in the Kingdom work happening around the world.",
-      showImage: true,
-      image: { url: "/sample/map.svg", alt: "A map showing where Brainerd missionaries and teams serve around the world" },
+      showImage: false,
+    },
+    {
+      id: "map1", type: "map", heading: "WHERE WE ARE ENGAGED", body: "", level: 0, showLegend: true,
+      legend: ["Level 1", "Level 2", "Level 3"],
       button: { label: "Open the interactive map", url: "https://www.brainerdbaptist.org/missions" },
     },
     {

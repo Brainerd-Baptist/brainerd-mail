@@ -63,7 +63,7 @@ function setBlock(doc: EmailDoc, id: string, patch: Partial<Block> | null): Emai
 
 function buttons(b: Block): { label: string }[] {
   switch (b.type) {
-    case "hero": case "card": case "event": return b.button ? [b.button] : [];
+    case "hero": case "card": case "event": case "map": return b.button ? [b.button] : [];
     case "cta": return [b.button];
     case "partners": return b.items.flatMap((i) => (i.button ? [i.button] : []));
     default: return [];

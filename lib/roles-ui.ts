@@ -24,6 +24,8 @@ export const analyticsMinistries = (p: Perm): string[] | null => (p.role === "ed
 export const canSeePeopleStats = (p: Perm) => p.role === "owner" || p.role === "admin";
 export const canSeeFeedback = (p: Perm) => p.role === "owner" || p.role === "admin";
 export const canEditRoster = (p: Perm) => p.role === "owner" || p.role === "admin" || p.role === "approver" || (p.role === "editor" && p.ministries.includes("missions"));
+// The Missions map is edited by the same people who edit the Serving list: Owner, Admins, Approvers, and Editors assigned to Missions. Everyone else on staff can look.
+export const canEditMissions = canEditRoster;
 // Which roles this person may hand out, and whose role they may change.
 export const rolesICanGrant = (p: Perm): Role[] => (p.role === "owner" ? ["admin", "approver", "editor", "viewer"] : p.role === "admin" ? ["approver", "editor", "viewer"] : []);
 export const canManageTarget = (actor: Role, target: Role) => (actor === "owner" ? target !== "owner" : actor === "admin" ? target === "approver" || target === "editor" || target === "viewer" : false);

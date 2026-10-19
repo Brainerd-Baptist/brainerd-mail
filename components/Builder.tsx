@@ -35,7 +35,7 @@ function useIsDesktop(): boolean | null {
   return v;
 }
 const ADDRESS = CHURCH_ADDRESS;
-const ADDABLE: BlockType[] = ["hero", "text", "photo", "event", "travel", "partners", "cta", "card", "divider"];
+const ADDABLE: BlockType[] = ["hero", "text", "photo", "event", "travel", "partners", "cta", "card", "map", "divider"];
 
 type SaveState = "saved" | "saving" | "error" | "conflict";
 

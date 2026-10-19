@@ -1,6 +1,6 @@
 import type { Block, EmailDoc } from "./blocks";
 
-const KIND: Record<string, string> = { hero: "header", text: "text block", travel: "travel block", partners: "partner block", cta: "button block", card: "card", photo: "photo", event: "event card", divider: "divider" };
+const KIND: Record<string, string> = { hero: "header", text: "text block", travel: "travel block", partners: "partner block", cta: "button block", card: "card", photo: "photo", event: "event card", divider: "divider", map: "Missions map" };
 
 function blockName(b: Block): string {
   const x = b as unknown as Record<string, unknown>;

@@ -29,10 +29,13 @@ export type EventBlock = {
   date: string; place: string; button?: Btn;
 };
 export type DividerBlock = { id: string; type: "divider" };
+// The live Missions map as a picture (email apps can't run the interactive one). It always shows the current
+// public map from Missions. level 0 colors every level; 1, 2 or 3 colors only that level.
+export type MapBlock = { id: string; type: "map"; heading: string; body: string; level: 0 | 1 | 2 | 3; showLegend: boolean; legend: string[]; button?: Btn };
 
 export type Block = (
   | HeroBlock | TextBlock | TravelBlock | PartnerBlock | CtaBlock
-  | CardBlock | PhotoBlock | EventBlock | DividerBlock
+  | CardBlock | PhotoBlock | EventBlock | DividerBlock | MapBlock
 ) & { hidden?: boolean };
 
 export type EmailDoc = {
@@ -58,6 +61,7 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
   photo: "Photo",
   event: "Event card",
   divider: "Divider",
+  map: "Missions map",
 };
 
 export function uid(prefix = "b"): string {
@@ -84,5 +88,7 @@ export function newBlock(type: BlockType): Block {
       return { id: uid(), type, eyebrow: "FEATURED EVENT", title: "Event title", body: "", date: "", place: "" };
     case "divider":
       return { id: uid(), type };
+    case "map":
+      return { id: uid(), type, heading: "WHERE WE ARE ENGAGED", body: "", level: 0, showLegend: true, legend: ["Level 1", "Level 2", "Level 3"], button: { label: "Explore the interactive map", url: "https://www.brainerdbaptist.org/missions" } };
   }
 }

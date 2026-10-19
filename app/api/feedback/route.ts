@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/resend";
-import { feedbackEmails, currentMe, canSeeFeedback, canManageTeam, canEditRoster } from "@/lib/roles";
+import { feedbackEmails, currentMe, canSeeFeedback, canManageTeam, canEditRoster, canEditMissions } from "@/lib/roles";
 
 const KINDS = { problem: "Problem", feature: "Feature request", feedback: "Feedback", question: "Help question" } as const;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -50,7 +50,7 @@ export async function GET(req: Request) {
   const summary = new URL(req.url).searchParams.get("summary");
   if (!me) return summary ? NextResponse.json({ role: null }) : NextResponse.json({ error: "Sign in required" }, { status: 401 });
   const admin = canSeeFeedback(me);
-  const info = { role: me.role, email: me.email, name: me.name, admin, team: canManageTeam(me), roster: canEditRoster(me) };
+  const info = { role: me.role, email: me.email, name: me.name, admin, team: canManageTeam(me), roster: canEditRoster(me), missions: canEditMissions(me) };
   if (!admin) return summary ? NextResponse.json(info) : NextResponse.json({ error: "Owner and admins only" }, { status: 403 });
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ ...info, new: 0, items: [] });
   const db = supabaseAdmin();

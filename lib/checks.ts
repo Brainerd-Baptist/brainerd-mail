@@ -20,7 +20,7 @@ function links(b: Block): { label: string; url: string }[] {
   const out: { label: string; url: string }[] = [];
   const push = (x?: { label: string; url: string }) => x && out.push(x);
   switch (b.type) {
-    case "hero": case "card": case "event": push(b.button); break;
+    case "hero": case "card": case "event": case "map": push(b.button); break;
     case "cta": push(b.button); break;
     case "partners": b.items.forEach((i) => push(i.button)); break;
   }
