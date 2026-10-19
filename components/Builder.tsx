@@ -710,25 +710,25 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   /* ---------- Desktop layout ---------- */
   return (
-    <div className="flex h-screen flex-col bg-mist">
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-line bg-white px-3 2xl:px-5">
-        <div className="flex items-center gap-2 2xl:gap-4">
+    <div className="flex h-screen min-w-0 flex-col overflow-x-hidden bg-mist">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-line bg-white px-3 min-[1900px]:px-5">
+        <div className="flex items-center gap-2 min-[1900px]:gap-4">
           <NavMenu />
                     {ministrySelect}
           <div>
-            <input aria-label="Email name" readOnly={locked} className="w-32 xl:w-44 bg-transparent text-[15px] font-semibold outline-none 2xl:w-64" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
+            <input aria-label="Email name" readOnly={locked} className="w-28 min-w-0 bg-transparent text-[15px] font-semibold outline-none min-[1500px]:w-40 min-[1900px]:w-64" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
             <div className="text-xs text-muted">{saveLabel}</div>
           </div>
         </div>
         {deviceToggle(["phone", "desktop", "dark", "text"])}
-        <div className="flex items-center gap-1 2xl:gap-3">
-          {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><Globe size={18} /><span className="hidden 2xl:inline">Serving list</span></a> : null}
-          <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2 text-sm font-semibold 2xl:px-3 hover:bg-[#f4f8fd] ${planIso ? "border-line text-ink" : "border-transparent text-[#1e61b9]"}`}><CalendarClock size={18} className={planIso ? "text-[#1e61b9]" : ""} />{planIso ? chipShort(planIso) : "Schedule"}</button>
-          <button onClick={() => setFeedbackOpen(true)} aria-label="Feedback" title="Feedback" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} /><span className="hidden 2xl:inline">Feedback</span>{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+        <div className="flex items-center gap-1 min-[1900px]:gap-3">
+          {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-[#f4f8fd]"><Globe size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Serving list</span></a> : null}
+          <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2 text-sm font-semibold min-[1900px]:px-3 hover:bg-[#f4f8fd] ${planIso ? "border-line text-ink" : "border-transparent text-[#1e61b9]"}`}><CalendarClock size={18} className={planIso ? "text-[#1e61b9]" : ""} />{planIso ? chipShort(planIso) : "Schedule"}</button>
+          <button onClick={() => setFeedbackOpen(true)} aria-label="Feedback" title="Feedback" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Feedback</span>{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
           <HelpButton />
           <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Redo2 size={20} /></button>
-          <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><History size={18} /><span className="hidden 2xl:inline">History</span></button>
-          <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><Monitor size={18} /><span className="hidden 2xl:inline">Live preview</span></a>
+          <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-[#f4f8fd]"><History size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">History</span></button>
+          <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-[#f4f8fd]"><Monitor size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Live preview</span></a>
           <div className="relative shrink-0">
             <button onClick={() => setTestMenu((v) => !v)} aria-haspopup="menu" aria-expanded={testMenu} disabled={testBusy} className="pill-btn whitespace-nowrap border-2 border-navy text-navy disabled:opacity-60"><FlaskConical size={16} className="mr-1.5" />{testBusy ? "Sending…" : "Send a test"}<ChevronDown size={16} className="ml-1" /></button>
             {testMenu ? (
