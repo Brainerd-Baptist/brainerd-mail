@@ -8,6 +8,7 @@ import { siteUrl } from "@/lib/site";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import { snapshot } from "@/lib/versions";
 import { meFor } from "@/lib/roles";
+import { needBuild, requireBuild } from "@/lib/email-guard";
 import type { EmailDoc } from "@/lib/blocks";
 
 // "Send me a test": goes only to the signed-in staff member's own address.
@@ -16,7 +17,8 @@ export async function POST(req: Request) {
   const { data } = await supabaseServer().auth.getUser();
   const user = data.user;
   if (!user?.email) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
-  if (!(await meFor(user.id))) return NextResponse.json({ error: "Your access to Brainerd Mail has changed." }, { status: 403 });
+  const me = await meFor(user.id);
+  if (!me) return NextResponse.json({ error: "Your access to Brainerd Mail has changed." }, { status: 403 });
   if (!process.env.RESEND_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY)
     return NextResponse.json({ error: "Test sending isn't switched on yet (missing server keys)." }, { status: 501 });
 
@@ -31,6 +33,9 @@ export async function POST(req: Request) {
   if (!targets.length) return NextResponse.json({ error: "Choose at least one person." }, { status: 400 });
   if (targets.length > 10) return NextResponse.json({ error: "Tests can go to 10 people at a time." }, { status: 400 });
   if (!doc?.blocks || !doc.subject) return NextResponse.json({ error: "Nothing to send" }, { status: 400 });
+  // A test also saves the draft, so it needs the same permission as editing: not for viewers, and editors only in their own ministries.
+  { const deny = needBuild(me, doc.ministry); if (deny) return deny; }
+  if (typeof body.emailId === "string") { const deny = await requireBuild(supabaseAdmin(), me, body.emailId); if (deny) return deny; }
   const preview = renderFor(doc, new Map(), "preview", "000000000000");
   if (runChecks(doc, Buffer.byteLength(preview.html), CHURCH_ADDRESS).some((c) => !c.ok && c.severity === "block"))
     return NextResponse.json({ error: "Fix the items marked in Check first." }, { status: 422 });
