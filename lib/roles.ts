@@ -3,11 +3,11 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { isRole, type Me, type Role } from "@/lib/roles-ui";
 export * from "@/lib/roles-ui";
 
-type Row = { user_id: string; email: string; name: string | null; role: string; ministries: string[] | null; disabled_at: string | null };
-const toMe = (r: Row): Me | null => (r.disabled_at || !isRole(r.role) ? null : { userId: r.user_id, email: r.email, name: r.name, role: r.role, ministries: r.ministries ?? [] });
+type Row = { user_id: string; email: string; name: string | null; role: string; ministries: string[] | null; disabled_at: string | null; can_approve?: boolean | null };
+const toMe = (r: Row): Me | null => (r.disabled_at || !isRole(r.role) ? null : { userId: r.user_id, email: r.email, name: r.name, role: r.role, ministries: r.ministries ?? [], approves: !!r.can_approve });
 
 export async function meFor(userId: string): Promise<Me | null> {
-  const { data } = await supabaseAdmin().from("staff").select("user_id,email,name,role,ministries,disabled_at").eq("user_id", userId).maybeSingle();
+  const { data } = await supabaseAdmin().from("staff").select("user_id,email,name,role,ministries,disabled_at,can_approve").eq("user_id", userId).maybeSingle();
   return data ? toMe(data as Row) : null;
 }
 
@@ -22,5 +22,9 @@ export async function emailsWithRole(roles: Role[]): Promise<string[]> {
   const { data } = await supabaseAdmin().from("staff").select("email,role,disabled_at").in("role", roles).is("disabled_at", null);
   return (data ?? []).map((r) => r.email as string);
 }
-export const approverEmails = () => emailsWithRole(["owner", "admin", "approver"]);
+// Everyone who can approve: the owner plus anyone the owner switched on.
+export async function approverEmails(): Promise<string[]> {
+  const { data } = await supabaseAdmin().from("staff").select("email,role,can_approve,disabled_at").is("disabled_at", null);
+  return (data ?? []).filter((r) => r.role === "owner" || r.can_approve).map((r) => r.email as string);
+}
 export const feedbackEmails = () => emailsWithRole(["owner", "admin"]);

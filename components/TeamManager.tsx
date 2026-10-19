@@ -9,7 +9,7 @@ import { HeaderBrand } from "@/components/HeaderBrand";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { ROLES, ROLE_BLURB, ROLE_LABEL, canManageTarget, rolesICanGrant, type Role } from "@/lib/roles-ui";
 
-export type Member = { user_id: string; email: string; name: string | null; role: Role; ministries: string[] | null; disabled_at: string | null; created_at: string };
+export type Member = { user_id: string; email: string; name: string | null; role: Role; ministries: string[] | null; disabled_at: string | null; created_at: string; can_approve?: boolean | null };
 export type Invite = { id: string; email: string; first_name: string | null; last_name: string | null; role: Role; ministries: string[] | null; created_at: string; expires_at: string; last_sent_at: string };
 
 const PILL: Record<Role, string> = {
@@ -128,7 +128,7 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
                 <li key={m.user_id} className="flex items-center gap-3 px-4 py-3">
                   <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8f0fb] text-sm font-bold text-navy">{initials(nameOf(m))}</span>
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="truncate text-[15px] font-semibold text-ink">{nameOf(m)}{mine ? " (you)" : ""}</span><RolePill role={m.role} /></div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="truncate text-[15px] font-semibold text-ink">{nameOf(m)}{mine ? " (you)" : ""}</span><RolePill role={m.role} />{m.role !== "owner" && m.can_approve ? <span className="inline-flex items-center rounded-full bg-[#e3f4ea] px-2.5 py-0.5 text-xs font-bold text-[#0d5a37]">Approves emails</span> : null}</div>
                     <div className="truncate text-sm text-muted">{m.email}</div>
                     <div className="truncate text-xs text-muted">{scope(m.role, m.ministries)} · joined {day(m.created_at)}</div>
                     {lastSignIn ? <div className="truncate text-xs font-semibold text-[#00205b]">{seen(lastSignIn, m.user_id)}</div> : null}
@@ -231,11 +231,12 @@ function ManageSheet({ m, me, grant, onClose, onDone, call, busy, err }: { m: Me
   const [last, setLast] = useState(parts.slice(1).join(" "));
   const [role, setRole] = useState<Role>(m.role);
   const [ministries, setMinistries] = useState<string[]>(m.ministries ?? []);
+  const [approves, setApproves] = useState(!!m.can_approve);
   const [handoff, setHandoff] = useState(false);
   const [confirm, setConfirm] = useState("");
   const [off, setOff] = useState(false);
   const fullName = `${first.trim()} ${last.trim()}`.trim();
-  const changed = (!!fullName && fullName !== nameOf(m)) || role !== m.role || (role === "editor" && JSON.stringify([...ministries].sort()) !== JSON.stringify([...(m.ministries ?? [])].sort()));
+  const changed = (!!fullName && fullName !== nameOf(m)) || role !== m.role || (me.role === "owner" && approves !== !!m.can_approve) || (role === "editor" && JSON.stringify([...ministries].sort()) !== JSON.stringify([...(m.ministries ?? [])].sort()));
   const valid = role !== "editor" || ministries.length > 0;
   const url = `/api/team/members/${m.user_id}`;
   return (
@@ -248,8 +249,14 @@ function ManageSheet({ m, me, grant, onClose, onDone, call, busy, err }: { m: Me
       <span className="label">Role</span>
       <RolePicker value={role} onChange={setRole} options={grant} />
       {role === "editor" ? <div className="mt-4"><MinistryPicker value={ministries} onChange={setMinistries} /></div> : null}
+      {me.role === "owner" ? (
+        <label className="mt-4 flex items-start gap-3 rounded-xl border border-line p-3">
+          <input type="checkbox" checked={approves} onChange={(e) => setApproves(e.target.checked)} className="mt-0.5 h-5 w-5" />
+          <span><span className="block text-[15px] font-semibold text-ink">Can approve emails</span><span className="block text-sm text-muted">They get the approval requests and can approve or send emails back. They can't approve an email they sent themselves. You can always approve.</span></span>
+        </label>
+      ) : null}
       {err ? <p role="alert" className="mt-4 rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-      <button disabled={!changed || !valid || !!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ name: fullName, role, ministries }) }, "save"); if (r.ok) onDone(`Saved. ${fullName || nameOf(m)} is now ${role === "admin" || role === "approver" || role === "editor" ? "an" : "a"} ${ROLE_LABEL[role]}.`); }} className="pill-btn mt-5 w-full bg-[#1e61b9] text-white disabled:bg-[#c4cfdc]">{busy === "save" ? "Saving…" : "Save changes"}</button>
+      <button disabled={!changed || !valid || !!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ name: fullName, role, ministries, ...(me.role === "owner" ? { approves } : {}) }) }, "save"); if (r.ok) onDone(`Saved. ${fullName || nameOf(m)} is now ${role === "admin" || role === "approver" || role === "editor" ? "an" : "a"} ${ROLE_LABEL[role]}.`); }} className="pill-btn mt-5 w-full bg-[#1e61b9] text-white disabled:bg-[#c4cfdc]">{busy === "save" ? "Saving…" : "Save changes"}</button>
 
       <div className="mt-6 space-y-3 border-t border-line pt-4">
         {off ? (

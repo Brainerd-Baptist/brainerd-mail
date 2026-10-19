@@ -12,7 +12,7 @@ export default async function TeamPage() {
   if (!me || !canManageTeam(me)) redirect("/emails");
   const sb = supabaseAdmin();
   const [{ data: people }, { data: invites }] = await Promise.all([
-    sb.from("staff").select("user_id,email,name,role,ministries,disabled_at,created_at").order("created_at", { ascending: true }),
+    sb.from("staff").select("user_id,email,name,role,ministries,disabled_at,created_at,can_approve").order("created_at", { ascending: true }),
     sb.from("invites").select("id,email,first_name,last_name,role,ministries,created_at,expires_at,last_sent_at").is("accepted_at", null).is("revoked_at", null).order("created_at", { ascending: false }),
   ]);
   // Owner only: when each person was last active in Mail (their most recent click, not their sign-in, since people can stay signed in for weeks). Never sent to anyone else.

@@ -11,7 +11,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (!canManageTeam(me)) return NextResponse.json({ error: "Only the owner and admins can manage people." }, { status: 403 });
   if (!UUID.test(params.id)) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (params.id === me.userId) return NextResponse.json({ error: "You can't change your own access." }, { status: 400 });
-  const { data: t } = await sb.from("staff").select("user_id,email,name,role,ministries,disabled_at").eq("user_id", params.id).maybeSingle();
+  const { data: t } = await sb.from("staff").select("user_id,email,name,role,ministries,disabled_at,can_approve").eq("user_id", params.id).maybeSingle();
   if (!t || !isRole(t.role)) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (!canManageTarget(me.role, t.role)) return NextResponse.json({ error: t.role === "owner" ? "The owner can't be changed. Use Make owner to hand it off." : "Only the owner can change an Admin." }, { status: 403 });
 
@@ -31,6 +31,11 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (role !== t.role) { patch.role = role; detail.role = { from: t.role, to: role }; }
   if (JSON.stringify(ministries) !== JSON.stringify(t.ministries ?? [])) { patch.ministries = ministries; detail.ministries = ministries; }
 
+  if (b.approves !== undefined) {
+    if (me.role !== "owner") return NextResponse.json({ error: "Only the owner can choose who approves emails." }, { status: 403 });
+    if (typeof b.approves !== "boolean") return NextResponse.json({ error: "Bad request" }, { status: 400 });
+    if (b.approves !== !!t.can_approve) { patch.can_approve = b.approves; detail.approves = b.approves; }
+  }
   if (typeof b.name === "string") {
     const n = b.name.trim().replace(/\s+/g, " ").slice(0, 120);
     if (!n) return NextResponse.json({ error: "Name can't be empty." }, { status: 400 });
