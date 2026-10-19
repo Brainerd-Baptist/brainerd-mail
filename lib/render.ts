@@ -261,7 +261,7 @@ export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
     })
     .join("\n");
   const footerLink = (url: string, label: string, id: string) =>
-    `<a class="dm-lk" href="${esc(o.wrap(url, id, label))}" style="color:${p.dark};text-decoration:underline;font-family:${SANS};font-size:14px;font-weight:600;margin-right:20px;">${esc(label)}</a>`;
+    `<a class="dm-lk" href="${esc(o.wrap(url, id, label))}" style="color:${p.dark};text-decoration:underline;font-family:${SANS};font-size:14px;font-weight:600;display:inline-block;white-space:nowrap;margin:0 20px 8px 0;">${esc(label)}</a>`;
   const links = [
     o.mode === "email" && o.webUrl ? footerLink(o.webUrl, "View in browser", "footer-web") : "",
     footerLink(o.preferencesUrl, "Manage preferences", "footer-prefs"),
@@ -323,7 +323,7 @@ ${blocks}
 <tr><td class="px dm-foot" style="background:#f1f5f9;padding:28px 40px 36px 40px;">
 ${churchFoot}<p class="dm-text" style="margin:0 0 14px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">${esc(doc.footerNote)}</p>
 ${o.contactEmail ? `<p class="dm-text" style="margin:0 0 16px 0;font-family:${SANS};font-size:14px;line-height:1.6;color:#33445d;">Questions? Write us at <a class="dm-lk" href="mailto:${esc(o.contactEmail)}" style="color:${p.dark};text-decoration:underline;font-weight:600;">${esc(o.contactEmail)}</a></p>` : ""}
-<div style="margin:0 0 16px 0;">${links}</div>
+<div style="margin:0 0 8px 0;">${links}</div>
 <p class="dm-muted" style="margin:0;font-family:${SANS};font-size:12px;line-height:1.5;color:#5b6b80;">${esc(o.address)}</p>
 </td></tr>
 </table>
