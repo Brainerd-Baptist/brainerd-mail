@@ -78,6 +78,7 @@ svg.map.drag{cursor:grabbing}
 .mm-bar{padding:12px 12px 0;gap:8px}
 .regions{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;width:100%;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .regions::-webkit-scrollbar{display:none}
+.regions{padding-right:24px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 34px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 34px),transparent 100%)}
 .mm-stats{grid-template-columns:repeat(2,1fr);gap:8px;padding:14px 12px 0}
 .stat{min-height:64px}
 .stat .num{font-size:1.6rem}

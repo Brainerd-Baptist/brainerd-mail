@@ -5,7 +5,7 @@
   var D = JSON.parse(document.getElementById("mm-data").textContent);
   var COLOR = { 1: "#00abc9", 2: "#33bc53", 3: "#ff4a53" };
   var REGIONS = [
-    { name: "World", vb: { x: 0, y: 0, w: D.W } },
+    { name: "World", vb: { x: 0, y: 20, w: D.W, id: 0 } },
     { name: "Americas", vb: { x: 0, y: 60, w: 720 } },
     { name: "Europe & Middle East", vb: { x: 395, y: 74, w: 347 } },
     { name: "Africa", vb: { x: 312, y: 170, w: 459 } },
@@ -187,13 +187,18 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") hideTip(true); });
 
   // ---- zoom and pan: buttons, pinch, drag, double-tap, trackpad pinch ----
-  var W = D.W, H = D.H, vb = { x: 0, y: 0, w: W, h: H }, anim = 0;
+  // The world map has empty ocean at the very bottom; start a little lower and crop it so the map fills its frame.
+  var W = D.W, H = D.H - 62, Y0 = 20, vb = { x: 0, y: Y0, w: W, h: H }, anim = 0;
+  svg.setAttribute("viewBox", "0 " + Y0 + " " + W + " " + H);
+  var fromJump = false;
   function setVB() {
     svg.setAttribute("viewBox", vb.x + " " + vb.y + " " + vb.w + " " + vb.h);
     svg.classList.toggle("zoomed", vb.w < W - 1);
-    regionBtns[0].classList.toggle("on", vb.w >= W - 1);
+    if (!fromJump && vb.w < W - 1) markRegionClear();
+    if (vb.w >= W - 1 && !fromJump) markRegion(0);
   }
-  function clamp(v) { v.w = Math.min(W, Math.max(W / 8, v.w)); v.h = v.w * H / W; v.x = Math.min(W - v.w, Math.max(0, v.x)); v.y = Math.min(H - v.h, Math.max(0, v.y)); return v; }
+  function markRegionClear() { regionBtns.forEach(function (b) { b.classList.remove("on"); b.setAttribute("aria-pressed", "false"); }); }
+  function clamp(v) { v.w = Math.min(W, Math.max(W / 8, v.w)); v.h = v.w * H / W; v.x = Math.min(W - v.w, Math.max(0, v.x)); v.y = Math.min(D.H - v.h, Math.max(Y0 - 4, v.y)); return v; }
   function rect() { return svg.getBoundingClientRect(); }
   // Zoom by factor f keeping the point under (px, py), in screen pixels, where it is.
   function zoomAt(f, px, py) {
@@ -203,16 +208,26 @@
     vb.x = gx - u * vb.w; vb.y = gy - v * vb.h; clamp(vb); setVB();
   }
   function zoomCenter(f) { var r = rect(); zoomAt(f, r.left + r.width / 2, r.top + r.height / 2); hideTip(true); }
+  function markRegion(i) {
+    regionBtns.forEach(function (b, k) { b.classList.toggle("on", k === i); b.setAttribute("aria-pressed", String(k === i)); });
+    if (i < 0) return;
+    var b = regionBtns[i], bx = regionsBox;
+    var left = b.offsetLeft - (bx.clientWidth - b.offsetWidth) / 2;
+    try { bx.scrollTo({ left: left, behavior: reduce ? "auto" : "smooth" }); } catch (e) { bx.scrollLeft = left; }
+  }
   function jump(r) {
-    hideTip(true);
-    var to = clamp({ x: r.vb.x, y: r.vb.y, w: r.vb.w, h: r.vb.w * H / W });
-    if (reduce) { vb = to; setVB(); return; }
+    hideTip(true); markRegion(REGIONS.indexOf(r));
+    var whole = r.vb.id === 0, k0 = whole ? 1 : D.H / H;
+    var nw = r.vb.w * k0, th = nw * H / W, cx = r.vb.x + r.vb.w / 2, cy = r.vb.y + r.vb.w * (D.H / D.W) / 2;
+    var to = clamp({ x: whole ? 0 : cx - nw / 2, y: whole ? Y0 : cy - th / 2, w: nw, h: th });
+    fromJump = true;
+    if (reduce) { vb = to; setVB(); fromJump = false; return; }
     var from = { x: vb.x, y: vb.y, w: vb.w }, t0 = null, id = ++anim;
     (function step(t) {
       if (id !== anim) return; if (t0 === null) t0 = t;
       var k = Math.min(1, (t - t0) / 280), e = 1 - Math.pow(1 - k, 3);
       vb = clamp({ x: from.x + (to.x - from.x) * e, y: from.y + (to.y - from.y) * e, w: from.w + (to.w - from.w) * e, h: 0 }); setVB();
-      if (k < 1) requestAnimationFrame(step);
+      if (k < 1) requestAnimationFrame(step); else fromJump = false;
     })(performance.now());
   }
   zin.onclick = function () { zoomCenter(1.7); };
@@ -221,7 +236,7 @@
   var ptrs = new Map(), g = null; // g: gesture start state
   function mid() { var a = Array.from(ptrs.values()); return { x: (a[0].x + a[1].x) / 2, y: (a[0].y + a[1].y) / 2, d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) }; }
   svg.addEventListener("pointerdown", function (e) {
-    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); drag.moved = false; anim++;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); drag.moved = false; anim++; fromJump = false;
     if (ptrs.size === 2) { var m = mid(); g = { two: true, d: m.d, x: m.x, y: m.y, vb: { x: vb.x, y: vb.y, w: vb.w, h: vb.h } }; drag.moved = true; hideTip(true); }
     else g = { two: false, x: e.clientX, y: e.clientY, vb: { x: vb.x, y: vb.y, w: vb.w, h: vb.h }, started: false };
   });
