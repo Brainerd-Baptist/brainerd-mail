@@ -410,7 +410,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const deviceToggle = (kinds: Device[]) => (
     <div className="flex items-center gap-1 rounded-full bg-[#e3eaf2] p-1">
       {([["phone", Smartphone, "Phone"], ["desktop", Monitor, "Desktop"], ["dark", Moon, "Dark"], ["text", MessageSquare, "Text"]] as const).filter(([k]) => kinds.includes(k)).map(([k, Icon, label]) => (
-        <button key={k} onClick={() => setDevice(k)} aria-label={label} className={`flex h-9 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-semibold transition lg:px-4 ${device === k ? "bg-white text-navy shadow-sm" : "text-muted"}`}><Icon size={16} /><span className={isPhoneLayout && device !== k ? "hidden" : ""}>{label}</span></button>
+        <button key={k} onClick={() => setDevice(k)} aria-label={label} className={`flex h-9 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-semibold transition lg:px-4 ${device === k ? "bg-white text-navy shadow-sm" : "text-muted"}`}><Icon size={16} /><span className={device !== k ? "hidden 2xl:inline" : ""}>{label}</span></button>
       ))}
     </div>
   );
