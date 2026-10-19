@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { syncLinks, renderFor } from "@/lib/tracking";
+import { syncLinks, renderFor, BOT_UA, deviceOf } from "@/lib/tracking";
 import { siteUrl } from "@/lib/site";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import type { EmailDoc } from "@/lib/blocks";
@@ -7,7 +7,7 @@ import type { EmailDoc } from "@/lib/blocks";
 export const dynamic = "force-dynamic";
 
 // The web version of an email, opened from "View in browser" and from text messages.
-export async function GET(_: Request, { params }: { params: { slug: string } }) {
+export async function GET(req: Request, { params }: { params: { slug: string } }) {
   const notFound = new Response("This email isn't available.", { status: 404, headers: { "content-type": "text/plain" } });
   if (!/^[0-9a-f]{12}$/.test(params.slug)) return notFound;
   const admin = supabaseAdmin();
@@ -19,5 +19,9 @@ export async function GET(_: Request, { params }: { params: { slug: string } }) 
     issueSlug: params.slug, webUrl: `${siteUrl()}/w/${params.slug}`, unsubscribeUrl: `${siteUrl()}/u/web`, preferencesUrl: `${siteUrl()}/u/web` };
   const linkIds = await syncLinks(admin, email.id, doc, base);
   const { html } = renderFor(doc, linkIds, "web", params.slug, "web");
+  try {
+    const ua = req.headers.get("user-agent") ?? "";
+    await admin.from("web_views").insert({ email_id: email.id, device: deviceOf(ua), is_bot: BOT_UA.test(ua) });
+  } catch {}
   return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store", "x-robots-tag": "noindex" } });
 }

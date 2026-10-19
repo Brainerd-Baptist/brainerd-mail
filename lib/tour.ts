@@ -10,6 +10,7 @@ export function tourFor(role: Role, name: string): TourStep[] {
   const menu: TourStep = { title: "Everything is in the menu", body: "Tap the three lines at the top left of any screen. You'll find Emails, Calendar and anything else your role can use. Your name and role show at the bottom.", hint: "Menu, top left" };
   const emails: TourStep = { title: "Emails", body: "The Emails screen lists every email from every ministry, newest edit first. Search by name, or filter by ministry. Tap one to open it.", hint: "Menu → Emails" };
   const calendar: TourStep = { title: "The calendar", body: "See what each ministry plans to send and what actually went out: on time, late, or missed (judged by the day). Switch between Month and Week. Every email links straight from its day.", hint: "Menu → Calendar" };
+  const analytics: TourStep = { title: "Analytics", body: "See how emails did: how many people clicked, which buttons got tapped, when and on what device. Use the filters for dates, ministry and more. Tap an email for its full report. Opens are estimates; clicks are the number to trust.", hint: "Menu → Analytics" };
   const feedback: TourStep = { title: "Tell us what's off", body: "Something confusing, broken, or missing? Use Feedback inside the email editor. It goes straight to the owner and admins.", hint: "Editor → Feedback" };
   const help: TourStep = { title: "Help is one tap away", body: "The ? button at the top of every screen shows help for the page you're on. You can also type a question in plain English, like \"how do I make a photo bigger?\" If help can't answer it, you can send it to us right there.", hint: "? at the top of any screen" };
   const replay: TourStep = { title: "You're set", body: "You can replay this tour any time from the menu: tap the three lines, then Take the tour.", hint: "Menu → Take the tour" };
@@ -17,7 +18,7 @@ export function tourFor(role: Role, name: string): TourStep[] {
   const steps: TourStep[] = [welcome, menu];
 
   if (role === "viewer") {
-    steps.push(emails, { title: "Look, don't touch", body: "You can open any email and see how it looks on a phone and on a desktop. Buttons that change things are hidden for your role, so you can't break anything." }, calendar, feedback);
+    steps.push(emails, { title: "Look, don't touch", body: "You can open any email and see how it looks on a phone and on a desktop. Buttons that change things are hidden for your role, so you can't break anything." }, calendar, analytics, feedback);
   }
   if (role === "editor") {
     steps.push(
@@ -37,14 +38,14 @@ export function tourFor(role: Role, name: string): TourStep[] {
       { title: "Approve or send it back", body: "Approve it, or send it back with a note saying what to change. If the send time is under 72 hours away, you have to confirm that you approve an expedited send. You can't approve an email you submitted yourself.", hint: "Review screen" },
       emails,
       { title: "Edit any ministry's email", body: "Approvers can open and edit any ministry's draft, for example to fix a typo rather than sending it back." },
-      calendar, feedback,
+      calendar, analytics, feedback,
     );
   }
   if (role === "admin" || role === "owner") {
     steps.push(
       emails,
       { title: "Review and approve", body: "Emails sent for approval appear as Waiting for approval, and you get an email each time. Approve, or send it back with a note. If the send time is under 72 hours away, you confirm an expedited send." },
-      calendar,
+      calendar, analytics,
       { title: "Team: invite people", body: "Open Team from the menu. Tap Invite someone, enter first and last name and a church email, choose a role, and for Editors pick the ministries they're responsible for. They sign in with Google.", hint: "Menu → Team" },
       { title: "When someone leaves", body: "Open them in Team, tap Manage, then Remove access. They're signed out on their next click and can't get back in. Their past work stays on the history, and you can restore access later.", hint: "Team → Manage → Remove access" },
       { title: "Feedback inbox", body: "Notes people send from the editor land in the Feedback inbox. Mark them seen, planned, or done.", hint: "Menu → Feedback inbox" },

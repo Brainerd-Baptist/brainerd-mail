@@ -37,6 +37,7 @@ export function renderFor(doc: EmailDoc, linkIds: Map<string, string>, token: st
   const opts: RenderOpts = {
     mode, siteUrl: site, address: CHURCH_ADDRESS, contactEmail: CONTACT_EMAIL, issueSlug: webSlug,
     webUrl: `${site}/w/${webSlug}`,
+    openPixelUrl: mode === "email" && /^[0-9a-f]{24}$/.test(token) ? `${site}/o/${token}` : undefined,
     unsubscribeUrl: `${site}/u/${token}`,
     preferencesUrl: `${site}/u/${token}`,
     wrap: (url, id, label) => {

@@ -11,6 +11,7 @@ export type RenderOpts = {
   // Wraps every outgoing link so clicks can be counted. In previews it just returns the url.
   wrap: (url: string, linkId: string, label: string) => string;
   webUrl?: string;
+  openPixelUrl?: string; // a 1x1 image that lets us estimate opens (email only, real recipients only)
   unsubscribeUrl: string;
   preferencesUrl: string;
   address: string;
@@ -303,6 +304,7 @@ ${o.contactEmail ? `<p class="dm-text" style="margin:0 0 16px 0;font-family:${SA
 </table>
 </td></tr></table>
 ${webScript}
+${o.mode === "email" && o.openPixelUrl ? `<img src="${esc(o.openPixelUrl)}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0;">` : ""}
 </body>
 </html>`;
 }

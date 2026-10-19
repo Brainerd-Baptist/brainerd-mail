@@ -18,6 +18,9 @@ export const canBuild = (p: Perm) => p.role !== "viewer";
 export const canBuildIn = (p: Perm, ministry: string) => p.role === "owner" || p.role === "admin" || p.role === "approver" || (p.role === "editor" && p.ministries.includes(ministry));
 export const canApprove = (p: Perm) => p.role === "owner" || p.role === "admin" || p.role === "approver";
 export const canManageTeam = (p: Perm) => p.role === "owner" || p.role === "admin";
+// Analytics: everyone signed in can read it. Editors see their own ministries; individual-level detail (who opened, who clicked) is for the Owner and Admins.
+export const analyticsMinistries = (p: Perm): string[] | null => (p.role === "editor" ? p.ministries : null);
+export const canSeePeopleStats = (p: Perm) => p.role === "owner" || p.role === "admin";
 export const canSeeFeedback = (p: Perm) => p.role === "owner" || p.role === "admin";
 export const canEditRoster = (p: Perm) => p.role === "owner" || p.role === "admin" || p.role === "approver" || (p.role === "editor" && p.ministries.includes("missions"));
 // Which roles this person may hand out, and whose role they may change.

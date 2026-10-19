@@ -10,12 +10,12 @@ export async function POST(_: Request, { params }: { params: { token: string } }
   const back = (q: string) => NextResponse.redirect(`${siteUrl()}/u/${params.token}?${q}`, { status: 303 });
   if (!/^[0-9a-f]{24}$/.test(params.token)) return back("error=1");
   const admin = supabaseAdmin();
-  const { data: r } = await admin.from("recipients").select("email,sends(emails(ministry))").eq("token", params.token).maybeSingle();
+  const { data: r } = await admin.from("recipients").select("email,send_id,sends(emails(ministry))").eq("token", params.token).maybeSingle();
   const email = r?.email?.toLowerCase();
   const ministry = (r as any)?.sends?.emails?.ministry as string | undefined;
   if (!email || !ministry) return back("error=1");
 
-  await admin.from("suppressions").upsert({ email, ministry, reason: "unsubscribed" }, { onConflict: "email,ministry", ignoreDuplicates: true });
+  await admin.from("suppressions").upsert({ email, ministry, reason: "unsubscribed", send_id: r?.send_id ?? null }, { onConflict: "email,ministry", ignoreDuplicates: true });
   const { data: open } = await admin.from("unsubscribe_tasks").select("id").eq("email", email).eq("ministry", ministry).eq("status", "open").limit(1);
   if (!open?.length) await admin.from("unsubscribe_tasks").insert({ email, ministry });
   return back("done=1");
