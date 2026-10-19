@@ -104,7 +104,7 @@ export function ruleNotes(f: Facts): Notes {
 export const hashOf = (f: Facts) => createHash("sha1").update(JSON.stringify([f.peopleEmailed, f.delivered, f.peopleWhoClicked, Math.round(f.totalClicks / 5), f.sends, f.dataFrom, f.subjectCharacters, f.hasPreviewText, f.trackedLinks])).digest("hex").slice(0, 16);
 
 // Every number Claude writes has to match a number we gave it (within rounding). Anything else is dropped.
-export function numbersOk(text: string, f: Facts): boolean {
+export function numbersOk(text: string, f: unknown): boolean {
   const have = (JSON.stringify(f).match(/\d+(?:\.\d+)?/g) ?? []).map(Number);
   const used = (text.match(/\d+(?:\.\d+)?/g) ?? []).map(Number);
   return used.every((u) => u <= 10 || have.some((h) => Math.abs(h - u) <= 0.51));
@@ -141,7 +141,7 @@ export const TOOL = {
   },
 } as const;
 
-export function cleanNotes(raw: any, f: Facts): Notes | null {
+export function cleanNotes(raw: any, f: unknown): Notes | null {
   if (!raw || typeof raw.summary !== "string") return null;
   const ok = (s: unknown): s is string => typeof s === "string" && s.trim().length > 5 && s.length < 400 && numbersOk(s, f);
   const summary = ok(raw.summary) ? raw.summary.trim() : "";

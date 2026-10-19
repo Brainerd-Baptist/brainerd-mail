@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { EmailInsights } from "@/components/EmailInsights";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BarChart3, ChevronDown, ChevronRight, Download, Filter, Info, RotateCcw, Search } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
@@ -217,6 +218,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
               </div>
             ) : (
               <div className="space-y-5">
+                <EmailInsights url={`/api/analytics/summary?${toQuery(f)}`} title="How your emails are doing" />
                 {/* Headline numbers */}
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Tile label="Emails sent" value={num(T.sends)} delta={P ? deltaCount(T.sends, P.sends) : null} />
