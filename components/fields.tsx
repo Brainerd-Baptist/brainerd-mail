@@ -129,10 +129,10 @@ export function ImageFields({ label = "Photo", value, onChange, aspect }: { labe
         </button>
       )}
       <input ref={input} type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />
-      <div className="flex gap-2">
-        <button type="button" onClick={() => input.current?.click()} disabled={busy} className="pill-btn flex-1 border-2 border-navy text-navy"><Camera size={18} className="mr-1.5" />{busy ? "Adding…" : v.url ? "Change photo" : "Choose or take a photo"}</button>
-        {v.url ? <button type="button" onClick={() => setEditing(true)} className="pill-btn px-4 text-brand">Adjust</button> : null}
-        {v.url ? <button type="button" onClick={() => onChange({ ...v, url: "", quality: undefined, original: undefined, edit: undefined })} className="pill-btn px-4 text-muted">Remove</button> : null}
+      <div className="flex items-center gap-1">
+        <button type="button" onClick={() => input.current?.click()} disabled={busy} className="pill-btn min-w-0 flex-1 border-2 border-navy text-navy"><Camera size={18} className="mr-1.5" />{busy ? "Adding…" : v.url ? "Change photo" : "Choose or take a photo"}</button>
+        {v.url ? <button type="button" onClick={() => setEditing(true)} className="pill-btn shrink-0 px-3 text-brand">Adjust</button> : null}
+        {v.url ? <button type="button" onClick={() => onChange({ ...v, url: "", quality: undefined, original: undefined, edit: undefined })} className="pill-btn shrink-0 px-3 text-muted">Remove</button> : null}
       </div>
       {note ? <span className="block text-xs text-muted">{note}</span> : null}
       {v.url && (v.quality?.dark || v.quality?.soft || v.quality?.small) ? (
