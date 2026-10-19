@@ -124,7 +124,10 @@ function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
   switch (b.type) {
     case "hero": {
       const img = b.showImage ? image(b.image, o, "width:100%;height:auto;display:block;border:0;border-radius:12px;") : "";
-      const kicker = [p.name === "BRAINERD" ? "" : p.label, b.eyebrow].filter(Boolean).join("  ·  ");
+      // "MEN · MEN OF BRAINERD" reads as a stutter: drop the ministry prefix when the eyebrow already names it.
+      const eb = (b.eyebrow || "").toLowerCase();
+      const named = !!eb && (eb.includes(p.label.toLowerCase()) || eb.includes(p.name.toLowerCase()));
+      const kicker = [p.name === "BRAINERD" || named ? "" : p.label, b.eyebrow].filter(Boolean).join("  ·  ");
       return `<tr><td class="px dm-hero" style="background:${p.tint};padding:30px 40px 34px 40px;">
 ${kicker ? `<div class="dm-eb" style="margin:0 0 10px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}
 <h1 class="h1 dm-head" style="margin:0 0 14px 0;font-family:${SERIF};font-weight:700;font-size:40px;line-height:1.1;color:${p.dark};">${esc(b.headline)}</h1>
@@ -306,7 +309,7 @@ a{color:inherit;}
 <body class="dm-bg" style="margin:0;padding:0;background:#e6ecf2;">
 ${preview}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-bg" style="background:#e6ecf2;"><tr><td align="center" class="outer" style="padding:32px 12px;">
-<table role="presentation" class="wrap dm-wrap" width="640" cellpadding="0" cellspacing="0" border="0" style="width:640px;max-width:640px;background:#ffffff;border-radius:12px;overflow:hidden;">
+${o.mode === "email" && o.webUrl ? `<div class="dm-muted" style="max-width:640px;margin:0 auto 12px auto;text-align:center;font-family:${SANS};font-size:12px;line-height:1.5;color:#5b6b80;">Trouble reading this email? <a class="dm-lk" href="${esc(o.wrap(o.webUrl, "top-web", "View in browser"))}" style="color:${p.dark};text-decoration:underline;font-weight:600;">View in browser</a></div>\n` : ""}<table role="presentation" class="wrap dm-wrap" width="640" cellpadding="0" cellspacing="0" border="0" style="width:640px;max-width:640px;background:#ffffff;border-radius:12px;overflow:hidden;">
 ${masthead}
 ${blocks}
 <tr><td style="height:32px;line-height:32px;font-size:1px;">&nbsp;</td></tr>
