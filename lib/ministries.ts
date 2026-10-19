@@ -31,3 +31,10 @@ export const PALETTES: Record<string, Palette> = {
 export function paletteFor(key: string): Palette {
   return PALETTES[key] ?? PALETTES["church-wide"];
 }
+
+// The ministry's identity color: what you see in its email masthead. Used for dots, chips and charts
+// so the app matches the emails. (Adults has a white masthead, so it uses its charcoal.)
+export function swatch(p: Palette): string {
+  const bar = p.bar?.toLowerCase();
+  return bar && bar !== "#ffffff" ? bar : p.dark;
+}

@@ -1,7 +1,7 @@
 import { Analytics } from "@/components/Analytics";
 import { currentMe } from "@/lib/roles";
 import { analyticsMinistries, canSeePeopleStats } from "@/lib/roles-ui";
-import { PALETTES } from "@/lib/ministries";
+import { PALETTES, swatch } from "@/lib/ministries";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Analytics | Brainerd Mail" };
@@ -10,6 +10,6 @@ export const metadata = { title: "Analytics | Brainerd Mail" };
 export default async function AnalyticsPage() {
   const me = await currentMe();
   const mine = me ? analyticsMinistries(me) : null;
-  const ministries = Object.values(PALETTES).filter((p) => !mine || mine.includes(p.key)).map((p) => ({ key: p.key, label: p.label, color: p.button === "#e0b22c" ? "#b88a0a" : p.button }));
+  const ministries = Object.values(PALETTES).filter((p) => !mine || mine.includes(p.key)).map((p) => ({ key: p.key, label: p.label, color: swatch(p) }));
   return <Analytics ministries={ministries} people={!!me && canSeePeopleStats(me)} own={!!mine} />;
 }

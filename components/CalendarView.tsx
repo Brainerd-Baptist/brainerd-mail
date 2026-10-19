@@ -7,7 +7,7 @@ import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Check, ChevronLeft, ChevronRight, CircleDashed, Clock, ExternalLink, Pause, Play, Plus, Repeat, SkipForward, Trash2, Undo2, X } from "lucide-react";
-import { PALETTES, paletteFor } from "@/lib/ministries";
+import { PALETTES, paletteFor, swatch } from "@/lib/ministries";
 import { canBuildIn, type Perm } from "@/lib/roles-ui";
 import {
   BADGE, LABEL, addDays, approvalDeadline, dayDiff, dayTitle, etKey, monthGrid, monthTitle, outcome, plannedFor, shiftMonth, shortTime, timeLabel, timingNote, toLocalInput, weekDays, weekTitle, whenOf,
@@ -173,7 +173,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                 const cls = `block w-full rounded-lg p-2 text-left text-xs ${BADGE[en.kind]}`;
                 const inner = (
                   <>
-                    <span className="flex items-center gap-1 font-semibold"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: p.button }} />{ICON[en.kind]}<span className="truncate">{shortTime(en.at)} · {p.label}</span></span>
+                    <span className="flex items-center gap-1 font-semibold"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: swatch(p) }} />{ICON[en.kind]}<span className="truncate">{shortTime(en.at)} · {p.label}</span></span>
                     <span className="mt-0.5 block break-words text-[13px] font-semibold leading-snug">{text}</span>
                     <span className="mt-0.5 block opacity-80">{LABEL[en.kind]}{note ? ` · ${note}` : ""}</span>
                   </>
@@ -246,14 +246,14 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                   <div key={day} onClick={() => setSel(day)} className={`min-h-[56px] cursor-pointer border-r border-line p-1 last:border-r-0 sm:min-h-[104px] sm:p-1.5 ${inMonth ? "bg-white" : "bg-[#f7f9fc]"} ${isSel ? "ring-2 ring-inset ring-[#1e61b9]" : ""}`}>
                     <div className={`mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${day === today ? "bg-[#1e61b9] text-white" : inMonth ? "text-ink" : "text-[#9aa8bd]"}`}>{Number(day.slice(8))}</div>
                     <div className="flex flex-wrap gap-0.5 sm:hidden">
-                      {list.slice(0, 6).map((en, i) => <span key={i} className="h-2 w-2 rounded-full" style={{ background: paletteFor(en.type === "email" ? en.e.ministry : en.s.ministry).button }} />)}
+                      {list.slice(0, 6).map((en, i) => <span key={i} className="h-2 w-2 rounded-full" style={{ background: swatch(paletteFor(en.type === "email" ? en.e.ministry : en.s.ministry)) }} />)}
                     </div>
                     <div className="hidden space-y-1 sm:block">
                       {list.slice(0, 3).map((en) => {
                         const p = paletteFor(en.type === "email" ? en.e.ministry : en.s.ministry);
                         const text = en.type === "email" ? en.e.title || "Untitled" : en.s.label || "Open slot";
                         const cls = `flex items-center gap-1 truncate rounded px-1.5 py-0.5 text-[11px] font-semibold leading-4 ${BADGE[en.kind]}`;
-                        const inner = (<><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: p.button }} />{ICON[en.kind]}<span className="truncate">{shortTime(en.at)} {text}</span></>);
+                        const inner = (<><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: swatch(p) }} />{ICON[en.kind]}<span className="truncate">{shortTime(en.at)} {text}</span></>);
                         return en.type === "email"
                           ? <Link key={en.e.id} href={hrefFor(en.e)} onClick={(ev) => ev.stopPropagation()} title={`${p.label}: ${text}`} className={cls}>{inner}</Link>
                           : <button key={en.s.id} onClick={(ev) => { ev.stopPropagation(); setSel(day); }} title={`${p.label}: ${text}`} className={`${cls} w-full text-left`}>{inner}</button>;
@@ -287,7 +287,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                 const dueIso = plan && new Date(plan).getTime() > now ? approvalDeadline(plan) : null;
                 return (
                   <li key={id} className={`flex overflow-hidden rounded-xl border border-line bg-white ${busy === id ? "opacity-60" : ""}`}>
-                    <span className="w-1.5 shrink-0" style={{ background: p.button }} />
+                    <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
                     <div className="min-w-0 flex-1 p-4">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                         <span className="font-semibold" style={{ color: p.dark }}>{p.label}</span>
@@ -368,7 +368,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                 const p = paletteFor(s.ministry);
                 return (
                   <li key={s.id} className={`flex items-center gap-3 rounded-xl border border-line bg-white p-3 ${busy === s.id ? "opacity-60" : ""}`}>
-                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: p.button }} />
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: swatch(p) }} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[15px] font-semibold text-ink">{s.label}{s.paused ? " (paused)" : ""}</span>
                       <span className="block truncate text-xs text-muted">{p.label} &middot; {describe(s)}{s.ends_on ? ` until ${s.ends_on}` : ""}</span>
@@ -388,7 +388,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
             <p className="text-sm text-muted">Drafts with no planned time. Open one and set when it should go out.</p>
             <ul className="space-y-2">
               {undated.map((e) => (
-                <li key={e.id}><Link href={hrefFor(e)} className="flex items-center gap-3 rounded-xl border border-line bg-white p-3 active:bg-[#f4f8fd]"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: paletteFor(e.ministry).button }} /><span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-ink">{e.title || "Untitled"}</span><span className="shrink-0 text-xs text-muted">{paletteFor(e.ministry).label}</span></Link></li>
+                <li key={e.id}><Link href={hrefFor(e)} className="flex items-center gap-3 rounded-xl border border-line bg-white p-3 active:bg-[#f4f8fd]"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: swatch(paletteFor(e.ministry)) }} /><span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-ink">{e.title || "Untitled"}</span><span className="shrink-0 text-xs text-muted">{paletteFor(e.ministry).label}</span></Link></li>
               ))}
             </ul>
           </section>

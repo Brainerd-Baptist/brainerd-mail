@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Users, Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History, Undo2, Redo2, CalendarClock, MoreHorizontal } from "lucide-react";
 import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc } from "@/lib/blocks";
-import { PALETTES, paletteFor } from "@/lib/ministries";
+import { PALETTES, paletteFor, swatch } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
 import { runChecks } from "@/lib/checks";
 import { PolishPanel } from "@/components/PolishPanel";
@@ -585,7 +585,7 @@ export default function Builder({ emailId }: { emailId: string }) {
         <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-line bg-white px-3">
           <div className="flex min-w-0 items-center gap-1">
             <NavMenu />
-            <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: palette.button }} />
+            <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: swatch(palette) }} />
             <div className="min-w-0">
               <input aria-label="Email name" readOnly={locked} className="w-full min-w-0 truncate bg-transparent text-[16px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
               <div className="-mt-0.5 truncate text-xs text-muted">{palette.label} · {saveLabel}{planIso ? ` · ${chipWhen(planIso)}` : ""}</div>

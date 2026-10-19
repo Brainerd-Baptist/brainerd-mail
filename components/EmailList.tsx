@@ -10,7 +10,7 @@ import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Copy, Globe, LogOut, Plus, Search, Trash2, X } from "lucide-react";
-import { PALETTES, paletteFor } from "@/lib/ministries";
+import { PALETTES, paletteFor, swatch } from "@/lib/ministries";
 import { canBuildIn, type Perm } from "@/lib/roles-ui";
 import { ago } from "@/lib/time";
 
@@ -112,7 +112,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
               const st = STATUS[it.status] ?? STATUS.draft;
               return (
                 <li key={it.id} className={`flex items-stretch overflow-hidden rounded-xl border border-line bg-white ${busy === it.id ? "opacity-60" : ""}`}>
-                  <span className="w-1.5 shrink-0" style={{ background: p.button }} />
+                  <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
                   <Link href={it.status === "pending_approval" ? `/review/${it.id}` : `/editor?e=${it.id}`} className="min-w-0 flex-1 p-4 active:bg-[#f4f8fd]">
                     <span className="block truncate text-[16px] font-semibold text-ink">{it.title || "Untitled"}</span>
                     {it.subject ? <span className="mt-0.5 block truncate text-sm text-muted">{it.subject}</span> : null}
