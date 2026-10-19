@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History, Undo2, Redo2, CalendarClock } from "lucide-react";
+import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History, Undo2, Redo2, CalendarClock, MoreHorizontal } from "lucide-react";
 import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc } from "@/lib/blocks";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
@@ -48,6 +48,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const [planErr, setPlanErr] = useState("");
   const [submitOpen, setSubmitOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [canEdit, setCanEdit] = useState(true);
   const [role, setRole] = useState("");
@@ -586,10 +587,20 @@ export default function Builder({ emailId }: { emailId: string }) {
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1">
-            {doc.ministry === "missions" ? <a href="/roster" aria-label="Edit members serving globally" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><Globe size={22} /></a> : null}
-            <button onClick={() => setScheduleOpen(true)} aria-label={planIso ? `Scheduled ${chipWhen(planIso)}. Change` : "Schedule"} className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><CalendarClock size={22} className={planIso ? "text-[#1e61b9]" : ""} /></button>
-            <button onClick={() => setFeedbackOpen(true)} aria-label="Report a problem or share feedback" className="relative flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><LifeBuoy size={22} />{inboxNew ? <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#c8102e]" /> : null}</button>
-<button onClick={() => setHistoryOpen(true)} aria-label="Version history" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><History size={22} /></button>
+            <div className="relative">
+              <button onClick={() => setMoreOpen((v) => !v)} aria-label="More: schedule, history, feedback" aria-haspopup="menu" aria-expanded={moreOpen} className="relative flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><MoreHorizontal size={24} />{inboxNew ? <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#c8102e]" /> : null}</button>
+              {moreOpen ? (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
+                  <div role="menu" className="absolute right-0 top-12 z-50 w-[min(280px,80vw)] overflow-hidden rounded-2xl border border-line bg-white py-1.5 shadow-xl">
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setScheduleOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><CalendarClock size={20} className={planIso ? "text-[#1e61b9]" : "text-muted"} /><span className="min-w-0 flex-1">Schedule{planIso ? <span className="block truncate text-xs font-normal text-muted">{chipWhen(planIso)}</span> : null}</span></button>
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setHistoryOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><History size={20} className="text-muted" />Version history</button>
+                    {doc.ministry === "missions" ? <a role="menuitem" href="/roster" className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Globe size={20} className="text-muted" />Serving list</a> : null}
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setFeedbackOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><LifeBuoy size={20} className="text-muted" /><span className="flex-1">Feedback</span>{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+                  </div>
+                </>
+              ) : null}
+            </div>
             <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />{locked ? "Status" : "Send"}</button>
           </div>
         </header>
