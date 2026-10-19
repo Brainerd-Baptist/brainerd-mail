@@ -19,7 +19,7 @@ function useIgnored(kind: string, ministry: string) {
 const btn = "min-h-9 rounded-full px-3.5 text-sm font-semibold";
 
 // Spelling: checks automatically a moment after you stop typing. Names and church words a dictionary
-// doesn't know can be ignored, and the choice is remembered for that ministry.
+// doesn't know can be ignored, and the choice is shared with the whole team.
 export function SpellRow({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d: EmailDoc) => void; onShow: (blockId: string) => void }) {
   const [ignored, ignore] = useIgnored("spell", doc.ministry);
   const [issues, setIssues] = useState<Issue[] | null>(null);
@@ -62,7 +62,7 @@ export function SpellRow({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d: E
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {i.suggestions.map((s) => <button key={s} onClick={() => setDoc(replaceWord(doc, i.blockId, i.word, s))} className={`${btn} bg-brand text-white`}>{s}</button>)}
                   <button onClick={() => onShow(i.blockId)} className={`${btn} flex items-center gap-1 border border-line text-ink`}><Eye size={14} />Show me</button>
-                  <button onClick={() => ignore(i.word.toLowerCase())} className={`${btn} px-2 text-muted`}>Ignore</button>
+                  <button onClick={() => { ignore(i.word.toLowerCase()); fetch("/api/spellcheck", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ignore: i.word }) }).catch(() => {}); }} className={`${btn} px-2 text-muted`}>Ignore</button>
                 </div>
               </li>
             ))}
