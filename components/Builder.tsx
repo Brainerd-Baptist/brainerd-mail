@@ -9,6 +9,7 @@ import { PALETTES, paletteFor, swatch } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
 import { runChecks } from "@/lib/checks";
 import { PolishPanel } from "@/components/PolishPanel";
+import { SpellRow, ClarityRow } from "@/components/CheckExtras";
 import { FeedbackSheet } from "@/components/FeedbackSheet";
 import { polish, readDismissed } from "@/lib/polish";
 import { MISSIONS_TEMPLATE } from "@/lib/templates/missions";
@@ -415,6 +416,8 @@ export default function Builder({ emailId }: { emailId: string }) {
     </div>
   );
 
+  const showBlock = (id: string) => { if (id === "doc") { setTab("details"); return; } setSelected(id); setTab("edit"); };
+
   const checksPanel = (
     <div className="space-y-4">
     <div className="rounded-xl border border-line bg-white p-4">
@@ -426,12 +429,26 @@ export default function Builder({ emailId }: { emailId: string }) {
         {checks.map((c, i) => (
           <li key={i} className="flex gap-2 text-[15px] text-[#33445d]">
             {c.ok ? <Check size={18} className="mt-0.5 shrink-0 text-[#1e7a4c]" /> : <AlertTriangle size={18} className={`mt-0.5 shrink-0 ${c.severity === "block" ? "text-[#c8102e]" : "text-[#9a5a00]"}`} />}
-            <span>{c.label}{c.detail ? <span className="block text-xs text-muted">{c.detail}</span> : null}</span>
+            <div className="min-w-0 flex-1">
+              <span>{c.label}{c.detail ? <span className="block text-xs text-muted">{c.detail}</span> : null}</span>
+              {c.items?.length ? (
+                <ul className="mt-2 space-y-2">
+                  {c.items.map((it, j) => (
+                    <li key={j} className="flex flex-wrap items-center gap-2 rounded-lg bg-[#f4f8fd] p-3">
+                      <span className="min-w-0 flex-1 text-sm text-ink">{it.text}</span>
+                      <button onClick={() => showBlock(it.blockId)} className="flex min-h-9 items-center gap-1 rounded-full border border-line px-3 text-sm font-semibold text-ink"><Eye size={14} />Show me</button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
           </li>
         ))}
+        <SpellRow doc={doc} setDoc={setDoc} onShow={showBlock} />
+        <ClarityRow doc={doc} setDoc={setDoc} onShow={showBlock} />
       </ul>
     </div>
-    <PolishPanel doc={doc} setDoc={setDoc} onShow={(id) => { setSelected(id); setTab("edit"); }} />
+    <PolishPanel doc={doc} setDoc={setDoc} onShow={showBlock} />
     </div>
   );
 

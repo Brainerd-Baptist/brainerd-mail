@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
 import { meFor, canBuild } from "@/lib/roles";
 import type { EmailDoc } from "@/lib/blocks";
-import { SYSTEM, TOOL, userMessage, validateEdits } from "@/lib/polish-ai";
+import { SYSTEM, CLARITY_SYSTEM, TOOL, userMessage, validateEdits } from "@/lib/polish-ai";
 
 // "Ask for ideas": staff only, runs only when they tap the button.
 export async function POST(req: Request) {
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         model: process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5",
         max_tokens: 2000,
-        system: SYSTEM,
+        system: body.mode === "clarity" ? CLARITY_SYSTEM : SYSTEM,
         tools: [TOOL],
         tool_choice: { type: "tool", name: TOOL.name },
         messages: [{ role: "user", content: userMessage(doc) }],
@@ -48,7 +48,8 @@ export async function POST(req: Request) {
     }
     const j = await res.json();
     const use = (j.content || []).find((c: any) => c.type === "tool_use");
-    return NextResponse.json({ edits: validateEdits(doc, use?.input?.edits) });
+    const edits = validateEdits(doc, use?.input?.edits).filter((e) => (body.mode === "clarity" ? e.kind === "rewrite" : true));
+    return NextResponse.json({ edits });
   } catch (e: any) {
     return NextResponse.json({ error: e?.name === "AbortError" ? "That took too long. Try again." : "Could not get ideas right now." }, { status: 502 });
   } finally {
