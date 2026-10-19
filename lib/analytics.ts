@@ -373,7 +373,7 @@ export type EmailReport = {
   sends: { id: string; kind: string; channel: string; at: string; recipients: number }[];
   t: Tally;
   funnel: { label: string; n: number }[];
-  links: { linkId: string; blockId: string; position: number; blockType: string; label: string; url: string; clicks: number; unique: number; phone: number; desktop: number; tablet: number; shareOfClickers: number | null; shareOfDelivered: number | null }[];
+  links: { linkId: string; blockId: string; position: number; inEmail: boolean; blockType: string; label: string; url: string; clicks: number; unique: number; phone: number; desktop: number; tablet: number; shareOfClickers: number | null; shareOfDelivered: number | null }[];
   devices: { phone: number; desktop: number; tablet: number; unknown: number };
   hours: { hour: number; clicks: number; opens: number }[];
   firstDays: { label: string; clicks: number; opens: number }[]; // by hours since send
@@ -404,7 +404,7 @@ export async function emailReport(me: Perm, f: Filters, emailId: string, people:
     const who = new Set(cs.map((c) => c.recipient_id).filter(Boolean) as string[]);
     const d = (x: string) => cs.filter((c) => c.device === x).length;
     const o = order.get(l.block_id);
-    return { linkId: l.id, blockId: l.block_id, position: o?.i ?? 999, blockType: typeName[o?.type ?? ""] ?? "Block", label: l.label, url: l.url, clicks: cs.length, unique: who.size, phone: d("phone"), desktop: d("desktop"), tablet: d("tablet"), shareOfClickers: pct(who.size, t.clickers), shareOfDelivered: pct(who.size, t.delivered) };
+    return { linkId: l.id, blockId: l.block_id, position: o?.i ?? 999, inEmail: !!o, blockType: typeName[o?.type ?? ""] ?? "Block", label: l.label, url: l.url, clicks: cs.length, unique: who.size, phone: d("phone"), desktop: d("desktop"), tablet: d("tablet"), shareOfClickers: pct(who.size, t.clickers), shareOfDelivered: pct(who.size, t.delivered) };
   }).sort((a, b) => a.position - b.position || b.clicks - a.clicks);
 
   const dev = (x: string) => clicks.filter((c) => c.device === x).length;

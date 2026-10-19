@@ -83,12 +83,12 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                 </div>
 
                 <Card title="What got tapped" note="In the order they appear in the email. The bar shows each link's share of the busiest link; the percent is the share of people reached who clicked it.">
-                  {r.links.length ? (
+                  {r.links.filter((l) => l.inEmail || l.clicks > 0).length ? (
                     <ul className="divide-y divide-line">
-                      {r.links.map((l) => (
+                      {r.links.filter((l) => l.inEmail || l.clicks > 0).map((l) => (
                         <li key={l.linkId} className="py-3 first:pt-0 last:pb-0">
                           <div className="flex items-baseline justify-between gap-3">
-                            <div className="min-w-0"><div className="truncate font-semibold text-ink">{l.label}</div><div className="truncate text-[12px] text-muted">{l.blockType} · block {l.position === 999 ? "–" : l.position} · {l.url.replace(/^https?:\/\/(www\.)?/, "")}</div></div>
+                            <div className="min-w-0"><div className="truncate font-semibold text-ink">{l.label}</div><div className="truncate text-[12px] text-muted">{l.inEmail ? `${l.blockType} · block ${l.position}` : "Removed from this email since"} · {l.url.replace(/^https?:\/\/(www\.)?/, "")}</div></div>
                             <div className="shrink-0 text-right"><div className="font-semibold tabular-nums text-navy">{num(l.clicks)} <span className="text-[12px] font-normal text-muted">click{l.clicks === 1 ? "" : "s"}</span></div><div className="text-[12px] text-muted">{num(l.unique)} {l.unique === 1 ? "person" : "people"}{l.shareOfDelivered !== null ? ` · ${pct(l.shareOfDelivered)}` : ""}</div></div>
                           </div>
                           <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eaf0f7]"><div className="h-full rounded-full bg-[#1e61b9]" style={{ width: `${Math.max(l.clicks ? 2 : 0, (l.clicks / maxClicks) * 100)}%` }} /></div>
