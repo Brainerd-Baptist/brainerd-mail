@@ -230,6 +230,17 @@ export default function Builder({ emailId }: { emailId: string }) {
     [origin]
   );
 
+  // Feed the "Live preview" tab: push every edit (saved or not) to any open preview of this email.
+  useEffect(() => {
+    let ch: BroadcastChannel | null = null;
+    try {
+      ch = new BroadcastChannel(`brainerd-mail:preview:${emailId}`);
+      ch.postMessage({ doc });
+      ch.onmessage = (e) => { if (e.data?.hello) ch?.postMessage({ doc }); };
+    } catch {}
+    return () => ch?.close();
+  }, [doc, emailId]);
+
   const sentHtml = useMemo(() => renderEmail(doc, baseOpts), [doc, baseOpts]);
   const checks = useMemo(() => runChecks(doc, new Blob([sentHtml]).size, ADDRESS), [doc, sentHtml]);
   const plain = useMemo(() => renderPlainText(doc, baseOpts), [doc, baseOpts]);
@@ -620,6 +631,7 @@ export default function Builder({ emailId }: { emailId: string }) {
                   <div role="menu" className="absolute right-0 top-12 z-50 w-[min(280px,80vw)] overflow-hidden rounded-2xl border border-line bg-white py-1.5 shadow-xl">
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setScheduleOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><CalendarClock size={20} className={planIso ? "text-[#1e61b9]" : "text-muted"} /><span className="min-w-0 flex-1">Schedule{planIso ? <span className="block truncate text-xs font-normal text-muted">{chipWhen(planIso)}</span> : null}</span></button>
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Users size={20} className="text-muted" />Send a test to others</button>
+                    <a role="menuitem" href={`/preview/${emailId}`} target="_blank" rel="noopener" onClick={() => setMoreOpen(false)} className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Monitor size={20} />Live preview in a new tab</a>
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setHistoryOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><History size={20} className="text-muted" />Version history</button>
                     {doc.ministry === "missions" ? <a role="menuitem" href="/roster" className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Globe size={20} className="text-muted" />Serving list</a> : null}
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setFeedbackOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><LifeBuoy size={20} className="text-muted" /><span className="flex-1">Feedback</span>{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
@@ -703,6 +715,7 @@ export default function Builder({ emailId }: { emailId: string }) {
           <HelpButton />
           <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Redo2 size={20} /></button>
           <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><History size={18} /><span className="hidden 2xl:inline">History</span></button>
+          <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><Monitor size={18} /><span className="hidden 2xl:inline">Live preview</span></a>
           <button onClick={() => { sendTest().catch(() => {}); }} className="pill-btn shrink-0 whitespace-nowrap border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
           <button onClick={() => setTestOpen(true)} aria-label="Send a test to others" title="Send a test to others" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold 2xl:px-3 text-muted hover:bg-[#f4f8fd]"><Users size={18} /><span className="hidden 2xl:inline">Test to others</span></button>
           <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn shrink-0 whitespace-nowrap ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
