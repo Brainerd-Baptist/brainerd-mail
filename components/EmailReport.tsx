@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Download, ExternalLink, Info } from "lucide-react";
+import { ArrowLeft, ChevronDown, Download, ExternalLink, Info } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { HelpButton } from "@/components/HelpButton";
@@ -19,6 +19,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
   const [loading, setLoading] = useState(true);
   const [who, setWho] = useState<"all" | "clicked" | "opened" | "quiet" | "problem">("all");
   const [shown, setShown] = useState(25);
+  const [open, setOpen] = useState<string | null>(null);
 
   useEffect(() => {
     const ac = new AbortController();
@@ -113,16 +114,38 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
 
                 {people && r.recipients ? (
                   <Card title={`People · ${people_.length}`} note="Only the Owner and Admins can see this. Please keep it inside the church."
-                    right={<button onClick={() => downloadCsv("brainerd-mail-recipients.csv", ["Email", "Channel", "Status", "Opened (est.)", "Clicks", "Links clicked"], people_.map((p) => [p.email, p.channel, p.status, p.opened ? "yes" : "no", p.clicks, p.links.join("; ")]))} className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><Download size={14} />CSV</button>}>
+                    right={<button onClick={() => downloadCsv("brainerd-mail-recipients.csv", ["Name", "Email", "Times sent", "Channel", "Status", "Opened (est.)", "Clicks", "Links clicked"], people_.map((p) => [p.name ?? "", p.email, p.receivedCount, p.channel, p.status, p.opened ? "yes" : "no", p.clicks, p.links.join("; ")]))} className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><Download size={14} />CSV</button>}>
                     <div className="mb-3 flex flex-wrap gap-2">
                       {([["all", "Everyone"], ["clicked", "Clicked"], ["opened", "Opened"], ["quiet", "No activity"], ["problem", "Bounced or failed"]] as const).map(([v, l]) => <button key={v} onClick={() => { setWho(v); setShown(25); }} aria-pressed={who === v} className={`min-h-9 rounded-full border px-3 text-[13px] font-semibold ${who === v ? "border-navy bg-navy text-white" : "border-line bg-white text-ink"}`}>{l}</button>)}
                     </div>
                     <ul className="divide-y divide-line">
-                      {people_.slice(0, shown).map((p, i) => (
-                        <li key={i} className="flex items-start justify-between gap-3 py-2.5 first:pt-0">
-                          <div className="min-w-0"><div className="truncate text-[14px] font-semibold text-ink">{p.email || "(text)"}</div><div className="truncate text-[12px] text-muted">{p.links.length ? p.links.join(", ") : p.opened ? "Opened, no clicks" : p.status === "bounced" ? "Bounced" : "No activity"}</div></div>
-                          <div className="shrink-0 text-right text-[12px] text-muted">{p.clicks ? <span className="font-semibold text-navy">{p.clicks} click{p.clicks === 1 ? "" : "s"}</span> : null}{p.lastActivity ? <div>{etDate(p.lastActivity, true)}</div> : null}</div>
-                        </li>))}
+                      {people_.slice(0, shown).map((p) => {
+                        const key = p.email || String(p.lastActivity);
+                        const isOpen = open === key;
+                        const sub = p.links.length ? `Tapped ${p.links.join(", ")}` : p.opened ? "Opened, no taps" : p.status === "bounced" ? "Bounced" : "No activity";
+                        return (
+                          <li key={key} className="py-1 first:pt-0">
+                            <button onClick={() => setOpen(isOpen ? null : key)} aria-expanded={isOpen} className="flex w-full items-start justify-between gap-3 rounded-lg py-2 text-left hover:bg-[#f4f8fd]">
+                              <div className="min-w-0">
+                                <div className="truncate text-[14px] font-semibold text-ink">{p.name || p.email || "(text)"}</div>
+                                {p.name ? <div className="truncate text-[12px] text-muted">{p.email}</div> : null}
+                                <div className="mt-0.5 text-[12px] text-muted">{sub}{p.receivedCount > 1 ? ` · received ${p.receivedCount} times` : ""}</div>
+                              </div>
+                              <div className="flex shrink-0 items-start gap-2 text-right text-[12px] text-muted">
+                                <div>{p.clicks ? <span className="font-semibold text-navy">{p.clicks} tap{p.clicks === 1 ? "" : "s"}</span> : null}{p.lastActivity ? <div>{etDate(p.lastActivity, true)}</div> : null}</div>
+                                <ChevronDown size={16} className={`mt-0.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+                              </div>
+                            </button>
+                            {isOpen ? (
+                              <div className="mb-2 ml-1 space-y-2 border-l-2 border-line pl-3">
+                                {p.receipts.map((rc, j) => (
+                                  <div key={j} className="text-[13px]">
+                                    <div className="flex flex-wrap items-center gap-x-2 text-ink"><span className="font-semibold">Sent {rc.at ? etDate(rc.at, true) : ""}</span>{rc.kind === "test" ? <Chip tone="amber">Test</Chip> : null}<span className="text-muted">{["bounced", "complained", "failed"].includes(rc.status) ? rc.status : rc.opened ? `opened ${rc.openedAt ? etDate(rc.openedAt, true) : ""}` : "not opened yet"}</span></div>
+                                    {rc.taps.length ? <ul className="mt-1 space-y-0.5">{rc.taps.map((t, k) => <li key={k} className="flex justify-between gap-3 text-muted"><span className="min-w-0 truncate text-ink">{t.label}</span><span className="shrink-0">{etDate(t.at, true)}{t.device ? ` · ${t.device}` : ""}</span></li>)}</ul> : <div className="text-muted">No taps</div>}
+                                  </div>))}
+                              </div>) : null}
+                          </li>);
+                      })}
                     </ul>
                     {people_.length === 0 ? <p className="text-[13px] text-muted">Nobody matches.</p> : null}
                     {people_.length > shown ? <button onClick={() => setShown((s) => s + 50)} className="mt-3 w-full rounded-xl border border-line py-2.5 text-[14px] font-semibold text-brand">Show more</button> : null}

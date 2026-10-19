@@ -367,6 +367,11 @@ function bucketLabel(b: string, g: Filters["group"]) {
 }
 
 // ---------- one email ----------
+export type PersonRow = {
+  email: string; name: string | null; channel: string; status: string; opened: boolean; clicks: number; links: string[]; lastActivity: string | null;
+  receivedCount: number; // how many times this address was sent the email
+  receipts: { at: string; kind: string; status: string; opened: boolean; openedAt: string | null; taps: { label: string; at: string; device: string | null }[] }[];
+};
 export type EmailReport = {
   email: { id: string; title: string; subject: string; ministry: string; ministryLabel: string; status: string; slug: string | null };
   people: boolean;
@@ -379,7 +384,7 @@ export type EmailReport = {
   firstDays: { label: string; clicks: number; opens: number }[]; // by hours since send
   timeToClick: { label: string; n: number }[];
   unsubscribes: number; webViews: number; prayers: number;
-  recipients: { email: string; channel: string; status: string; opened: boolean; clicks: number; links: string[]; lastActivity: string | null }[] | null;
+  recipients: PersonRow[] | null;
 };
 
 export async function emailReport(me: Perm, f: Filters, emailId: string, people: boolean): Promise<EmailReport | null> {
@@ -441,10 +446,30 @@ export async function emailReport(me: Perm, f: Filters, emailId: string, people:
     for (const o of raw.opens) if (o.recipient_id && (!openedBy.has(o.recipient_id) || o.at < openedBy.get(o.recipient_id)!)) openedBy.set(o.recipient_id, o.at);
     const clickBy = new Map<string, { n: number; links: Set<string>; last: string }>();
     for (const c of clicks) if (c.recipient_id) { const x = clickBy.get(c.recipient_id) ?? clickBy.set(c.recipient_id, { n: 0, links: new Set(), last: c.at }).get(c.recipient_id)!; x.n++; x.links.add(linkLabel.get(c.link_id) ?? "link"); if (c.at > x.last) x.last = c.at; }
-    recipients = raw.rcpts.filter((r) => rcptOK(r, f)).map((r) => {
-      const cl = clickBy.get(r.id); const op = openedBy.get(r.id);
-      return { email: r.email ?? "", channel: r.channel, status: r.status, opened: !!op, clicks: cl?.n ?? 0, links: cl ? [...cl.links] : [], lastActivity: [cl?.last, op].filter(Boolean).sort().slice(-1)[0] ?? null };
-    }).sort((a, b) => b.clicks - a.clicks || (a.email || "").localeCompare(b.email || "")).slice(0, 1000);
+    const { data: st } = await sb.from("staff").select("email,name");
+    const nameOf = new Map((st ?? []).filter((x) => x.name && String(x.name).trim()).map((x) => [String(x.email).toLowerCase(), String(x.name).trim()]));
+    const sendOf = new Map(sends.map((x) => [x.id, x]));
+    const tapsBy = new Map<string, { label: string; at: string; device: string | null }[]>();
+    for (const c of clicks) if (c.recipient_id) (tapsBy.get(c.recipient_id) ?? tapsBy.set(c.recipient_id, []).get(c.recipient_id)!).push({ label: linkLabel.get(c.link_id) ?? "Link", at: c.at, device: c.device });
+    const byPerson = new Map<string, PersonRow>();
+    for (const r of raw.rcpts.filter((x) => rcptOK(x, f))) {
+      const key = (r.email || r.id).toLowerCase();
+      const taps = (tapsBy.get(r.id) ?? []).sort((x, y) => x.at.localeCompare(y.at));
+      const op = openedBy.get(r.id) ?? null;
+      const row = byPerson.get(key) ?? { email: r.email ?? "", name: nameOf.get(key) ?? null, channel: r.channel, status: r.status, opened: false, clicks: 0, links: [], lastActivity: null, receivedCount: 0, receipts: [] };
+      row.receivedCount++;
+      row.opened = row.opened || !!op;
+      row.clicks += taps.length;
+      for (const t of taps) if (!row.links.includes(t.label)) row.links.push(t.label);
+      const last = [taps[taps.length - 1]?.at, op].filter(Boolean).sort().slice(-1)[0] ?? null;
+      if (last && (!row.lastActivity || last > row.lastActivity)) row.lastActivity = last;
+      // keep the best status across sends: a delivery wins over an old bounce
+      if (["delivered", "sent"].includes(r.status) || row.receivedCount === 1) row.status = r.status;
+      row.receipts.push({ at: sendOf.get(r.send_id)?.started_at ?? r.sent_at ?? "", kind: sendOf.get(r.send_id)?.kind ?? "real", status: r.status, opened: !!op, openedAt: op, taps });
+      byPerson.set(key, row);
+    }
+    recipients = [...byPerson.values()].map((p) => ({ ...p, receipts: p.receipts.sort((x, y) => y.at.localeCompare(x.at)) }))
+      .sort((a, b) => b.clicks - a.clicks || (a.name || a.email || "").localeCompare(b.name || b.email || "")).slice(0, 1000);
   }
 
   return {
