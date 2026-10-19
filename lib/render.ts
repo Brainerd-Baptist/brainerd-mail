@@ -196,7 +196,7 @@ ${b.note ? `<p class="dm-muted" style="margin:14px 0 0 0;font-family:${SANS};fon
       const enlarge = b.enlarge !== false && /^https?:\/\//i.test(full);
       const href = enlarge ? esc(o.wrap(full, b.id, "Enlarge photo")) : "";
       const pic = enlarge ? `<a href="${href}" style="text-decoration:none;display:block;">${imgHtml}</a>` : imgHtml;
-      const more = enlarge ? `<p style="margin:10px 0 0 0;font-family:${SANS};font-size:14px;line-height:1.4;"><a class="dm-lk" href="${href}" style="color:${p.dark};text-decoration:underline;font-weight:600;">Tap to enlarge &middot; Save</a></p>` : "";
+      const more = enlarge ? `<p style="margin:8px 0 0 0;font-family:${SANS};font-size:12px;line-height:1.4;"><a class="dm-muted" href="${href}" style="color:#7a8aa0;text-decoration:underline;font-weight:400;">Tap to enlarge &middot; Save</a></p>` : "";
       return section(
         `${pic}${b.caption ? `<p class="dm-muted" style="margin:10px 0 0 0;font-family:${SANS};font-size:14px;color:#5b6b80;">${esc(b.caption)}</p>` : ""}${more}`,
         "24px 40px 8px 40px"
