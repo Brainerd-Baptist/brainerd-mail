@@ -409,7 +409,7 @@ export default function Builder({ emailId }: { emailId: string }) {
     } catch { setStatus("Couldn’t open that email."); setSwitching(false); }
   }
   const ministrySelect = (
-    <select aria-label="Ministry email" disabled={switching} className="rounded-full border border-line bg-white px-3 py-1.5 text-sm font-semibold disabled:opacity-60" style={{ color: palette.dark }} value={doc.ministry} onChange={(e) => openMinistry(e.target.value)}>
+    <select aria-label="Ministry email" disabled={switching} className="appearance-none rounded-full border border-line bg-white bg-no-repeat py-1.5 pl-4 pr-9 text-sm font-semibold disabled:opacity-60" style={{ color: palette.dark, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")", backgroundPosition: "right 14px center" }} value={doc.ministry} onChange={(e) => openMinistry(e.target.value)}>
       {Object.values(PALETTES).map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
     </select>
   );
