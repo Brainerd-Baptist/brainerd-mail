@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 };
 
 const CSS = `
-.sv{--bg:#f3f7f5;--card:#fff;--ink:#14281f;--muted:#51655c;--line:#d5e2dc;--dark:#0d3b2c;--accent:#118058;--tint:#e6f5ee;--soft:#b7dcc8;background:var(--bg);color:var(--ink);min-height:100%;font-family:Barlow,system-ui,sans-serif;font-size:17px;line-height:1.5}
-@media (prefers-color-scheme:dark){.sv{--bg:#0c1511;--card:#14221b;--ink:#e8f0ec;--muted:#9bb0a6;--line:#25372e;--accent:#4cc794;--tint:#173126}}
+.sv{--bg:#f1f5f9;--card:#fff;--ink:#0b1b33;--muted:#5b6b82;--line:#d6dfeb;--dark:#00205b;--accent:#1e61b9;--tint:#e8eff9;--soft:#c9d9f0;background:var(--bg);color:var(--ink);min-height:100%;font-family:Barlow,system-ui,sans-serif;font-size:17px;line-height:1.5}
+@media (prefers-color-scheme:dark){.sv{--bg:#0a1424;--card:#111c2e;--ink:#e9eff7;--muted:#93a4bd;--line:#26364f;--accent:#7fb0ee;--tint:#16253d}}
 .sv *{box-sizing:border-box}
 .sv-top{background:var(--dark);color:#fff;padding:22px max(20px,env(safe-area-inset-left)) 28px}
 .sv-in{max-width:1000px;margin:0 auto}
