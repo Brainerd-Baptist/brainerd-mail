@@ -225,8 +225,8 @@ export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
   const p = doc.theme && doc.theme !== doc.ministry ? { ...paletteFor(doc.theme), label: pm.label, name: pm.name } : pm;
   const mk = mark(o, pm.key);
   const masthead = (mk
-    ? bar(p.dark, `<div style="line-height:0;font-size:0;">${mk}</div>`, "22px 40px")
-    : bar(p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px")) + "\n" + stripe(p.bright);
+    ? bar(p.bar ?? p.dark, `<div style="line-height:0;font-size:0;">${mk}</div>`, "22px 40px")
+    : bar(p.bar ?? p.dark, `<div style="line-height:0;font-size:0;">${logo(o, 150, p.key)}</div>`, "22px 40px")) + "\n" + stripe(p.bright);
   const churchFoot = mk ? footLogo(o, 150) : "";
   const blocks = doc.blocks
     .filter((b) => !b.hidden)
