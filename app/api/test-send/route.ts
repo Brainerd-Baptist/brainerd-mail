@@ -22,6 +22,14 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => ({}));
   const doc = body.doc as EmailDoc | undefined;
+  // Who gets it: you (unless unticked) plus up to 9 more, picked from the team or typed. Validated here, not just in the screen.
+  const EMAIL_RE = /^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/;
+  const extra: string[] = Array.isArray(body.extra) ? body.extra.map((x: unknown) => String(x).trim().toLowerCase()).filter(Boolean) : [];
+  if (extra.some((x) => !EMAIL_RE.test(x))) return NextResponse.json({ error: "One of those email addresses isn't valid." }, { status: 400 });
+  const includeMe = body.includeMe !== false;
+  const targets = Array.from(new Set([...(includeMe ? [user.email.toLowerCase()] : []), ...extra]));
+  if (!targets.length) return NextResponse.json({ error: "Choose at least one person." }, { status: 400 });
+  if (targets.length > 10) return NextResponse.json({ error: "Tests can go to 10 people at a time." }, { status: 400 });
   if (!doc?.blocks || !doc.subject) return NextResponse.json({ error: "Nothing to send" }, { status: 400 });
   const preview = renderFor(doc, new Map(), "preview", "000000000000");
   if (runChecks(doc, Buffer.byteLength(preview.html), CHURCH_ADDRESS).some((c) => !c.ok && c.severity === "block"))
@@ -48,15 +56,22 @@ export async function POST(req: Request) {
       webUrl: `${site}/w/${slug}`, unsubscribeUrl: `${site}/u/x`, preferencesUrl: `${site}/u/x` };
     const linkIds = await syncLinks(admin, emailId!, doc, base);
 
-    const { data: send } = await admin.from("sends").insert({ email_id: emailId, kind: "test", channel: "email", counts: { to: 1 } }).select("id").single();
-    const { data: rcpt } = await admin.from("recipients").insert({ send_id: send!.id, email: user.email, channel: "email" }).select("token,id").single();
-    const out = renderFor(doc, linkIds, rcpt!.token, slug);
-
-    await sendEmail({ to: user.email, subject: `[TEST ${new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })}] ${doc.subject}`, html: out.html, text: out.text, unsubscribeUrl: out.unsubscribeUrl });
-    await admin.from("recipients").update({ status: "sent", sent_at: new Date().toISOString() }).eq("id", rcpt!.id);
+    const { data: send } = await admin.from("sends").insert({ email_id: emailId, kind: "test", channel: "email", counts: { to: targets.length } }).select("id").single();
+    const stampNow = new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
+    const sent: string[] = [], failed: string[] = [];
+    for (const to of targets) {
+      try {
+        const { data: rcpt } = await admin.from("recipients").insert({ send_id: send!.id, email: to, channel: "email" }).select("token,id").single();
+        const out = renderFor(doc, linkIds, rcpt!.token, slug);
+        await sendEmail({ to, subject: `[TEST ${stampNow}] ${doc.subject}`, html: out.html, text: out.text, unsubscribeUrl: out.unsubscribeUrl });
+        await admin.from("recipients").update({ status: "sent", sent_at: new Date().toISOString() }).eq("id", rcpt!.id);
+        sent.push(to);
+      } catch { failed.push(to); }
+    }
     await admin.from("sends").update({ finished_at: new Date().toISOString() }).eq("id", send!.id);
-    await admin.from("audit_log").insert({ actor: user.id, action: "test_send", email_id: emailId, detail: { to: user.email } });
-    return NextResponse.json({ ok: true, to: user.email, emailId, version, webUrl: `${site}/w/${slug}` });
+    await admin.from("audit_log").insert({ actor: user.id, action: "test_send", email_id: emailId, detail: { to: sent, failed } });
+    if (!sent.length) throw new Error("The test couldn't be sent. Please try again.");
+    return NextResponse.json({ ok: true, to: sent.length === 1 ? sent[0] : `${sent.length} people`, sent, failed, emailId, version, webUrl: `${site}/w/${slug}` });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? "Test send failed" }, { status: 502 });
   }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History, Undo2, Redo2, CalendarClock, MoreHorizontal } from "lucide-react";
+import { Users, Eye, EyeOff, ChevronUp, ChevronDown, Copy, Trash2, Plus, Smartphone, Monitor, Moon, MessageSquare, Check, AlertTriangle, Send, FlaskConical, Pencil, LayoutList, ListChecks, Settings2, X, LifeBuoy, Globe, ArrowLeft, History, Undo2, Redo2, CalendarClock, MoreHorizontal } from "lucide-react";
 import { BLOCK_LABELS, newBlock, uid, type Block, type BlockType, type EmailDoc } from "@/lib/blocks";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { renderEmail, renderPlainText } from "@/lib/render";
@@ -13,6 +13,7 @@ import { FeedbackSheet } from "@/components/FeedbackSheet";
 import { polish, readDismissed } from "@/lib/polish";
 import { MISSIONS_TEMPLATE } from "@/lib/templates/missions";
 import { SubmitSheet, HistorySheet, ScheduleSheet } from "@/components/ApprovalSheets";
+import { TestSheet } from "@/components/TestSheet";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { SENDING_ENABLED, when } from "@/lib/approval";
@@ -49,6 +50,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const [submitOpen, setSubmitOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [testOpen, setTestOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [canEdit, setCanEdit] = useState(true);
   const [role, setRole] = useState("");
@@ -302,18 +304,19 @@ export default function Builder({ emailId }: { emailId: string }) {
     const what = Array.from(new Set(open.map((s) => s.title.replace("This photo ", "").replace("is ", "").replace("looks ", "")))).join(", ");
     return confirm(`${open.length} photo${open.length === 1 ? "" : "s"} may not look their best (${what}). Look at the Check tab, or send for approval anyway?`);
   }
-  async function sendTest() {
+  async function sendTest(extra: string[] = [], includeMe = true) {
     if (testingRef.current) return;
     testingRef.current = true;
-    setStatus("Sending a test to you…");
+    setStatus(extra.length ? `Sending a test to ${extra.length + (includeMe ? 1 : 0)} people…` : "Sending a test to you…");
     try {
       if (dirtyRef.current || stateRef.current === "saving") { while (inflightRef.current) await new Promise((r) => setTimeout(r, 100)); await saveNow(); }
       if (stateRef.current === "conflict") { setStatus(saveMsg || "Reload this email before sending a test."); return; }
-      const res = await fetch("/api/test-send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ doc, emailId: emailIdRef.current }) });
+      const res = await fetch("/api/test-send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ doc, emailId: emailIdRef.current, extra, includeMe }) });
       const j = await res.json();
       if (j.version) versionRef.current = j.version;
-      setStatus(res.ok ? `Test sent to ${j.to}. Check your inbox and phone.` : j.error || "Could not send the test.");
-    } catch { setStatus("Could not send the test."); }
+      setStatus(res.ok ? `Test sent to ${j.to}.${j.failed?.length ? ` Couldn't reach ${j.failed.join(", ")}.` : " Check your inbox and phone."}` : j.error || "Could not send the test.");
+      if (!res.ok) throw new Error(j.error || "Could not send the test.");
+    } catch (e: any) { setStatus(e?.message || "Could not send the test."); throw e; }
     finally { testingRef.current = false; }
   }
 
@@ -558,6 +561,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const sheets = (
     <>
       {scheduleOpen ? <ScheduleSheet onClose={() => setScheduleOpen(false)} initial={plannedAt} locked={locked} lockedAt={sched.at} onSave={savePlan} onSubmit={scheduleAndSubmit} blockedReason={blocking > 0 ? `Fix the ${blocking} item${blocking > 1 ? "s" : ""} in the checklist before sending for approval.` : undefined} /> : null}
+      {testOpen ? <TestSheet onClose={() => setTestOpen(false)} onSend={(extra, me) => sendTest(extra, me)} /> : null}
       {submitOpen ? <SubmitSheet onClose={() => setSubmitOpen(false)} onSubmit={submitForApproval} softWarnings={0} initial={plannedAt} /> : null}
       {historyOpen ? <HistorySheet emailId={emailId} onClose={() => setHistoryOpen(false)} onRestore={restoreVersion} onSaveCopy={saveCopy} readOnly={locked} renderHtml={(d) => renderEmail(d as EmailDoc, baseOpts)} /> : null}
     </>
@@ -567,7 +571,8 @@ export default function Builder({ emailId }: { emailId: string }) {
     <p className="text-sm text-muted">This email is {rowStatus === "pending_approval" ? "waiting for approval" : rowStatus.replace("_", " ")}. Use “Edit again” above to change it.</p>
   ) : (
     <div className="flex flex-col gap-3">
-      <button onClick={sendTest} className="pill-btn w-full border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
+      <button onClick={() => { sendTest().catch(() => {}); }} className="pill-btn w-full border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
+      <button onClick={() => setTestOpen(true)} className="min-h-10 text-center text-[14px] font-semibold text-brand">Send a test to others…</button>
       <button onClick={() => { if (!confirmPhotos()) return; setSendOpen(false); setSubmitOpen(true); }} disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
       {blocking ? <p className="text-center text-xs text-muted">Fix the {blocking} item{blocking > 1 ? "s" : ""} in the checklist first.</p> : null}
     </div>
@@ -594,6 +599,7 @@ export default function Builder({ emailId }: { emailId: string }) {
                   <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
                   <div role="menu" className="absolute right-0 top-12 z-50 w-[min(280px,80vw)] overflow-hidden rounded-2xl border border-line bg-white py-1.5 shadow-xl">
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setScheduleOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><CalendarClock size={20} className={planIso ? "text-[#1e61b9]" : "text-muted"} /><span className="min-w-0 flex-1">Schedule{planIso ? <span className="block truncate text-xs font-normal text-muted">{chipWhen(planIso)}</span> : null}</span></button>
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Users size={20} className="text-muted" />Send a test to others</button>
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setHistoryOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><History size={20} className="text-muted" />Version history</button>
                     {doc.ministry === "missions" ? <a role="menuitem" href="/roster" className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Globe size={20} className="text-muted" />Serving list</a> : null}
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setFeedbackOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><LifeBuoy size={20} className="text-muted" /><span className="flex-1">Feedback</span>{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
@@ -677,7 +683,8 @@ export default function Builder({ emailId }: { emailId: string }) {
           <HelpButton />
           <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Redo2 size={20} /></button>
           <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><History size={18} /><span className="hidden 2xl:inline">History</span></button>
-          <button onClick={sendTest} className="pill-btn shrink-0 whitespace-nowrap border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
+          <button onClick={() => { sendTest().catch(() => {}); }} className="pill-btn shrink-0 whitespace-nowrap border-2 border-navy text-navy"><FlaskConical size={16} className="mr-1.5" />Send me a test</button>
+          <button onClick={() => setTestOpen(true)} aria-label="Send a test to others" title="Send a test to others" className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted hover:bg-[#f4f8fd]"><Users size={18} /><span className="hidden 2xl:inline">Test to others</span></button>
           <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn shrink-0 whitespace-nowrap ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
         </div>
       </header>
