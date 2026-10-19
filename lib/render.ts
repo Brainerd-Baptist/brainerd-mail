@@ -132,10 +132,10 @@ function renderBlock(b: Block, p: Palette, o: RenderOpts): string {
       const eb = (b.eyebrow || "").toLowerCase();
       const named = !!eb && (eb.includes(p.label.toLowerCase()) || eb.includes(p.name.toLowerCase()));
       const kicker = [p.name === "BRAINERD" || named ? "" : p.label, b.eyebrow].filter(Boolean).join("  ·  ");
-      return `<tr><td class="px dm-hero" style="background:${p.tint};padding:30px 40px 34px 40px;">
+      return `<tr><td class="px dm-hero" style="background:${p.tint};padding:30px 40px ${b.body && !img && !b.button?.url ? 30 : 34}px 40px;">
 ${kicker ? `<div class="dm-eb" style="margin:0 0 10px 0;font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${p.dark};">${esc(kicker)}</div>` : ""}
 <h1 class="h1 dm-head" style="margin:0 0 14px 0;font-family:${SERIF};font-weight:700;font-size:40px;line-height:1.1;color:${p.dark};">${esc(b.headline)}</h1>
-${b.body ? `<p class="dm-text" style="margin:0 0 20px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:#33445d;max-width:500px;">${esc(b.body)}</p>` : ""}
+${b.body ? `<p class="dm-text" style="margin:0 0 ${img || b.button?.url ? 20 : 0}px 0;font-family:${SANS};font-size:18px;line-height:1.55;color:#33445d;max-width:500px;">${esc(b.body)}</p>` : ""}
 ${img ? `<div style="margin:0 0 18px 0;">${img}</div>` : ""}
 ${button(b.button, "primary", p, o, b.id)}
 </td></tr>`;
@@ -199,7 +199,7 @@ ${b.note ? `<p class="dm-muted" style="margin:14px 0 0 0;font-family:${SANS};fon
       const more = enlarge ? `<p style="margin:8px 0 0 0;font-family:${SANS};font-size:12px;line-height:1.4;"><a class="dm-muted" href="${href}" style="color:#7a8aa0;text-decoration:underline;font-weight:400;">Tap to enlarge &middot; Save</a></p>` : "";
       return section(
         `${pic}${b.caption ? `<p class="dm-muted" style="margin:10px 0 0 0;font-family:${SANS};font-size:14px;color:#5b6b80;">${esc(b.caption)}</p>` : ""}${more}`,
-        "24px 40px 8px 40px"
+        "24px 40px 0 40px"
       );
     }
     case "event":
