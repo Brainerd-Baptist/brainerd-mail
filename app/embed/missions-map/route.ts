@@ -7,12 +7,15 @@ export const dynamic = "force-dynamic";
 // Brainerd Mail shows up here within seconds. Add ?standalone=1 to open it as a full page.
 // Safe to frame from any page: it only shows what the missions team marked public.
 export async function GET(req: Request) {
-  const standalone = new URL(req.url).searchParams.get("standalone") === "1";
+  const q = new URL(req.url).searchParams;
+  const standalone = q.get("standalone") === "1";
+  const lv = Number(q.get("level"));
+  const initial = { level: lv === 1 || lv === 2 || lv === 3 ? lv : 0, view: q.get("view") === "list" ? "list" : "map" };
   try {
     const view = await loadPublic();
     const { base, hit } = mapShapes(view.countries.map((c) => c.id));
     const LS = String.fromCharCode(0x2028), PS = String.fromCharCode(0x2029);
-    const data = JSON.stringify({ W: MAP_W, H: MAP_H, base, hit, countries: view.countries, levels: view.levels, counts: view.counts })
+    const data = JSON.stringify({ W: MAP_W, H: MAP_H, base, hit, countries: view.countries, levels: view.levels, counts: view.counts, initial })
       .replace(/</g, "\\u003c").split(LS).join("\\u2028").split(PS).join("\\u2029");
     const html = `<!doctype html>
 <html lang="en"><head>

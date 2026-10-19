@@ -209,12 +209,15 @@ ${button(b.button, "primary", p, o, b.id)}
     case "map": {
       const base = (o.siteUrl || "https://mail.brainerdhq.app").replace(/\/+$/, "");
       const src = `${base}/api/public/missions-map.png${b.level ? `?level=${b.level}` : ""}`;
-      const pic0 = `<img src="${esc(src)}" alt="World map showing the countries where Brainerd is engaged in missions, colored by level" width="100%" style="width:100%;height:auto;display:block;border:0;border-radius:12px;">`;
+      const pic0 = `<img src="${esc(src)}" alt="World map showing the countries where Brainerd is engaged in missions, colored by level" width="520" height="281" style="width:100%;max-width:520px;height:auto;display:block;border:0;border-radius:12px;">`;
+      const frameSrc = `${base}/embed/missions-map${b.level ? `?level=${b.level}` : ""}`;
       const link = b.button?.url ? esc(o.wrap(b.button.url, b.id, "Map picture")) : "";
-      const pic = link ? `<a href="${link}" style="text-decoration:none;display:block;">${pic0}</a>` : pic0;
+      const pic1 = link ? `<a href="${link}" style="text-decoration:none;display:block;">${pic0}</a>` : pic0;
+      // The hosted web version shows the live, tappable map; inboxes get the picture.
+      const pic = o.mode === "web" ? `<iframe class="mm-frame" src="${esc(frameSrc)}" title="Interactive map of the countries where Brainerd is engaged in missions" loading="lazy" style="width:100%;height:640px;border:0;display:block;border-radius:12px;"></iframe><noscript>${pic1}</noscript>` : pic1;
       const dots = ["#00abc9", "#33bc53", "#ff4a53"];
       const keys = (b.legend ?? []).slice(0, 3).map((t, i) => ({ t: (t ?? "").trim(), c: dots[i], on: !b.level || b.level === i + 1 })).filter((k) => k.t && k.on);
-      const legend = b.showLegend && keys.length ? `<div style="margin:12px 0 0 0;">${keys.map((k) => `<span class="dm-text" style="display:inline-block;margin:0 18px 6px 0;font-family:${SANS};font-size:14px;line-height:1.4;color:#33445d;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${k.c};margin-right:7px;vertical-align:middle;"></span>${esc(k.t)}</span>`).join("")}</div>` : "";
+      const legend = b.showLegend && keys.length ? `<div style="margin:12px 0 0 0;">${keys.map((k) => `<span class="dm-text" style="display:inline-block;margin:0 18px 6px 0;font-family:${SANS};font-size:14px;line-height:1.4;color:#33445d;"><span style="color:${k.c};font-size:16px;line-height:1;">&#9679;</span>&nbsp;${esc(k.t)}</span>`).join("")}</div>` : "";
       return section(`${eyebrow(b.heading, p.accent ?? p.button)}${paragraphs(b.body, "#33445d")}${pic}${legend}${b.button?.url ? `<div style="margin-top:16px;">${button(b.button, "primary", p, o, b.id)}</div>` : ""}`, "24px 40px 8px 40px");
     }
     case "divider":
@@ -259,7 +262,7 @@ export function renderEmail(doc: EmailDoc, o: RenderOpts): string {
     : "";
   const webScript =
     o.mode === "web"
-      ? `<script>(function(){var s=${JSON.stringify(o.issueSlug ?? "")};function load(){fetch("/api/pray?issue="+encodeURIComponent(s)).then(function(r){return r.json()}).then(function(d){document.querySelectorAll(".pray-count").forEach(function(e){var n=(d.counts||{})[e.getAttribute("data-team")]||0;e.textContent=n?n+" praying":""})}).catch(function(){})}load();document.querySelectorAll(".pray").forEach(function(a){a.addEventListener("click",function(ev){ev.preventDefault();var t=a.getAttribute("data-team");fetch("/api/pray",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({issue:s,team:t})}).then(load);a.textContent="Thank you";})})})();</script>`
+      ? `<script>window.addEventListener("message",function(e){var d=e.data;if(!d||d.source!=="brainerd-missions-map"||!d.height)return;document.querySelectorAll("iframe.mm-frame").forEach(function(f){if(f.contentWindow===e.source)f.style.height=Math.ceil(d.height)+"px"})});</script><script>(function(){var s=${JSON.stringify(o.issueSlug ?? "")};function load(){fetch("/api/pray?issue="+encodeURIComponent(s)).then(function(r){return r.json()}).then(function(d){document.querySelectorAll(".pray-count").forEach(function(e){var n=(d.counts||{})[e.getAttribute("data-team")]||0;e.textContent=n?n+" praying":""})}).catch(function(){})}load();document.querySelectorAll(".pray").forEach(function(a){a.addEventListener("click",function(ev){ev.preventDefault();var t=a.getAttribute("data-team");fetch("/api/pray",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({issue:s,team:t})}).then(load);a.textContent="Thank you";})})})();</script>`
       : "";
   return `<!doctype html>
 <html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
