@@ -123,7 +123,9 @@ Rules:
 - Suggestions must be things the person can do in Brainerd Mail: move a block or button higher, shorten or rewrite the subject, add preview text, make a button label more specific, use fewer links, check the phone view, or send at a time that FACTS supports. Do not suggest anything FACTS can't support.
 - If ministryTypicalClickRatePct is given, compare to it. If not, don't compare.
 - Never mention or guess at individual people. Do not use headings, bullets or emojis inside the strings. No hype.
-- If there is little to say, say less.`;
+- Only state something if one specific fact supports it. Do not comment on link wording, label names, duplicate-looking links or how many links there are unless FACTS plainly shows a problem. Do not pad: "several people engaged" or "clicks were spread out" is not an insight.
+- Compare links by their clicks and position only. A link with zero clicks is only worth mentioning if the email was sent to enough people (not smallSample) or it is clearly the main call to action.
+- If there is little to say, say less. One good sentence beats three weak ones.`;
 
 export const TOOL = {
   name: "write_insights",
