@@ -309,7 +309,7 @@ a{color:inherit;}
 <body class="dm-bg" style="margin:0;padding:0;background:#e6ecf2;">
 ${preview}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-bg" style="background:#e6ecf2;"><tr><td align="center" class="outer" style="padding:32px 12px;">
-${o.mode === "email" && o.webUrl ? `<div class="dm-muted" style="max-width:640px;margin:0 auto 12px auto;text-align:center;font-family:${SANS};font-size:12px;line-height:1.5;color:#5b6b80;">Trouble reading this email? <a class="dm-lk" href="${esc(o.wrap(o.webUrl, "top-web", "View in browser"))}" style="color:${p.dark};text-decoration:underline;font-weight:600;">View in browser</a></div>\n` : ""}<table role="presentation" class="wrap dm-wrap" width="640" cellpadding="0" cellspacing="0" border="0" style="width:640px;max-width:640px;background:#ffffff;border-radius:12px;overflow:hidden;">
+${o.mode === "email" && o.webUrl ? `<div class="dm-muted" style="max-width:640px;margin:0 auto;padding:16px 12px 12px 12px;text-align:center;font-family:${SANS};font-size:12px;line-height:1.5;color:#5b6b80;">Trouble reading this email? <a class="dm-lk" href="${esc(o.wrap(o.webUrl, "top-web", "View in browser"))}" style="color:${p.dark};text-decoration:underline;font-weight:600;">View in browser</a></div>\n` : ""}<table role="presentation" class="wrap dm-wrap" width="640" cellpadding="0" cellspacing="0" border="0" style="width:640px;max-width:640px;background:#ffffff;border-radius:12px;overflow:hidden;">
 ${masthead}
 ${blocks}
 <tr><td style="height:32px;line-height:32px;font-size:1px;">&nbsp;</td></tr>
