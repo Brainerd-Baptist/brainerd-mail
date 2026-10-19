@@ -140,7 +140,7 @@ ${button(b.button, "primary", p, o, b.id)}
       const cardOf = (t: (typeof b.teams)[number]) => `<table role="presentation" width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;overflow:hidden;height:100%;">${t.image?.url ? `<tr><td style="line-height:0;font-size:0;">${image(t.image, o, "width:100%;height:auto;display:block;border:0;")}</td></tr>` : ""}<tr><td valign="top" style="padding:24px;">
 <h3 class="dm-head" style="margin:0 0 12px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(t.name)}</h3>
 <div style="margin:0 0 14px 0;"><span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(t.dates)}</span>${t.places ? `<span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(t.places)}</span>` : ""}</div>
-${bullets(t.prayer, "PRAY FOR", "#33445d", p.button)}
+${bullets(t.prayer, "PRAY FOR", "#33445d", p.accent ?? p.button)}
 ${o.mode === "web" ? `<div style="margin-top:14px;"><a href="#" class="pray" data-team="${esc(t.id)}" style="display:inline-block;min-height:44px;line-height:40px;padding:0 24px;border-radius:999px;background:${p.button};border:2px solid ${p.button};color:${p.btnText};font-family:${SANS};font-size:15px;font-weight:600;text-decoration:none;">I'm praying</a> <span class="pray-count" data-team="${esc(t.id)}" style="font-family:${SANS};font-size:13px;color:#5b6b80;margin-left:8px;"></span></div>` : ""}
 </td></tr></table>`;
       const rows: string[] = [];
@@ -153,18 +153,18 @@ ${o.mode === "web" ? `<div style="margin-top:14px;"><a href="#" class="pray" dat
         }
       }
       return section(
-        `${eyebrow(b.heading, p.button)}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${rows.join("")}</table>`,
+        `${eyebrow(b.heading, p.accent ?? p.button)}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${rows.join("")}</table>`,
         "40px 40px 0 40px"
       );
     }
     case "partners": {
       const items = b.items.map((it) => {
         const img = b.showImages && it.image?.url ? image(it.image, o, "width:100%;height:auto;display:block;border:0;") : "";
-        const text = `${eyebrow(it.label, p.button)}<h3 class="dm-head" style="margin:0 0 10px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(it.heading)}</h3>${paragraphs(it.body, "#33445d", 15)}${bullets(it.prayer, "PRAYER REQUESTS", "#33445d", p.button)}${button(it.button, "secondary", p, o, it.id)}`;
+        const text = `${eyebrow(it.label, p.accent ?? p.button)}<h3 class="dm-head" style="margin:0 0 10px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(it.heading)}</h3>${paragraphs(it.body, "#33445d", 15)}${bullets(it.prayer, "PRAYER REQUESTS", "#33445d", p.accent ?? p.button)}${button(it.button, "secondary", p, o, it.id)}`;
         return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;overflow:hidden;margin:0 0 16px 0;">${img ? `<tr><td style="line-height:0;font-size:0;">${img}</td></tr>` : ""}
 <tr><td valign="top" style="padding:24px;">${text}</td></tr></table>`;
       });
-      return section(`${eyebrow(b.heading, p.button)}${items.join("")}`, "24px 40px 0 40px");
+      return section(`${eyebrow(b.heading, p.accent ?? p.button)}${items.join("")}`, "24px 40px 0 40px");
     }
     case "cta":
       return section(
@@ -197,7 +197,7 @@ ${b.note ? `<p class="dm-muted" style="margin:14px 0 0 0;font-family:${SANS};fon
     case "event":
       return section(
         `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;"><tr><td style="padding:24px;">
-${eyebrow(b.eyebrow, p.button)}
+${eyebrow(b.eyebrow, p.accent ?? p.button)}
 <h3 class="dm-head" style="margin:0 0 10px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(b.title)}</h3>
 ${paragraphs(b.body, "#33445d", 15)}
 <div style="margin:0 0 14px 0;">${b.date ? `<span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(b.date)}</span>` : ""}${b.place ? `<span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(b.place)}</span>` : ""}</div>
