@@ -218,17 +218,17 @@ ${button(b.button, "primary", p, o, b.id)}
       const src = `${base}/api/public/missions-map.png${b.level ? `?level=${b.level}` : ""}`;
       const pic0 = `<img src="${esc(src)}" alt="World map showing the countries where Brainerd is engaged in missions, colored by level" width="520" height="281" style="width:100%;max-width:520px;height:auto;display:block;border:0;border-radius:12px;">`;
       const frameSrc = `${base}/embed/missions-map${b.level ? `?level=${b.level}` : ""}`;
-      // Older map blocks point at the website page; send readers to the live, tappable map instead.
+      // Every click on the map block (picture or button) opens the live, tappable map page.
       const liveMap = `${base}/embed/missions-map?standalone=1${b.level ? `&level=${b.level}` : ""}`;
-      const mapUrl = b.button?.url && /^https?:\/\/(www\.)?brainerdbaptist\.org\/missions\/?$/i.test(b.button.url.trim()) ? liveMap : b.button?.url;
-      const link = mapUrl ? esc(o.wrap(mapUrl, b.id, "Map picture")) : "";
+      const mapUrl = liveMap;
+      const link = esc(o.wrap(mapUrl, b.id, "Map picture"));
       const pic1 = link ? `<a href="${link}" style="text-decoration:none;display:block;">${pic0}</a>` : pic0;
       // The hosted web version shows the live, tappable map; inboxes get the picture.
       const pic = o.mode === "web" ? `<iframe class="mm-frame" src="${esc(frameSrc)}" title="Interactive map of the countries where Brainerd is engaged in missions" loading="lazy" style="width:100%;height:640px;border:0;display:block;border-radius:12px;"></iframe><noscript>${pic1}</noscript>` : pic1;
       const dots = ["#00abc9", "#33bc53", "#ff4a53"];
       const keys = (b.legend ?? []).slice(0, 3).map((t, i) => ({ t: (t ?? "").trim(), c: dots[i], on: !b.level || b.level === i + 1 })).filter((k) => k.t && k.on);
       const legend = b.showLegend && keys.length ? `<div style="margin:12px 0 0 0;">${keys.map((k) => `<span class="dm-text" style="display:inline-block;margin:0 18px 6px 0;font-family:${SANS};font-size:14px;line-height:1.4;color:#33445d;"><span style="color:${k.c};font-size:16px;line-height:1;">&#9679;</span>&nbsp;${esc(k.t)}</span>`).join("")}</div>` : "";
-      return section(`${eyebrow(b.heading, p.accent ?? p.button)}${paragraphs(b.body, "#33445d")}${pic}${legend}${b.button?.url ? `<div style="margin-top:16px;">${button(mapUrl !== b.button.url ? { ...b.button, url: mapUrl! } : b.button, "primary", p, o, b.id)}</div>` : ""}`, "24px 40px 8px 40px");
+      return section(`${eyebrow(b.heading, p.accent ?? p.button)}${paragraphs(b.body, "#33445d")}${pic}${legend}${b.button?.url ? `<div style="margin-top:16px;">${button({ ...b.button, url: mapUrl }, "primary", p, o, b.id)}</div>` : ""}`, "24px 40px 8px 40px");
     }
     case "divider":
       return section(`<div style="height:1px;background:#dbe3ec;line-height:1px;font-size:1px;">&nbsp;</div>`, "24px 40px 8px 40px");
@@ -349,7 +349,7 @@ export function renderPlainText(doc: EmailDoc, o: RenderOpts): string {
       case "photo": lines.push(b.caption, b.enlarge !== false && b.image?.url ? `Full size: ${b.image.url.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + b.image.url : b.image.url}` : ""); break;
       case "event": lines.push(b.title, b.body, [b.date, b.place].filter(Boolean).join(" · "), link(b.button)); break;
       case "divider": lines.push("----"); break;
-      case "map": lines.push(b.heading, b.body, link(b.button)); break;
+      case "map": lines.push(b.heading, b.body, link(b.button ? { ...b.button, url: `${(o.siteUrl || "https://mail.brainerdhq.app").replace(/\/+$/, "")}/embed/missions-map?standalone=1${b.level ? `&level=${b.level}` : ""}` } : undefined)); break;
     }
     lines.push("");
   }
