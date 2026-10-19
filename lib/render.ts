@@ -104,6 +104,10 @@ function footLogo(o: RenderOpts, w: number): string {
   return `<div class="lg-light" style="margin:0 0 18px 0;line-height:0;font-size:0;"><img src="${esc(base)}/brand/brainerd-full.png" alt="Brainerd Baptist Church" width="${w}" height="${h}" style="display:block;${st}"></div><div class="lg-dark" style="display:none;max-height:0;overflow:hidden;margin:0;line-height:0;font-size:0;"><img src="${esc(base)}/brand/brainerd-full-white.png" alt="Brainerd Baptist Church" width="${w}" height="${h}" style="display:block;${st}"></div>`;
 }
 
+function photoSrc(url: string, o: RenderOpts): string {
+  return url.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + url : url;
+}
+
 function image(img: Img | undefined, o: RenderOpts, style = "width:100%;height:auto;display:block;border:0;"): string {
   if (!img?.url) return "";
   const src = img.url.startsWith("/") && o.siteUrl ? o.siteUrl.replace(/\/+$/, "") + img.url : img.url;
@@ -141,7 +145,7 @@ ${button(b.button, "primary", p, o, b.id)}
         `${b.heading ? `<h2 class="dm-head" style="margin:0 0 12px 0;font-family:${SERIF};font-weight:600;font-size:24px;line-height:1.2;color:${p.dark};">${esc(b.heading)}</h2>` : ""}${paragraphs(b.body, "#33445d")}`
       );
     case "travel": {
-      const cardOf = (t: (typeof b.teams)[number]) => `<table role="presentation" width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #dbe3ec;border-radius:12px;overflow:hidden;height:100%;">${t.image?.url ? `<tr><td style="line-height:0;font-size:0;">${image(t.image, o, "width:100%;height:auto;display:block;border:0;")}</td></tr>` : ""}<tr><td valign="top" style="padding:24px;">
+      const cardOf = (t: (typeof b.teams)[number]) => `<table role="presentation" width="100%" height="100%" cellpadding="0" cellspacing="0" border="0" class="dm-card" style="border:1px solid #cdd8e5;border-radius:12px;overflow:hidden;height:100%;">${t.image?.url ? `<tr><td role="img" aria-label="${esc(t.image.alt || "")}" height="170" bgcolor="${p.tint}" style="height:170px;line-height:0;font-size:0;background-color:${p.tint};background-image:url('${esc(photoSrc(t.image.url, o))}');background-size:cover;background-position:${Math.round(((t.image.edit?.fx ?? 0.5)) * 100)}% ${Math.round(((t.image.edit?.fy ?? 0.5)) * 100)}%;background-repeat:no-repeat;">&nbsp;</td></tr>` : ""}<tr><td valign="top" style="padding:24px;">
 <h3 class="dm-head" style="margin:0 0 12px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(t.name)}</h3>
 <div style="margin:0 0 14px 0;"><span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(t.dates)}</span>${t.places ? `<span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(t.places)}</span>` : ""}</div>
 ${bullets(t.prayer, "PRAY FOR", "#33445d", p.accent ?? p.button)}
@@ -153,7 +157,7 @@ ${o.mode === "web" ? `<div style="margin-top:14px;"><a href="#" class="pray" dat
       } else {
         for (let i = 0; i < b.teams.length; i += 2) {
           const a = b.teams[i], c = b.teams[i + 1];
-          rows.push(`<tr><td class="stack" valign="top" width="${c ? "50%" : "100%"}" style="padding:0 ${c ? "8px" : "0"} 16px 0;">${cardOf(a)}</td>${c ? `<td class="stack" valign="top" width="50%" style="padding:0 0 16px 8px;">${cardOf(c)}</td>` : ""}</tr>`);
+          rows.push(`<tr><td class="stack" valign="top" width="${c ? "50%" : "100%"}" style="padding:0 ${c ? "10px" : "0"} 16px 0;">${cardOf(a)}</td>${c ? `<td class="stack" valign="top" width="50%" style="padding:0 0 16px 10px;">${cardOf(c)}</td>` : ""}</tr>`);
         }
       }
       return section(
