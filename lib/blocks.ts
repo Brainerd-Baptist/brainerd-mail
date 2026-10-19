@@ -89,6 +89,6 @@ export function newBlock(type: BlockType): Block {
     case "divider":
       return { id: uid(), type };
     case "map":
-      return { id: uid(), type, heading: "WHERE WE ARE ENGAGED", body: "", level: 0, showLegend: true, legend: ["Level 1", "Level 2", "Level 3"], button: { label: "Explore the interactive map", url: "https://www.brainerdbaptist.org/missions" } };
+      return { id: uid(), type, heading: "WHERE WE ARE ENGAGED", body: "", level: 0, showLegend: true, legend: ["Level 1", "Level 2", "Level 3"], button: { label: "Explore the interactive map", url: "https://mail.brainerdhq.app/embed/missions-map?standalone=1" } };
   }
 }

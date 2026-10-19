@@ -23,7 +23,7 @@ export const MISSIONS_TEMPLATE: EmailDoc = {
     {
       id: "map1", type: "map", heading: "WHERE WE ARE ENGAGED", body: "", level: 0, showLegend: true,
       legend: ["Level 1", "Level 2", "Level 3"],
-      button: { label: "Open the interactive map", url: "https://www.brainerdbaptist.org/missions" },
+      button: { label: "Open the interactive map", url: "https://mail.brainerdhq.app/embed/missions-map?standalone=1" },
     },
     {
       id: "travel1", type: "travel", heading: "UPCOMING TRAVEL", layout: "side-by-side",

@@ -79,7 +79,7 @@ export default function LivePreview({ emailId }: { emailId: string }) {
     if (!doc) return "";
     let h = renderEmail(doc, { mode: "email", wrap: (u: string) => u, webUrl: `${origin}/w/preview`, unsubscribeUrl: "#unsubscribe", preferencesUrl: "#preferences", address: CHURCH_ADDRESS, contactEmail: CONTACT_EMAIL, siteUrl: origin });
     h = h.replace("@media (prefers-color-scheme:dark)", dark ? "@media all" : "@media not all");
-    return h.replace("</body>", `<script>document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(a)e.preventDefault();});</script></body>`);
+    return h.replace("</body>", `<script>document.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(a){e.preventDefault();var h=a.getAttribute("href")||"";if(/^https?:/i.test(h))window.open(h,"_blank","noopener");}});</script></body>`);
   }, [doc, dark, origin]);
 
   const pick = (v: View) => { setView(v); try { localStorage.setItem("brainerd-mail:preview-view", v); } catch {} };
