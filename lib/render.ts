@@ -40,6 +40,21 @@ function paragraphs(body: string, color: string, size = 16, cls = "dm-text"): st
     .join("");
 }
 
+// A small rounded label (a date or a place). An address that is long enough to wrap is split after the street
+// ("8214 East Brainerd Road," then "Chattanooga, TN") so the pill reads as two tidy lines, never a stretched oval.
+function pill(text: string | undefined, p: { tint: string; dark: string }): string {
+  const t = (text ?? "").trim();
+  if (!t) return "";
+  let lines = t.split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
+  if (lines.length === 1 && t.length > 28 && t.includes(",")) {
+    const i = t.indexOf(",");
+    const rest = t.slice(i + 1).trim();
+    if (rest) lines = [t.slice(0, i + 1), rest];
+  }
+  const multi = lines.length > 1;
+  return `<span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:${multi ? 18 : 999}px;padding:6px 14px;font-family:${SANS};font-size:13px;line-height:1.45;font-weight:600;margin:0 6px 6px 0;">${lines.map(esc).join("<br>")}</span>`;
+}
+
 function eyebrow(text: string, color: string): string {
   if (!text) return "";
   return `<div class="dm-eb" style="font-family:${SANS};font-size:13px;font-weight:700;letter-spacing:0.14em;color:${color};text-transform:uppercase;margin:0 0 10px 0;">${esc(text)}</div>`;
@@ -208,7 +223,7 @@ ${b.note ? `<p class="dm-muted" style="margin:14px 0 0 0;font-family:${SANS};fon
 ${eyebrow(b.eyebrow, p.accent ?? p.button)}
 <h3 class="dm-head" style="margin:0 0 10px 0;font-family:${SERIF};font-weight:600;font-size:22px;line-height:1.2;color:${p.dark};">${esc(b.title)}</h3>
 ${paragraphs(b.body, "#33445d", 15)}
-<div style="margin:0 0 14px 0;">${b.date ? `<span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(b.date)}</span>` : ""}${b.place ? `<span style="display:inline-block;background:${p.tint};color:${p.dark};border-radius:999px;padding:6px 12px;font-family:${SANS};font-size:13px;font-weight:600;margin:0 6px 6px 0;">${esc(b.place)}</span>` : ""}</div>
+<div style="margin:0 0 14px 0;">${pill(b.date, p)}${pill(b.place, p)}</div>
 ${button(b.button, "primary", p, o, b.id)}
 </td></tr></table>`,
         "24px 40px 8px 40px"
