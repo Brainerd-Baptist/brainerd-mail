@@ -18,7 +18,7 @@ function defaultSendTime(): string {
 function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={onClose}>
-      <div className="max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+      <div className="max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">{title}</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
         {children}
       </div>
@@ -52,7 +52,7 @@ export function SubmitSheet({ onClose, onSubmit, softWarnings, initial }: { onCl
       {softWarnings > 0 ? <p className="mb-4 text-sm text-muted">{softWarnings} suggestion{softWarnings === 1 ? "" : "s"} in the Check tab {softWarnings === 1 ? "is" : "are"} still open. They won’t stop this.</p> : null}
       {!SENDING_ENABLED ? <p className="mb-4 text-sm text-muted">Sending isn’t switched on yet, so approval won’t send anything for now.</p> : null}
       {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
-      <button disabled={!valid || busy} onClick={async () => { setBusy(true); setErr(""); const m = await onSubmit(sendAt.toISOString()); if (m) { setErr(m); setBusy(false); } }} className="pill-btn w-full bg-[#1e61b9] text-white disabled:opacity-50"><Send size={16} className="mr-1.5" />{busy ? "Sending…" : "Send for approval"}</button>
+      <button disabled={!valid || busy} onClick={async () => { setBusy(true); setErr(""); const m = await onSubmit(sendAt.toISOString()); if (m) { setErr(m); setBusy(false); } }} className="pill-btn w-full bg-brand text-white disabled:opacity-50"><Send size={16} className="mr-1.5" />{busy ? "Sending…" : "Send for approval"}</button>
     </Sheet>
   );
 }
@@ -82,7 +82,7 @@ export function ScheduleSheet({ onClose, initial, locked, lockedAt, onSave, onSu
   if (locked) {
     return (
       <Sheet title="Schedule" onClose={onClose}>
-        <p className="mb-3 flex items-start gap-2 text-[15px] text-ink"><CalendarClock size={20} className="mt-0.5 shrink-0 text-[#1e61b9]" /><span>{lockedAt ? <>Set to go out <b>{when(lockedAt)}</b>.</> : "This email already has a send time."}</span></p>
+        <p className="mb-3 flex items-start gap-2 text-[15px] text-ink"><CalendarClock size={20} className="mt-0.5 shrink-0 text-brand" /><span>{lockedAt ? <>Set to go out <b>{when(lockedAt)}</b>.</> : "This email already has a send time."}</span></p>
         <p className="mb-4 text-sm text-muted">The time is locked while the email is waiting or approved. Use “Edit again” on the banner above to change it. That cancels the approval.</p>
         <button onClick={onClose} className="pill-btn w-full border-2 border-navy text-navy">Close</button>
       </Sheet>
@@ -101,7 +101,7 @@ export function ScheduleSheet({ onClose, initial, locked, lockedAt, onSave, onSu
       {blockedReason ? <p className="mb-4 rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]">{blockedReason}</p> : null}
       {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
       <div className="flex flex-col gap-2">
-        <button disabled={!submitOk || !!busy || !!blockedReason} onClick={() => run("submit")} className="pill-btn w-full bg-[#1e61b9] text-white disabled:opacity-50"><Send size={16} className="mr-1.5" />{busy === "submit" ? "Sending…" : "Send for approval at this time"}</button>
+        <button disabled={!submitOk || !!busy || !!blockedReason} onClick={() => run("submit")} className="pill-btn w-full bg-brand text-white disabled:opacity-50"><Send size={16} className="mr-1.5" />{busy === "submit" ? "Sending…" : "Send for approval at this time"}</button>
         <button disabled={!valid || !!busy} onClick={() => run("save")} className="pill-btn w-full border-2 border-navy text-navy disabled:opacity-50">{busy === "save" ? "Saving…" : "Just save the date"}</button>
         {initial ? <button disabled={!!busy} onClick={() => run("clear")} className="min-h-11 text-sm font-semibold text-muted underline">{busy === "clear" ? "Clearing…" : "Remove the date"}</button> : null}
       </div>
@@ -158,15 +158,15 @@ export function HistorySheet({ emailId, onClose, onRestore, onSaveCopy, readOnly
                       {!readOnly || true ? <button aria-label="Name this version" onClick={() => { setRenaming(v.id); setDraft(v.named ? v.note ?? "" : ""); }} className="shrink-0 text-muted"><Pencil size={13} /></button> : null}</div>
                   )}
                   <div className="text-xs text-muted">{new Date(v.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })} · {ago(v.created_at)}{v.by ? ` · ${v.by}` : ""}</div>
-                  {v.summary ? <div className="mt-0.5 text-xs text-[#33445d]">{v.summary}</div> : null}
+                  {v.summary ? <div className="mt-0.5 text-xs text-ink">{v.summary}</div> : null}
                   {v.subject ? <div className="truncate text-xs text-muted">Subject: {v.subject}</div> : null}
                 </div>
                 <div className="flex shrink-0 flex-col items-end">
-                  <button onClick={() => preview(v.id)} className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-brand active:bg-[#f4f8fd]"><Eye size={15} />{open === v.id ? "Hide" : "Preview"}</button>
-                  {!readOnly ? <button disabled={busy !== null} onClick={async () => { if (!confirm("Restore this copy? Your current version is saved first.")) return; setBusy(v.id); const m = await onRestore(v.id); if (m) { setErr(m); setBusy(null); } }} className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-brand active:bg-[#f4f8fd] disabled:opacity-50"><RotateCcw size={15} />{busy === v.id ? "…" : "Restore"}</button> : null}
+                  <button onClick={() => preview(v.id)} className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-brand active:bg-mist"><Eye size={15} />{open === v.id ? "Hide" : "Preview"}</button>
+                  {!readOnly ? <button disabled={busy !== null} onClick={async () => { if (!confirm("Restore this copy? Your current version is saved first.")) return; setBusy(v.id); const m = await onRestore(v.id); if (m) { setErr(m); setBusy(null); } }} className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-semibold text-brand active:bg-mist disabled:opacity-50"><RotateCcw size={15} />{busy === v.id ? "…" : "Restore"}</button> : null}
                 </div>
               </div>
-              {open === v.id ? (html ? <iframe title="Preview of this copy" srcDoc={html} sandbox="" className="mt-3 h-[420px] w-full rounded-lg border border-line bg-white" /> : <p className="mt-3 text-sm text-muted">Loading preview…</p>) : null}
+              {open === v.id ? (html ? <iframe title="Preview of this copy" srcDoc={html} sandbox="" className="mt-3 h-[420px] w-full rounded-lg border border-line bg-surface" /> : <p className="mt-3 text-sm text-muted">Loading preview…</p>) : null}
             </li>
           ))}
         </ul>

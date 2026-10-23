@@ -12,7 +12,7 @@ export function HeaderBrand({ label = "Mail" }: { label?: string }) {
         <img src="/brand/brainerd-full.png" alt="Brainerd Baptist Church" width={Math.round(HEIGHT * (560 / 131))} height={HEIGHT} style={{ height: HEIGHT, width: "auto" }} />
       </span>
       <div className="hidden items-center gap-3 sm:flex">
-        <div className="h-6 w-px bg-[#00abc9]/20" />
+        <div className="h-6 w-px bg-brand/20" />
         <span className="whitespace-nowrap text-xs uppercase tracking-[0.2em] text-muted" style={{ fontFamily: SYSTEM_UI_FONT_STACK }}>{label}</span>
       </div>
     </div>

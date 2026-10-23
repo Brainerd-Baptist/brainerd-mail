@@ -17,7 +17,7 @@ import { ago } from "@/lib/time";
 export type Item = { id: string; ministry: string; title: string; subject: string | null; status: string; updated_at: string; scheduled_at?: string | null; expedited?: boolean };
 
 const STATUS: Record<string, { label: string; cls: string }> = {
-  draft: { label: "Draft", cls: "bg-[#eef1f5] text-[#33445d]" },
+  draft: { label: "Draft", cls: "bg-line/60 text-ink" },
   pending_approval: { label: "Waiting for approval", cls: "bg-[#fff3d6] text-[#7a4a00]" },
   approved: { label: "Approved", cls: "bg-[#e3f3ea] text-[#17603c]" },
   scheduled: { label: "Scheduled", cls: "bg-[#e3effc] text-[#1e4f99]" },
@@ -69,7 +69,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
 
   return (
     <div className="min-h-full bg-mist pb-16">
-      <header className="sticky top-0 z-10 border-b border-[#00abc9]/15 bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <NavMenu />
           <HeaderBrand label="Mail" />
@@ -81,11 +81,11 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
       <main className="mx-auto max-w-3xl space-y-4 px-4 pt-6">
         <div className="flex items-center justify-between gap-3">
           <h1 className="font-serif text-2xl font-semibold text-navy">Emails</h1>
-          {buildable.length ? <button onClick={() => setCreating(true)} className="pill-btn bg-[#1e61b9] text-white"><Plus size={16} className="mr-1.5" />New email</button> : null}
+          {buildable.length ? <button onClick={() => setCreating(true)} className="pill-btn bg-brand text-white"><Plus size={16} className="mr-1.5" />New email</button> : null}
         </div>
 
         {items.length > 4 ? (
-          <label className="flex items-center gap-2 rounded-full border border-line bg-white px-4">
+          <label className="flex items-center gap-2 rounded-full border border-line bg-surface px-4">
             <Search size={16} className="text-muted" />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or subject" className="h-11 min-w-0 flex-1 bg-transparent text-[15px] outline-none" />
           </label>
@@ -94,7 +94,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
         {ministries.length > 1 ? (
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
             {["all", ...ministries].map((m) => (
-              <button key={m} onClick={() => setFilter(m)} className={`h-9 shrink-0 rounded-full border px-4 text-sm font-semibold ${filter === m ? "border-navy bg-navy text-white" : "border-line bg-white text-ink"}`}>{m === "all" ? "All" : paletteFor(m).label}</button>
+              <button key={m} onClick={() => setFilter(m)} className={`h-9 shrink-0 rounded-full border px-4 text-sm font-semibold ${filter === m ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink"}`}>{m === "all" ? "All" : paletteFor(m).label}</button>
             ))}
           </div>
         ) : null}
@@ -102,7 +102,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
         {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
         {shown.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-line bg-white p-8 text-center text-[15px] text-muted">
+          <div className="rounded-xl border border-dashed border-line bg-surface p-8 text-center text-[15px] text-muted">
             {items.length === 0 ? (buildable.length ? "No emails yet. Tap New email to start one." : "No emails yet.") : "Nothing matches. Clear the search or filter."}
           </div>
         ) : (
@@ -111,9 +111,9 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
               const p = paletteFor(it.ministry);
               const st = STATUS[it.status] ?? STATUS.draft;
               return (
-                <li key={it.id} className={`flex items-stretch overflow-hidden rounded-xl border border-line bg-white ${busy === it.id ? "opacity-60" : ""}`}>
+                <li key={it.id} className={`flex items-stretch overflow-hidden rounded-xl border border-line bg-surface ${busy === it.id ? "opacity-60" : ""}`}>
                   <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
-                  <Link href={it.status === "pending_approval" ? `/review/${it.id}` : `/editor?e=${it.id}`} className="min-w-0 flex-1 p-4 active:bg-[#f4f8fd]">
+                  <Link href={it.status === "pending_approval" ? `/review/${it.id}` : `/editor?e=${it.id}`} className="min-w-0 flex-1 p-4 active:bg-mist">
                     <span className="block truncate text-[16px] font-semibold text-ink">{it.title || "Untitled"}</span>
                     {it.subject ? <span className="mt-0.5 block truncate text-sm text-muted">{it.subject}</span> : null}
                     <span className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
@@ -124,7 +124,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
                   </Link>
                   <div className="flex shrink-0 items-center pr-1">
                     {canBuildIn(perm, it.ministry) ? <button onClick={() => create({ fromId: it.id }, it.id)} disabled={!!busy} aria-label={`Duplicate ${it.title}`} title="Duplicate" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-ink disabled:opacity-40"><Copy size={18} /></button> : null}
-                    {canDelete(it.status) && canBuildIn(perm, it.ministry) ? <button onClick={() => remove(it)} disabled={!!busy} aria-label={`Delete ${it.title}`} title="Delete" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-[#c8102e] disabled:opacity-40"><Trash2 size={18} /></button> : null}
+                    {canDelete(it.status) && canBuildIn(perm, it.ministry) ? <button onClick={() => remove(it)} disabled={!!busy} aria-label={`Delete ${it.title}`} title="Delete" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-red-600 disabled:opacity-40"><Trash2 size={18} /></button> : null}
                   </div>
                 </li>
               );
@@ -135,7 +135,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
 
       {creating ? (
         <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={() => !busy && setCreating(false)}>
-          <div className="w-full rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">New email</h2><button aria-label="Close" onClick={() => setCreating(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
             <label className="mb-4 block">
               <span className="label">Ministry</span>
@@ -148,14 +148,14 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
               {([["blank", "A blank email", "A header and a text block."], ["starter", STARTERS[ministry]?.label ?? "A starter", STARTERS[ministry]?.blurb ?? "A ready-made layout to fill in."], ["october", OCTOBER[ministry]?.label ?? "October email", OCTOBER[ministry]?.blurb ?? ""], ["homegoing", "Homegoing announcement", "Announcing the passing of a church member: name, photo, visitation and service details."]] as const).map(([k, t, d]) => {
                 const off = (k === "october" && !OCTOBER[ministry]) || (k === "homegoing" && ministry !== "church-wide");
                 return (
-                  <label key={k} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${start === k ? "border-brand bg-[#f4f8fd]" : "border-line"} ${off ? "opacity-40" : ""}`}>
+                  <label key={k} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${start === k ? "border-brand bg-mist" : "border-line"} ${off ? "opacity-40" : ""}`}>
                     <input type="radio" name="start" className="mt-1" checked={start === k} disabled={off} onChange={() => setStart(k)} />
                     <span><span className="block text-[15px] font-semibold text-ink">{t}</span><span className="block text-sm text-muted">{off ? (k === "homegoing" ? "Only for Church-Wide." : "Only for Missions and the BX.") : d}</span></span>
                   </label>
                 );
               })}
             </fieldset>
-            <button onClick={() => create({ ministry, start }, "new")} disabled={!!busy} className="pill-btn w-full bg-[#1e61b9] text-white disabled:opacity-60">{busy === "new" ? "Creating…" : "Create email"}</button>
+            <button onClick={() => create({ ministry, start }, "new")} disabled={!!busy} className="pill-btn w-full bg-brand text-white disabled:opacity-60">{busy === "new" ? "Creating…" : "Create email"}</button>
           </div>
         </div>
       ) : null}

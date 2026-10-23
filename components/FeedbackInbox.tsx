@@ -34,7 +34,7 @@ function Card({ n, onChange }: { n: Note; onChange: (id: number, patch: Partial<
   const bits = [c.ministry, c.emailTitle && `“${c.emailTitle}”`, c.tab && `${c.tab} tab`, c.device, c.selectedBlock && `${c.selectedBlock} block`, c.viewport, c.build && `build ${c.build}`].filter(Boolean);
 
   return (
-    <li className="rounded-xl border border-line bg-white p-4">
+    <li className="rounded-xl border border-line bg-surface p-4">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted"><Icon size={14} className="text-brand" />{label}</span>
         <span className="text-xs text-muted">{when(n.created_at)}</span>
@@ -43,7 +43,7 @@ function Card({ n, onChange }: { n: Note; onChange: (id: number, patch: Partial<
       <p className="mt-2 text-xs text-muted">From {n.email ?? "unknown"}{bits.length ? ` · ${bits.join(" · ")}` : ""}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {STATUS.map((s) => (
-          <button key={s.k} onClick={() => save({ status: s.k })} className={`min-h-9 rounded-full px-3 text-sm font-semibold ${n.status === s.k ? "bg-[#1e61b9] text-white" : "border border-line text-ink"}`}>{s.label}</button>
+          <button key={s.k} onClick={() => save({ status: s.k })} className={`min-h-9 rounded-full px-3 text-sm font-semibold ${n.status === s.k ? "bg-brand text-white" : "border border-line text-ink"}`}>{s.label}</button>
         ))}
       </div>
       <textarea value={note} onChange={(e) => setNote(e.target.value)} onBlur={() => { if (note !== (n.note ?? "")) save({ note }); }} rows={2} placeholder="Private note (what we decided, where it's tracked)" className="field mt-3 w-full text-sm" />
@@ -65,10 +65,10 @@ export function FeedbackInbox({ initial }: { initial: Note[] }) {
       <h1 className="mb-3 font-serif text-2xl font-semibold text-navy">Feedback inbox</h1>
       <div className="mb-4 flex flex-wrap gap-1.5">
         {FILTERS.map((x) => (
-          <button key={x.k} onClick={() => setFilter(x.k)} className={`min-h-10 rounded-full px-4 text-sm font-semibold ${filter === x.k ? "bg-navy text-white" : "bg-white text-ink border border-line"}`}>{x.label} <span className="opacity-70">{items.filter(x.match).length}</span></button>
+          <button key={x.k} onClick={() => setFilter(x.k)} className={`min-h-10 rounded-full px-4 text-sm font-semibold ${filter === x.k ? "bg-navy text-white" : "bg-surface text-ink border border-line"}`}>{x.label} <span className="opacity-70">{items.filter(x.match).length}</span></button>
         ))}
       </div>
-      {shown.length === 0 ? <p className="rounded-xl bg-white p-6 text-center text-[15px] text-muted">Nothing here. New notes from the builder will show up in this list.</p> : (
+      {shown.length === 0 ? <p className="rounded-xl bg-surface p-6 text-center text-[15px] text-muted">Nothing here. New notes from the builder will show up in this list.</p> : (
         <ul className="space-y-3">{shown.map((n) => <Card key={n.id} n={n} onChange={update} />)}</ul>
       )}
     </div>

@@ -41,20 +41,20 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
 
   const maxClicks = r ? Math.max(1, ...r.links.map((l) => l.clicks)) : 1;
   const seg = <T extends string>(cur: T, set: (v: T) => void, opts: [T, string][], label: string) => (
-    <div role="group" aria-label={label} className="inline-flex overflow-hidden rounded-full border border-line bg-white text-[13px] font-semibold">
-      {opts.map(([v, l]) => <button key={v} onClick={() => set(v)} aria-pressed={cur === v} className={`min-h-9 px-3 ${cur === v ? "bg-navy text-white" : "text-ink hover:bg-[#f4f8fd]"}`}>{l}</button>)}
+    <div role="group" aria-label={label} className="inline-flex overflow-hidden rounded-full border border-line bg-surface text-[13px] font-semibold">
+      {opts.map(([v, l]) => <button key={v} onClick={() => set(v)} aria-pressed={cur === v} className={`min-h-9 px-3 ${cur === v ? "bg-navy text-white" : "text-ink hover:bg-mist"}`}>{l}</button>)}
     </div>
   );
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-[#00abc9]/15 bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-4xl items-center gap-3"><NavMenu /><HeaderBrand label="Analytics" /><span className="flex-1" /><HelpButton /></div>
       </header>
       <main className="mx-auto max-w-4xl space-y-5 px-4 pt-5">
         <Link href="/analytics" className="inline-flex min-h-9 items-center gap-1.5 text-[14px] font-semibold text-brand"><ArrowLeft size={16} />All analytics</Link>
         {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-        {loading && !r ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-white" /> : null}
+        {loading && !r ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-surface" /> : null}
 
         {r ? (
           <div className={`space-y-5 ${loading ? "opacity-60 transition" : "transition"}`}>
@@ -71,7 +71,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
             </div>
 
             {r.t.recipients === 0 ? (
-              <div className="rounded-2xl border border-line bg-white p-8 text-center"><h2 className="font-serif text-xl font-semibold text-navy">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
+              <div className="rounded-2xl border border-line bg-surface p-8 text-center"><h2 className="font-serif text-xl font-semibold text-navy">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
             ) : (
               <>
                 <EmailInsights id={id} />
@@ -96,7 +96,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                             <div className="min-w-0"><div className="truncate font-semibold text-ink">{l.label}</div><div className="truncate text-[12px] text-muted">{l.inEmail ? `${l.blockType} · block ${l.position}` : "Removed from this email since"} · {l.url.replace(/^https?:\/\/(www\.)?/, "")}</div></div>
                             <div className="shrink-0 text-right"><div className="font-semibold tabular-nums text-navy">{num(l.clicks)} <span className="text-[12px] font-normal text-muted">click{l.clicks === 1 ? "" : "s"}</span></div><div className="text-[12px] text-muted">{num(l.unique)} {l.unique === 1 ? "person" : "people"}{l.shareOfDelivered !== null ? ` · ${pct(l.shareOfDelivered)}` : ""}</div></div>
                           </div></button>
-                          <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#eaf0f7]"><div className="h-full rounded-full bg-[#1e61b9]" style={{ width: `${Math.max(l.clicks ? 2 : 0, (l.clicks / maxClicks) * 100)}%` }} /></div>
+                          <div className="mt-2 h-2 overflow-hidden rounded-full bg-line/50"><div className="h-full rounded-full bg-brand" style={{ width: `${Math.max(l.clicks ? 2 : 0, (l.clicks / maxClicks) * 100)}%` }} /></div>
                           {l.clicks > 0 && (l.phone || l.desktop || l.tablet) ? <div className="mt-1 text-[12px] text-muted">{[l.phone ? `${l.phone} phone` : "", l.desktop ? `${l.desktop} desktop` : "", l.tablet ? `${l.tablet} tablet` : ""].filter(Boolean).join(" · ")}</div> : null}
                           {people && l.clicks > 0 ? <div className="mt-1 text-[12px] font-semibold text-brand">{openLink === l.linkId ? "Hide who tapped" : "See who tapped"}</div> : null}
                           {openLink === l.linkId && r.linkWho?.[l.linkId] ? (
@@ -123,7 +123,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                   <Card title={`People · ${people_.length}`} note="Only the Owner and Admins can see this. Please keep it inside the church."
                     right={<button onClick={() => downloadCsv("brainerd-mail-recipients.csv", ["Name", "Email", "Times sent", "Channel", "Status", "Opens (est.)", "Clicks", "Links clicked"], people_.map((p) => [p.name ?? "", p.email, p.receivedCount, p.channel, p.status, p.opens, p.clicks, p.links.join("; ")]))} className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><Download size={14} />CSV</button>}>
                     <div className="mb-3 flex flex-wrap gap-2">
-                      {([["all", "Everyone"], ["clicked", "Clicked"], ["opened", "Opened"], ["quiet", "No activity"], ["problem", "Bounced or failed"]] as const).map(([v, l]) => <button key={v} onClick={() => { setWho(v); setShown(25); }} aria-pressed={who === v} className={`min-h-9 rounded-full border px-3 text-[13px] font-semibold ${who === v ? "border-navy bg-navy text-white" : "border-line bg-white text-ink"}`}>{l}</button>)}
+                      {([["all", "Everyone"], ["clicked", "Clicked"], ["opened", "Opened"], ["quiet", "No activity"], ["problem", "Bounced or failed"]] as const).map(([v, l]) => <button key={v} onClick={() => { setWho(v); setShown(25); }} aria-pressed={who === v} className={`min-h-9 rounded-full border px-3 text-[13px] font-semibold ${who === v ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink"}`}>{l}</button>)}
                     </div>
                     <ul className="divide-y divide-line">
                       {people_.slice(0, shown).map((p) => {
@@ -132,7 +132,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                         const sub = [p.opens ? `Opened ${p.opens} time${p.opens === 1 ? "" : "s"}` : p.status === "bounced" ? "Bounced" : "Not opened", p.clicks ? `tapped ${p.links.join(", ")}` : "no taps"].join(" · ");
                         return (
                           <li key={key} className="py-1 first:pt-0">
-                            <button onClick={() => setOpen(isOpen ? null : key)} aria-expanded={isOpen} className="flex w-full items-start justify-between gap-3 rounded-lg py-2 text-left hover:bg-[#f4f8fd]">
+                            <button onClick={() => setOpen(isOpen ? null : key)} aria-expanded={isOpen} className="flex w-full items-start justify-between gap-3 rounded-lg py-2 text-left hover:bg-mist">
                               <div className="min-w-0">
                                 <div className="truncate text-[14px] font-semibold text-ink">{p.name || p.email || "(text)"}</div>
                                 {p.name ? <div className="truncate text-[12px] text-muted">{p.email}</div> : null}

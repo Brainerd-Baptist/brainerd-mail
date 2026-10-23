@@ -44,7 +44,7 @@ function CountryCard({ c, isNew, canEdit, levels, onSaved, onRemoved, onCancel }
   }
 
   return (
-    <article className={`overflow-hidden rounded-xl border bg-white ${c.isPublic ? "border-line" : "border-dashed border-[#c4cfdc]"}`}>
+    <article className={`overflow-hidden rounded-xl border bg-surface ${c.isPublic ? "border-line" : "border-dashed border-[#c4cfdc]"}`}>
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left">
         <span className="h-3.5 w-3.5 flex-none rounded-full" style={{ background: LEVEL_COLOR[d.level] }} />
         <span className="min-w-0 flex-1">
@@ -146,7 +146,7 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
 
   return (
     <div className="min-h-full bg-mist pb-24">
-      <header className="sticky top-0 z-10 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-line bg-surface/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center gap-3">
           <NavMenu />
           <h1 className="flex-1 truncate text-center font-serif text-lg font-semibold text-navy">Missions map</h1>
@@ -156,10 +156,10 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
       </header>
 
       <main className="mx-auto max-w-2xl space-y-6 px-4 pt-6">
-        {!canEdit ? <p className="rounded-xl border border-line bg-white p-3 text-sm text-muted">Your role can look at the Missions map but not change it. Ask the Owner or an Admin if you need to edit.</p> : null}
+        {!canEdit ? <p className="rounded-xl border border-line bg-surface p-3 text-sm text-muted">Your role can look at the Missions map but not change it. Ask the Owner or an Admin if you need to edit.</p> : null}
         <p className="text-[15px] text-muted">This is the map on the website’s missions page and in missions emails. Change a country and tap Save: the website updates within seconds.</p>
 
-        <section aria-label="Preview" className="overflow-hidden rounded-xl border border-line bg-white">
+        <section aria-label="Preview" className="overflow-hidden rounded-xl border border-line bg-surface">
           <img src={`/api/public/missions-map.png?t=${stamp}`} alt="Preview of the public world map" className="block w-full" />
           <p className="px-4 py-3 text-sm text-muted"><b className="text-ink">{counts.pub}</b> countries shown publicly{counts.priv ? <> · <b className="text-ink">{counts.priv}</b> private</> : null}. This is the picture emails use.</p>
         </section>
@@ -171,7 +171,7 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
           </div>
 
           {adding && canEdit ? (
-            <div className="space-y-2 rounded-xl border border-line bg-white p-3">
+            <div className="space-y-2 rounded-xl border border-line bg-surface p-3">
               <label className="block"><span className="label">Find a country</span><input autoFocus className="field" value={pick} onChange={(e) => setPick(e.target.value)} placeholder="Start typing, for example Kenya" /></label>
               <ul>{available.map((g) => (
                 <li key={g.id}><button type="button" onClick={() => { setDraftNew({ iso2: g.id, name: g.name, level: 1, since: "", religion: "", peopleGroup: "", unreachedGroups: "", unreachedPop: "", isPublic: true, showPeopleGroup: true }); setAdding(false); }} className="flex min-h-12 w-full items-center rounded-lg px-3 text-left text-[16px] text-ink active:bg-mist">{g.name}</button></li>
@@ -188,15 +188,15 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
           </label>
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="Filter the list">
             {chips.map((c) => (
-              <button key={c.id} type="button" aria-pressed={filter === c.id} onClick={() => setFilter(c.id)} className={`flex-none rounded-full border px-3.5 py-1.5 text-sm font-semibold ${filter === c.id ? "border-navy bg-navy text-white" : "border-line bg-white text-ink"}`}>{c.label} <span className={filter === c.id ? "text-white/70" : "text-muted"}>{c.n}</span></button>
+              <button key={c.id} type="button" aria-pressed={filter === c.id} onClick={() => setFilter(c.id)} className={`flex-none rounded-full border px-3.5 py-1.5 text-sm font-semibold ${filter === c.id ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink"}`}>{c.label} <span className={filter === c.id ? "text-white/70" : "text-muted"}>{c.n}</span></button>
             ))}
           </div>
 
           {shown.map((c) => <CountryCard key={c.iso2} c={c} canEdit={canEdit} levels={levels} onSaved={upsert} onRemoved={drop} />)}
-          {shown.length === 0 ? <p className="rounded-xl border border-dashed border-line bg-white p-4 text-sm text-muted">{list.length ? "No countries match." : "No countries yet. Tap Add a country."}</p> : null}
+          {shown.length === 0 ? <p className="rounded-xl border border-dashed border-line bg-surface p-4 text-sm text-muted">{list.length ? "No countries match." : "No countries yet. Tap Add a country."}</p> : null}
         </section>
 
-        <section className="space-y-3 rounded-xl border border-line bg-white p-4">
+        <section className="space-y-3 rounded-xl border border-line bg-surface p-4">
           <h2 className="label !mb-0">What the levels mean</h2>
           <p className="text-sm text-muted">Shown as the key on the public map. Use words a visitor would understand. Leave the description empty to show only the name.</p>
           <fieldset disabled={!canEdit || lvBusy} className="min-w-0 space-y-4">
@@ -211,7 +211,7 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
           {canEdit ? <div className="flex items-center gap-3"><span className="flex-1 text-sm text-muted" role="status">{lvMsg}</span><button type="button" onClick={saveLevels} disabled={!lvDirty || lvBusy} className="pill-btn bg-brand px-6 text-white disabled:opacity-40">{lvBusy ? "Saving…" : "Save"}</button></div> : null}
         </section>
 
-        <details className="rounded-xl border border-line bg-white p-4">
+        <details className="rounded-xl border border-line bg-surface p-4">
           <summary className="cursor-pointer text-[15px] font-semibold text-ink">For the website team</summary>
           <div className="mt-3 space-y-3 text-sm text-muted">
             <p>The missions page can show this map in a frame. It always shows the latest saved version, and it only contains what is marked public.</p>

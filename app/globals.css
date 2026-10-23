@@ -2,10 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body { height: 100%; }
-body { background: #f1f5f9; color: #1b2a41; font-family: Barlow, system-ui, sans-serif; }
+/* ── Theme tokens ─────────────────────────────────────────────────────────── */
+/* Mail-blue palette: light mode */
+:root,
+:root[data-theme="light"] {
+  --color-navy:    0 32 91;       /* #00205b — navy links / pressed states */
+  --color-brand:   30 97 185;     /* #1e61b9 — Mail blue accent             */
+  --color-line:    219 227 236;   /* #dbe3ec — borders                      */
+  --color-mist:    241 245 249;   /* #f1f5f9 — page background              */
+  --color-ink:     27 42 65;      /* #1b2a41 — body text                    */
+  --color-muted:   91 107 128;    /* #5b6b80 — secondary text               */
+  --color-surface: 255 255 255;   /* #ffffff — card / panel                 */
+}
 
-.field { @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-[16px] text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20; }
+/* Mail-blue palette: dark mode */
+:root[data-theme="dark"] {
+  --color-navy:    147 186 240;   /* lighter tint for dark bg */
+  --color-brand:   99 160 230;    /* brighter brand on dark   */
+  --color-line:    37 52 72;      /* dark border              */
+  --color-mist:    14 22 38;      /* dark page bg             */
+  --color-ink:     226 235 245;   /* near-white body text     */
+  --color-muted:   148 163 184;   /* muted light              */
+  --color-surface: 22 33 55;      /* dark card / panel        */
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+html, body { height: 100%; }
+body { background: rgb(var(--color-mist)); color: rgb(var(--color-ink)); font-family: Barlow, system-ui, sans-serif; }
+
+/* ── Form utilities ───────────────────────────────────────────────────────── */
+.field { @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-[16px] text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20; }
 select.field { appearance: none; -webkit-appearance: none; padding-right: 2.5rem; background-repeat: no-repeat; background-position: right 14px center; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 /* iPhone Safari lets date/time inputs grow past their box and centers the text; keep them inside the column, left-aligned, same height as other fields. */
 input[type="datetime-local"], input[type="date"], input[type="time"] { display: block; -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; max-width: 100%; min-height: 44px; box-sizing: border-box; text-align: left; }

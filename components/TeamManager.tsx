@@ -13,8 +13,8 @@ export type Member = { user_id: string; email: string; name: string | null; role
 export type Invite = { id: string; email: string; first_name: string | null; last_name: string | null; role: Role; ministries: string[] | null; created_at: string; expires_at: string; last_sent_at: string };
 
 const PILL: Record<Role, string> = {
-  owner: "bg-[#00205b] text-white",
-  admin: "bg-[#e8f0fb] text-[#00205b]",
+  owner: "bg-navy text-white",
+  admin: "bg-brand/10 text-navy",
   approver: "bg-[#e6f5ee] text-[#0d3b2c]",
   editor: "bg-[#fff3d6] text-[#5c3a00]",
   viewer: "bg-slate-100 text-slate-700",
@@ -28,7 +28,7 @@ const scope = (r: Role, m: string[] | null) => (r === "editor" ? ((m ?? []).map(
 function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={onClose}>
-      <div className="max-h-[90dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+      <div className="max-h-[90dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">{title}</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
         {children}
       </div>
@@ -40,8 +40,8 @@ function RolePicker({ value, onChange, options }: { value: Role; onChange: (r: R
   return (
     <div className="space-y-2" role="radiogroup" aria-label="Role">
       {options.map((r) => (
-        <button key={r} type="button" role="radio" aria-checked={value === r} onClick={() => onChange(r)} className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left ${value === r ? "border-[#1e61b9] bg-[#f4f8fd]" : "border-line bg-white"}`}>
-          <span className={`mt-1 h-4 w-4 shrink-0 rounded-full border-2 ${value === r ? "border-[#1e61b9] bg-[#1e61b9] shadow-[inset_0_0_0_3px_#fff]" : "border-line"}`} />
+        <button key={r} type="button" role="radio" aria-checked={value === r} onClick={() => onChange(r)} className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left ${value === r ? "border-brand bg-mist" : "border-line bg-surface"}`}>
+          <span className={`mt-1 h-4 w-4 shrink-0 rounded-full border-2 ${value === r ? "border-brand bg-brand shadow-[inset_0_0_0_3px_#fff]" : "border-line"}`} />
           <span className="min-w-0"><span className="block text-[15px] font-semibold text-ink">{ROLE_LABEL[r]}</span><span className="block text-sm text-muted">{ROLE_BLURB[r]}</span></span>
         </button>
       ))}
@@ -56,7 +56,7 @@ function MinistryPicker({ value, onChange }: { value: string[]; onChange: (v: st
       <div className="flex flex-wrap gap-2">
         {Object.values(PALETTES).map((p) => {
           const on = value.includes(p.key);
-          return <button key={p.key} type="button" aria-pressed={on} onClick={() => onChange(on ? value.filter((k) => k !== p.key) : [...value, p.key])} className={`h-10 rounded-full border px-4 text-sm font-semibold ${on ? "border-navy bg-navy text-white" : "border-line bg-white text-ink"}`}>{p.label}</button>;
+          return <button key={p.key} type="button" aria-pressed={on} onClick={() => onChange(on ? value.filter((k) => k !== p.key) : [...value, p.key])} className={`h-10 rounded-full border px-4 text-sm font-semibold ${on ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink"}`}>{p.label}</button>;
         })}
       </div>
       <p className="mt-1 text-xs text-muted">Editors can change emails for these ministries only. They can still see everything.</p>
@@ -100,7 +100,7 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
 
   return (
     <div className="min-h-full bg-mist pb-16">
-      <header className="sticky top-0 z-10 border-b border-[#00abc9]/15 bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <NavMenu />
           <HeaderBrand label="Team" />
@@ -112,13 +112,13 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
       <main className="mx-auto max-w-3xl space-y-5 px-4 pt-6">
         <div className="flex items-center justify-between gap-3">
           <h1 className="font-serif text-2xl font-semibold text-navy">Team</h1>
-          <button onClick={() => { setNote(""); setErr(""); setInviteOpen(true); }} className="pill-btn shrink-0 whitespace-nowrap bg-[#1e61b9] text-white"><UserPlus size={16} className="mr-1.5" />Invite someone</button>
+          <button onClick={() => { setNote(""); setErr(""); setInviteOpen(true); }} className="pill-btn shrink-0 whitespace-nowrap bg-brand text-white"><UserPlus size={16} className="mr-1.5" />Invite someone</button>
         </div>
 
         {note ? <p role="status" className="rounded-xl bg-[#e8f5ee] px-4 py-3 text-sm text-[#0d3b2c]">{note}</p> : null}
         {err && !inviteOpen && !editing ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
-        <section aria-label="People" className="overflow-hidden rounded-2xl border border-line bg-white">
+        <section aria-label="People" className="overflow-hidden rounded-2xl border border-line bg-surface">
           <h2 className="border-b border-line px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">People · {active.length}</h2>
           <ul className="divide-y divide-line">
             {active.map((m) => {
@@ -126,12 +126,12 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
               const can = !mine && canManageTarget(me.role, m.role);
               return (
                 <li key={m.user_id} className="flex items-center gap-3 px-4 py-3">
-                  <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8f0fb] text-sm font-bold text-navy">{initials(nameOf(m))}</span>
+                  <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-navy">{initials(nameOf(m))}</span>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="truncate text-[15px] font-semibold text-ink">{nameOf(m)}{mine ? " (you)" : ""}</span><RolePill role={m.role} />{m.role !== "owner" && m.can_approve ? <span className="inline-flex items-center rounded-full bg-[#e3f4ea] px-2.5 py-0.5 text-xs font-bold text-[#0d5a37]">Approves emails</span> : null}</div>
                     <div className="truncate text-sm text-muted">{m.email}</div>
                     <div className="truncate text-xs text-muted">{scope(m.role, m.ministries)} · joined {day(m.created_at)}</div>
-                    {lastSignIn ? <div className="truncate text-xs font-semibold text-[#00205b]">{seen(lastSignIn, m.user_id)}</div> : null}
+                    {lastSignIn ? <div className="truncate text-xs font-semibold text-navy">{seen(lastSignIn, m.user_id)}</div> : null}
                   </div>
                   {can ? <button onClick={() => { setErr(""); setNote(""); setEditing(m); }} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink">Manage</button>
                     : me.role === "owner" && !mine ? null : null}
@@ -142,7 +142,7 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
         </section>
 
         {invites.length ? (
-          <section aria-label="Invitations" className="overflow-hidden rounded-2xl border border-line bg-white">
+          <section aria-label="Invitations" className="overflow-hidden rounded-2xl border border-line bg-surface">
             <h2 className="border-b border-line px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">Invitations · {invites.length}</h2>
             <ul className="divide-y divide-line">
               {invites.map((i) => {
@@ -167,7 +167,7 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
         ) : null}
 
         {off.length ? (
-          <section aria-label="Removed" className="overflow-hidden rounded-2xl border border-line bg-white">
+          <section aria-label="Removed" className="overflow-hidden rounded-2xl border border-line bg-surface">
             <h2 className="border-b border-line px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">Removed · {off.length}</h2>
             <ul className="divide-y divide-line">
               {off.map((m) => (
@@ -180,7 +180,7 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
           </section>
         ) : null}
 
-        <section className="rounded-2xl border border-line bg-white">
+        <section className="rounded-2xl border border-line bg-surface">
           <button onClick={() => setGuide(!guide)} aria-expanded={guide} className="flex min-h-12 w-full items-center gap-2 px-4 text-left text-[15px] font-semibold text-navy"><ShieldCheck size={18} />What each role can do<span className="flex-1" /><span className="text-sm text-muted">{guide ? "Hide" : "Show"}</span></button>
           {guide ? (
             <ul className="space-y-3 border-t border-line px-4 py-4">
@@ -220,7 +220,7 @@ function InviteSheet({ grant, onClose, onDone, call, busy, err }: { grant: Role[
       <RolePicker value={role} onChange={setRole} options={grant} />
       {role === "editor" ? <div className="mt-4"><MinistryPicker value={ministries} onChange={setMinistries} /></div> : null}
       {err ? <p role="alert" className="mt-4 rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-      <button disabled={!valid || !!busy} onClick={async () => { const r = await call("/api/team/invites", { method: "POST", body: JSON.stringify({ firstName: first, lastName: last, email, role, ministries }) }, "invite"); if (r.ok) onDone(r.data.emailed === false ? `Invitation saved for ${first.trim()}, but the email didn't go out. Use Resend in a minute.` : `Invitation sent to ${first.trim()} ${last.trim()} (${email.trim()}).`); }} className="pill-btn mt-5 w-full bg-[#1e61b9] text-white disabled:bg-[#c4cfdc]">{busy === "invite" ? "Sending…" : "Send invitation"}</button>
+      <button disabled={!valid || !!busy} onClick={async () => { const r = await call("/api/team/invites", { method: "POST", body: JSON.stringify({ firstName: first, lastName: last, email, role, ministries }) }, "invite"); if (r.ok) onDone(r.data.emailed === false ? `Invitation saved for ${first.trim()}, but the email didn't go out. Use Resend in a minute.` : `Invitation sent to ${first.trim()} ${last.trim()} (${email.trim()}).`); }} className="pill-btn mt-5 w-full bg-brand text-white disabled:bg-line">{busy === "invite" ? "Sending…" : "Send invitation"}</button>
     </Sheet>
   );
 }
@@ -256,14 +256,14 @@ function ManageSheet({ m, me, grant, onClose, onDone, call, busy, err }: { m: Me
         </label>
       ) : null}
       {err ? <p role="alert" className="mt-4 rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-      <button disabled={!changed || !valid || !!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ name: fullName, role, ministries, ...(me.role === "owner" ? { approves } : {}) }) }, "save"); if (r.ok) onDone(`Saved. ${fullName || nameOf(m)} is now ${role === "admin" || role === "approver" || role === "editor" ? "an" : "a"} ${ROLE_LABEL[role]}.`); }} className="pill-btn mt-5 w-full bg-[#1e61b9] text-white disabled:bg-[#c4cfdc]">{busy === "save" ? "Saving…" : "Save changes"}</button>
+      <button disabled={!changed || !valid || !!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ name: fullName, role, ministries, ...(me.role === "owner" ? { approves } : {}) }) }, "save"); if (r.ok) onDone(`Saved. ${fullName || nameOf(m)} is now ${role === "admin" || role === "approver" || role === "editor" ? "an" : "a"} ${ROLE_LABEL[role]}.`); }} className="pill-btn mt-5 w-full bg-brand text-white disabled:bg-line">{busy === "save" ? "Saving…" : "Save changes"}</button>
 
       <div className="mt-6 space-y-3 border-t border-line pt-4">
         {off ? (
           <div className="rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]">
             <p><b>Remove {nameOf(m)}'s access?</b> They are signed out on their next click and can't sign in again unless you restore access. Their name and past work stay on the history.</p>
             <div className="mt-3 flex gap-2">
-              <button disabled={!!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ disabled: true }) }, "off"); if (r.ok) onDone(`${nameOf(m)} no longer has access.`); }} className="pill-btn bg-[#c8102e] text-white disabled:opacity-60">{busy === "off" ? "Working…" : "Remove access"}</button>
+              <button disabled={!!busy} onClick={async () => { const r = await call(url, { method: "PATCH", body: JSON.stringify({ disabled: true }) }, "off"); if (r.ok) onDone(`${nameOf(m)} no longer has access.`); }} className="pill-btn bg-red-600 text-white disabled:opacity-60">{busy === "off" ? "Working…" : "Remove access"}</button>
               <button onClick={() => setOff(false)} className="pill-btn text-muted">Keep them</button>
             </div>
           </div>
@@ -271,11 +271,11 @@ function ManageSheet({ m, me, grant, onClose, onDone, call, busy, err }: { m: Me
 
         {me.role === "owner" ? (
           handoff ? (
-            <div className="rounded-xl bg-[#f4f8fd] p-3 text-sm text-ink">
+            <div className="rounded-xl bg-mist p-3 text-sm text-ink">
               <p><b>Make {nameOf(m)} the owner?</b> You become an Admin. Only they can change Admins or hand ownership back.</p>
               <label className="mt-3 block"><span className="label">Type their email to confirm</span><input className="field" autoCapitalize="none" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={m.email} /></label>
               <div className="mt-3 flex gap-2">
-                <button disabled={!!busy || confirm.trim().toLowerCase() !== m.email.toLowerCase()} onClick={async () => { const r = await call("/api/team/transfer", { method: "POST", body: JSON.stringify({ userId: m.user_id, confirmEmail: confirm }) }, "xfer"); if (r.ok) { onDone(`${nameOf(m)} is now the owner.`); window.location.assign("/team"); } }} className="pill-btn bg-[#00205b] text-white disabled:bg-[#c4cfdc]">{busy === "xfer" ? "Working…" : "Hand off ownership"}</button>
+                <button disabled={!!busy || confirm.trim().toLowerCase() !== m.email.toLowerCase()} onClick={async () => { const r = await call("/api/team/transfer", { method: "POST", body: JSON.stringify({ userId: m.user_id, confirmEmail: confirm }) }, "xfer"); if (r.ok) { onDone(`${nameOf(m)} is now the owner.`); window.location.assign("/team"); } }} className="pill-btn bg-navy text-white disabled:bg-line">{busy === "xfer" ? "Working…" : "Hand off ownership"}</button>
                 <button onClick={() => setHandoff(false)} className="pill-btn text-muted">Cancel</button>
               </div>
             </div>

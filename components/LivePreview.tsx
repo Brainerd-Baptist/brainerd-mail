@@ -22,8 +22,8 @@ function Frame({ html, width, height, phone }: { html: string; width: number; he
     requestAnimationFrame(() => { if (d.scrollingElement) d.scrollingElement.scrollTop = y; });
   }, [html]);
   return (
-    <div className={phone ? "overflow-hidden rounded-[40px] border-[10px] border-[#1b2a41] bg-white shadow-lg" : "overflow-hidden rounded-xl border border-line bg-white shadow-sm"} style={{ width, maxWidth: "100%" }}>
-      <iframe ref={ref} title={phone ? "Phone preview" : "Desktop preview"} className="block w-full bg-white" style={{ height }} />
+    <div className={phone ? "overflow-hidden rounded-[40px] border-[10px] border-ink bg-surface shadow-lg" : "overflow-hidden rounded-xl border border-line bg-surface shadow-sm"} style={{ width, maxWidth: "100%" }}>
+      <iframe ref={ref} title={phone ? "Phone preview" : "Desktop preview"} className="block w-full bg-surface" style={{ height }} />
     </div>
   );
 }
@@ -85,21 +85,21 @@ export default function LivePreview({ emailId }: { emailId: string }) {
   const pick = (v: View) => { setView(v); try { localStorage.setItem("brainerd-mail:preview-view", v); } catch {} };
   const showPhone = view === "phone" || (view === "both" && wide) || (view === "both" && !wide);
   const showDesktop = view === "desktop" || (view === "both" && wide);
-  const btn = (on: boolean) => `flex h-9 items-center rounded-full px-4 text-sm font-semibold ${on ? "bg-white text-navy shadow-sm" : "text-muted"}`;
+  const btn = (on: boolean) => `flex h-9 items-center rounded-full px-4 text-sm font-semibold ${on ? "bg-surface text-navy shadow-sm" : "text-muted"}`;
 
   return (
     <div className="min-h-[100dvh] bg-mist">
-      <header className="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-line bg-white px-4 py-3">
+      <header className="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-line bg-surface px-4 py-3">
         <div className="mr-auto">
           <h1 className="font-serif text-lg font-semibold text-navy">{doc?.subject || "Live preview"}</h1>
           <p className="text-xs text-muted">{updated ? `Updated ${updated.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })}` : "Loading…"} · follows your edits automatically</p>
         </div>
-        <div className="flex items-center gap-1 rounded-full bg-[#e3eaf2] p-1">
+        <div className="flex items-center gap-1 rounded-full bg-line p-1">
           {wide ? <button onClick={() => pick("both")} className={btn(view === "both")}>Both</button> : null}
           <button onClick={() => pick("phone")} className={btn(view === "phone" || (view === "both" && !wide))}>Phone</button>
           <button onClick={() => pick("desktop")} className={btn(view === "desktop")}>Desktop</button>
         </div>
-        <button onClick={() => setDark((d) => !d)} aria-pressed={dark} className={`flex h-11 items-center rounded-full border px-4 text-sm font-semibold ${dark ? "border-navy bg-navy text-white" : "border-line bg-white text-ink"}`}>{dark ? "Dark on" : "Dark mode"}</button>
+        <button onClick={() => setDark((d) => !d)} aria-pressed={dark} className={`flex h-11 items-center rounded-full border px-4 text-sm font-semibold ${dark ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink"}`}>{dark ? "Dark on" : "Dark mode"}</button>
       </header>
       {err ? <p className="m-4 rounded-xl bg-[#fdecec] px-4 py-3 text-sm text-[#8a1c1c]">{err}</p> : null}
       {doc ? (
