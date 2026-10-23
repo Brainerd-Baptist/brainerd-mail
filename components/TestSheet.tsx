@@ -35,14 +35,14 @@ export function TestSheet({ onClose, onSend }: { onClose: () => void; onSend: (e
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={() => !busy && onClose()}>
-      <div className="max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+      <div className="max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">Send a test to…</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={20} /></button></div>
         <p className="mb-3 text-[14px] text-muted">The subject starts with [TEST]. Test emails are never counted as a real send.</p>
         <label className="flex min-h-11 items-center gap-3 rounded-xl border border-line px-3 text-[15px] font-semibold text-ink"><input type="checkbox" checked={me} onChange={(e) => setMe(e.target.checked)} className="h-5 w-5" />Me{myEmail ? <span className="truncate font-normal text-muted">{myEmail}</span> : null}</label>
 
         <div className="mt-3">
           <span className="label">People with access to Mail</span>
-          {!people ? <div className="h-16 animate-pulse rounded-xl bg-[#eef2f6]" /> : others.length === 0 ? <p className="text-[14px] text-muted">No one else has access yet.</p> : (
+          {!people ? <div className="h-16 animate-pulse rounded-xl bg-line/40" /> : others.length === 0 ? <p className="text-[14px] text-muted">No one else has access yet.</p> : (
             <ul className="max-h-48 divide-y divide-line overflow-y-auto rounded-xl border border-line">
               {others.map((p) => {
                 const on = picked.includes(p.email.toLowerCase());

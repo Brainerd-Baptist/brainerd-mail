@@ -51,7 +51,7 @@ export function RosterEditor({ initial, version }: { initial: Member[]; version:
 
   return (
     <div className="min-h-full bg-mist pb-32">
-      <header className="sticky top-0 z-10 border-b border-line bg-white/95 px-4 py-3 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-line bg-surface/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center gap-3">
           <NavMenu />
           <h1 className="flex-1 truncate text-center font-serif text-lg font-semibold text-navy">Members serving globally</h1>
@@ -66,11 +66,11 @@ export function RosterEditor({ initial, version }: { initial: Member[]; version:
         {grouped.map((g) => (
           <section key={g.region} className="space-y-3">
             <h2 className="label !mb-0 flex items-center justify-between"><span>{g.region}</span><button type="button" onClick={() => add(g.region)} className="flex items-center gap-1 text-brand normal-case tracking-normal"><Plus size={16} />Add person</button></h2>
-            {g.items.length === 0 ? <p className="rounded-xl border border-dashed border-line bg-white p-4 text-sm text-muted">No one listed here yet.</p> : null}
+            {g.items.length === 0 ? <p className="rounded-xl border border-dashed border-line bg-surface p-4 text-sm text-muted">No one listed here yet.</p> : null}
             {g.items.map((m) => {
               const isOpen = open === m.id;
               return (
-                <article key={m.id} className={`overflow-hidden rounded-xl border bg-white ${m.hidden ? "border-dashed opacity-70" : "border-line"}`}>
+                <article key={m.id} className={`overflow-hidden rounded-xl border bg-surface ${m.hidden ? "border-dashed opacity-70" : "border-line"}`}>
                   <button type="button" onClick={() => setOpen(isOpen ? null : m.id)} className="flex w-full items-center gap-3 p-3 text-left" aria-expanded={isOpen}>
                     {m.photo ? <img src={m.photo} alt="" className="h-14 w-[74px] flex-none rounded-md object-cover" /> : <span className="flex h-14 w-[74px] flex-none items-center justify-center rounded-md bg-mist text-xs text-muted">No photo</span>}
                     <span className="min-w-0 flex-1">
@@ -107,7 +107,7 @@ export function RosterEditor({ initial, version }: { initial: Member[]; version:
         ))}
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 border-t border-line bg-white/95 px-4 py-3 backdrop-blur" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
+      <div className="fixed inset-x-0 bottom-0 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur" style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}>
         <div className="mx-auto flex max-w-2xl items-center gap-3">
           <span className={`min-w-0 flex-1 text-sm ${err ? "text-[#b3261e]" : "text-muted"}`} role="status">{err || msg || (dirty ? "You have unsaved changes." : "Everything is saved.")}</span>
           <button type="button" onClick={save} disabled={busy || !dirty} className="pill-btn bg-brand px-6 text-white disabled:opacity-40">{busy ? "Saving…" : "Save"}</button>

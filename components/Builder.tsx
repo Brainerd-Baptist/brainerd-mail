@@ -417,7 +417,7 @@ export default function Builder({ emailId }: { emailId: string }) {
     } catch { setStatus("Couldn’t open that email."); setSwitching(false); }
   }
   const ministrySelect = (
-    <select aria-label="Ministry email" disabled={switching} className="appearance-none rounded-full border border-line bg-white bg-no-repeat py-1.5 pl-4 pr-9 text-sm font-semibold disabled:opacity-60" style={{ color: palette.dark, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")", backgroundPosition: "right 14px center" }} value={doc.ministry} onChange={(e) => openMinistry(e.target.value)}>
+    <select aria-label="Ministry email" disabled={switching} className="appearance-none rounded-full border border-line bg-surface bg-no-repeat py-1.5 pl-4 pr-9 text-sm font-semibold disabled:opacity-60" style={{ color: palette.dark, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")", backgroundPosition: "right 14px center" }} value={doc.ministry} onChange={(e) => openMinistry(e.target.value)}>
       {Object.values(PALETTES).map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
     </select>
   );
@@ -430,9 +430,9 @@ export default function Builder({ emailId }: { emailId: string }) {
   );
 
   const deviceToggle = (kinds: Device[]) => (
-    <div className="flex items-center gap-1 rounded-full bg-[#e3eaf2] p-1">
+    <div className="flex items-center gap-1 rounded-full bg-line p-1">
       {([["phone", Smartphone, "Phone"], ["desktop", Monitor, "Desktop"], ["dark", Moon, "Dark"], ["text", MessageSquare, "Text"]] as const).filter(([k]) => kinds.includes(k)).map(([k, Icon, label]) => (
-        <button key={k} onClick={() => setDevice(k)} aria-label={label} className={`flex h-9 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-semibold transition lg:px-4 ${device === k ? "bg-white text-navy shadow-sm" : "text-muted"}`}><Icon size={16} /><span className={device !== k ? "hidden 2xl:inline" : ""}>{label}</span></button>
+        <button key={k} onClick={() => setDevice(k)} aria-label={label} className={`flex h-9 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-semibold transition lg:px-4 ${device === k ? "bg-surface text-navy shadow-sm" : "text-muted"}`}><Icon size={16} /><span className={device !== k ? "hidden 2xl:inline" : ""}>{label}</span></button>
       ))}
     </div>
   );
@@ -441,21 +441,21 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   const checksPanel = (
     <div className="space-y-4">
-    <div className="rounded-xl border border-line bg-white p-4">
+    <div className="rounded-xl border border-line bg-surface p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-[15px] font-bold text-ink">Before you send</h3>
         <span className={`text-xs font-bold ${statusColor}`}>{statusPill}</span>
       </div>
       <ul className="space-y-3">
         {checks.map((c, i) => (
-          <li key={i} className="flex gap-2 text-[15px] text-[#33445d]">
+          <li key={i} className="flex gap-2 text-[15px] text-ink">
             {c.ok ? <Check size={18} className="mt-0.5 shrink-0 text-[#1e7a4c]" /> : <AlertTriangle size={18} className={`mt-0.5 shrink-0 ${c.severity === "block" ? "text-[#c8102e]" : "text-[#9a5a00]"}`} />}
             <div className="min-w-0 flex-1">
               <span>{c.label}{c.detail ? <span className="block text-xs text-muted">{c.detail}</span> : null}</span>
               {c.items?.length ? (
                 <ul className="mt-2 space-y-2">
                   {c.items.map((it, j) => (
-                    <li key={j} className="flex flex-wrap items-center gap-2 rounded-lg bg-[#f4f8fd] p-3">
+                    <li key={j} className="flex flex-wrap items-center gap-2 rounded-lg bg-mist p-3">
                       <span className="min-w-0 flex-1 text-sm text-ink">{it.text}</span>
                       <button onClick={() => showBlock(it.blockId)} className="flex min-h-9 items-center gap-1 rounded-full border border-line px-3 text-sm font-semibold text-ink"><Eye size={14} />Show me</button>
                     </li>
@@ -506,14 +506,14 @@ export default function Builder({ emailId }: { emailId: string }) {
       <div className="label">Add to this email</div>
       <div className="mb-6 grid grid-cols-2 gap-2">
         {ADDABLE.map((t) => (
-          <button key={t} onClick={() => { add(t); if (isPhoneLayout) setTab("edit"); }} className="flex min-h-12 items-center gap-1.5 rounded-xl border border-line bg-white px-3 py-2.5 text-left text-[15px] font-semibold text-ink transition active:bg-[#f4f8fd] lg:hover:border-brand"><Plus size={16} className="shrink-0 text-brand" />{BLOCK_LABELS[t]}</button>
+          <button key={t} onClick={() => { add(t); if (isPhoneLayout) setTab("edit"); }} className="flex min-h-12 items-center gap-1.5 rounded-xl border border-line bg-surface px-3 py-2.5 text-left text-[15px] font-semibold text-ink transition active:bg-mist lg:hover:border-brand"><Plus size={16} className="shrink-0 text-brand" />{BLOCK_LABELS[t]}</button>
         ))}
       </div>
       <div className="label">In this email</div>
       <ol className="space-y-1.5">
         {doc.blocks.map((b, i) => (
           <li key={b.id}>
-            <div className={`rounded-xl border px-2 pb-1 pt-1 text-sm transition ${selected === b.id ? "border-brand bg-[#f4f8fd]" : "border-line bg-white"}`}>
+            <div className={`rounded-xl border px-2 pb-1 pt-1 text-sm transition ${selected === b.id ? "border-brand bg-mist" : "border-line bg-surface"}`}>
               <button className={`block min-h-11 w-full min-w-0 px-1 text-left ${b.hidden ? "text-muted line-through" : "text-ink"}`} onClick={() => { setSelected(b.id); if (isPhoneLayout) setTab("edit"); }}>
                 <span className="block truncate text-[15px] font-semibold"><span className="mr-1.5 text-muted">{i + 1}.</span>{BLOCK_LABELS[b.type]}</span>
                 {blockHint(b) ? <span className="block truncate text-[13px] font-normal text-muted">{blockHint(b)}</span> : null}
@@ -533,9 +533,9 @@ export default function Builder({ emailId }: { emailId: string }) {
   );
 
   const textPreview = (
-    <div className="mx-auto max-w-[380px] rounded-[28px] bg-white p-5 shadow-sm">
+    <div className="mx-auto max-w-[380px] rounded-[28px] bg-surface p-5 shadow-sm">
       <div className="mb-3 text-center text-xs font-semibold text-muted">Brainerd Baptist Church · Today</div>
-      <div className="rounded-2xl bg-[#eef1f5] p-4 text-[16px] leading-snug text-ink">
+      <div className="rounded-2xl bg-line/60 p-4 text-[16px] leading-snug text-ink">
         {palette.label === "Church-Wide" ? "Brainerd" : `Brainerd ${palette.label}`}: {doc.previewText || doc.subject}
         <div className="mt-2 text-[#1e5fa8] underline">{origin.replace(/^https?:\/\//, "")}/w/xxxx</div>
         <div className="mt-2 text-sm text-muted">Reply STOP to opt out</div>
@@ -566,7 +566,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   if (loadErr) return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-mist p-6 text-center">
       <p className="max-w-sm text-[16px] text-ink">{loadErr}</p>
-      <div className="flex gap-3"><Link href="/emails" className="pill-btn border-2 border-navy text-navy">All emails</Link><button onClick={() => location.reload()} className="pill-btn bg-[#1e61b9] text-white">Try again</button></div>
+      <div className="flex gap-3"><Link href="/emails" className="pill-btn border-2 border-navy text-navy">All emails</Link><button onClick={() => location.reload()} className="pill-btn bg-brand text-white">Try again</button></div>
     </div>
   );
   if (!loaded) return <div className="flex min-h-[100dvh] items-center justify-center bg-mist text-sm text-muted">Opening…</div>;
@@ -583,9 +583,9 @@ export default function Builder({ emailId }: { emailId: string }) {
   ) : null;
 
   const stateBanner = viewOnly ? (
-    <div className="bg-[#e8f0fb] px-4 py-2 text-sm text-[#0d2b52]"><b>View only.</b> {role === "viewer" ? "Your role can look at emails but not change them." : `Only people assigned to ${paletteFor(doc.ministry).label} can change this email.`}</div>
+    <div className="bg-brand/10 px-4 py-2 text-sm text-navy"><b>View only.</b> {role === "viewer" ? "Your role can look at emails but not change them." : `Only people assigned to ${paletteFor(doc.ministry).label} can change this email.`}</div>
   ) : locked ? (
-    <div className="flex flex-wrap items-center justify-between gap-2 bg-[#e8f0fb] px-4 py-2 text-sm text-[#0d2b52]">
+    <div className="flex flex-wrap items-center justify-between gap-2 bg-brand/10 px-4 py-2 text-sm text-navy">
       <span>
         {rowStatus === "pending_approval" ? <><b>Waiting for approval.</b> {sched.at ? `Set to go out ${when(sched.at)}.` : ""}{sched.expedited ? " Expedited." : ""}</> : null}
         {rowStatus === "approved" ? <><b>Approved.</b> {sched.at ? `Scheduled for ${when(sched.at)}.` : ""}{!SENDING_ENABLED ? " Sending isn’t switched on yet, so it will wait." : ""}</> : null}
@@ -617,7 +617,7 @@ export default function Builder({ emailId }: { emailId: string }) {
       <button onClick={() => { sendTest().catch(() => {}); }} disabled={testBusy} className="pill-btn w-full border-2 border-navy text-navy disabled:opacity-60"><FlaskConical size={16} className="mr-1.5" />{testBusy ? "Sending…" : "Send me a test"}</button>
       {status && /test/i.test(status) ? <p role="status" className="rounded-xl bg-[#e8f5ee] px-3 py-2 text-center text-sm text-navy">{status}</p> : null}
       <button onClick={() => setTestOpen(true)} className="min-h-10 text-center text-[14px] font-semibold text-brand">Send a test to others…</button>
-      <button onClick={() => { if (!confirmPhotos()) return; setSendOpen(false); setSubmitOpen(true); }} disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
+      <button onClick={() => { if (!confirmPhotos()) return; setSendOpen(false); setSubmitOpen(true); }} disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-line text-white" : "bg-brand text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
       {blocking ? <p className="text-center text-xs text-muted">Fix the {blocking} item{blocking > 1 ? "s" : ""} in the checklist first.</p> : null}
     </div>
   );
@@ -626,7 +626,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   if (isPhoneLayout) {
     return (
       <div className="flex h-[100dvh] flex-col bg-mist">
-        <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-line bg-white px-3">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-line bg-surface px-3">
           <div className="flex min-w-0 items-center gap-1">
             <NavMenu />
             <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: swatch(palette) }} />
@@ -637,22 +637,22 @@ export default function Builder({ emailId }: { emailId: string }) {
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <div className="relative">
-              <button onClick={() => setMoreOpen((v) => !v)} aria-label="More: schedule, history, feedback" aria-haspopup="menu" aria-expanded={moreOpen} className="relative flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-[#f4f8fd]"><MoreHorizontal size={24} />{inboxNew ? <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-[#c8102e]" /> : null}</button>
+              <button onClick={() => setMoreOpen((v) => !v)} aria-label="More: schedule, history, feedback" aria-haspopup="menu" aria-expanded={moreOpen} className="relative flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-mist"><MoreHorizontal size={24} />{inboxNew ? <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-600" /> : null}</button>
               {moreOpen ? (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
-                  <div role="menu" className="absolute right-0 top-12 z-50 w-[min(280px,80vw)] overflow-hidden rounded-2xl border border-line bg-white py-1.5 shadow-xl">
-                    <button role="menuitem" onClick={() => { setMoreOpen(false); setScheduleOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><CalendarClock size={20} className={planIso ? "text-[#1e61b9]" : "text-muted"} /><span className="min-w-0 flex-1">Schedule{planIso ? <span className="block truncate text-xs font-normal text-muted">{chipWhen(planIso)}</span> : null}</span></button>
-                    <button role="menuitem" onClick={() => { setMoreOpen(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Users size={20} className="text-muted" />Send a test to others</button>
-                    <a role="menuitem" href={`/preview/${emailId}`} target="_blank" rel="noopener" onClick={() => setMoreOpen(false)} className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Monitor size={20} />Live preview in a new tab</a>
-                    <button role="menuitem" onClick={() => { setMoreOpen(false); setHistoryOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><History size={20} className="text-muted" />Version history</button>
-                    {doc.ministry === "missions" ? <a role="menuitem" href="/roster" className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><Globe size={20} className="text-muted" />Serving list</a> : null}
-                    <button role="menuitem" onClick={() => { setMoreOpen(false); setFeedbackOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-[#f4f8fd]"><LifeBuoy size={20} className="text-muted" /><span className="flex-1">Feedback</span>{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+                  <div role="menu" className="absolute right-0 top-12 z-50 w-[min(280px,80vw)] overflow-hidden rounded-2xl border border-line bg-surface py-1.5 shadow-xl">
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setScheduleOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><CalendarClock size={20} className={planIso ? "text-brand" : "text-muted"} /><span className="min-w-0 flex-1">Schedule{planIso ? <span className="block truncate text-xs font-normal text-muted">{chipWhen(planIso)}</span> : null}</span></button>
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><Users size={20} className="text-muted" />Send a test to others</button>
+                    <a role="menuitem" href={`/preview/${emailId}`} target="_blank" rel="noopener" onClick={() => setMoreOpen(false)} className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-mist"><Monitor size={20} />Live preview in a new tab</a>
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setHistoryOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><History size={20} className="text-muted" />Version history</button>
+                    {doc.ministry === "missions" ? <a role="menuitem" href="/roster" className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-mist"><Globe size={20} className="text-muted" />Serving list</a> : null}
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setFeedbackOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><LifeBuoy size={20} className="text-muted" /><span className="flex-1">Feedback</span>{inboxNew ? <span className="rounded-full bg-red-600 px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
                   </div>
                 </>
               ) : null}
             </div>
-            <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-[#1e61b9] px-4 text-white"><Send size={15} className="mr-1.5" />{locked ? "Status" : "Send"}</button>
+            <button onClick={() => setSendOpen(true)} className="pill-btn shrink-0 bg-brand px-4 text-white"><Send size={15} className="mr-1.5" />{locked ? "Status" : "Send"}</button>
           </div>
         </header>
         {status ? <div className="bg-[#e8f5ee] px-4 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
@@ -667,37 +667,37 @@ export default function Builder({ emailId }: { emailId: string }) {
               <div className="flex shrink-0 items-center justify-between gap-2 px-3 py-2">{ministrySelect}{deviceToggle(["phone", "dark", "text"])}</div>
               <div className="min-h-0 flex-1 overflow-auto px-0">
                 {device === "text" ? <div className="p-3">{textPreview}</div> : (
-                  <iframe ref={iframeRef} title="Email preview" className="block h-full w-full bg-white" />
+                  <iframe ref={iframeRef} title="Email preview" className="block h-full w-full bg-surface" />
                 )}
               </div>
               {inspector ? (
-                <div className="max-h-[48dvh] shrink-0 overflow-y-auto rounded-t-2xl border-t border-line bg-[#f7f9fc] p-4 shadow-[0_-8px_24px_rgba(0,32,91,0.12)]">{inspector}</div>
+                <div className="max-h-[48dvh] shrink-0 overflow-y-auto rounded-t-2xl border-t border-line bg-mist p-4 shadow-[0_-8px_24px_rgba(0,32,91,0.12)]">{inspector}</div>
               ) : (
-                <div className="flex shrink-0 items-center justify-between border-t border-line bg-white px-2 py-1 text-sm text-muted">
-                  <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" className="flex h-11 items-center gap-1 rounded-full px-3 font-semibold text-brand active:bg-[#f4f8fd] disabled:text-muted disabled:opacity-40"><Undo2 size={18} />Undo</button>
+                <div className="flex shrink-0 items-center justify-between border-t border-line bg-surface px-2 py-1 text-sm text-muted">
+                  <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" className="flex h-11 items-center gap-1 rounded-full px-3 font-semibold text-brand active:bg-mist disabled:text-muted disabled:opacity-40"><Undo2 size={18} />Undo</button>
                   <span className="px-1 text-center">Tap any part of the email to edit it</span>
-                  <button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" className="flex h-11 items-center gap-1 rounded-full px-3 font-semibold text-brand active:bg-[#f4f8fd] disabled:text-muted disabled:opacity-40"><Redo2 size={18} />Redo</button>
+                  <button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" className="flex h-11 items-center gap-1 rounded-full px-3 font-semibold text-brand active:bg-mist disabled:text-muted disabled:opacity-40"><Redo2 size={18} />Redo</button>
                 </div>
               )}
             </div>
           ) : null}
-          {tab === "blocks" ? <div className="h-full overflow-y-auto bg-white p-4">{blocksPanel}</div> : null}
+          {tab === "blocks" ? <div className="h-full overflow-y-auto bg-surface p-4">{blocksPanel}</div> : null}
           {tab === "check" ? <div className="h-full overflow-y-auto p-4">{checksPanel}</div> : null}
-          {tab === "details" ? <div className="h-full overflow-y-auto bg-[#f7f9fc] p-4">{detailsPanel}</div> : null}
+          {tab === "details" ? <div className="h-full overflow-y-auto bg-mist p-4">{detailsPanel}</div> : null}
         </div>
 
-        <nav className="grid shrink-0 grid-cols-4 border-t border-line bg-white pb-[env(safe-area-inset-bottom)]">
+        <nav className="grid shrink-0 grid-cols-4 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]">
           {([["edit", Pencil, "Edit"], ["blocks", LayoutList, "Blocks"], ["check", ListChecks, "Check"], ["details", Settings2, "Details"]] as const).map(([k, Icon, label]) => (
             <button key={k} onClick={() => setTab(k)} className={`relative flex h-16 flex-col items-center justify-center gap-0.5 text-xs font-semibold ${tab === k ? "text-navy" : "text-muted"}`}>
               <Icon size={22} />{label}
-              {k === "check" && (blocking + warns) > 0 ? <span className="absolute right-[28%] top-2 h-2.5 w-2.5 rounded-full bg-[#c8102e]" /> : null}
+              {k === "check" && (blocking + warns) > 0 ? <span className="absolute right-[28%] top-2 h-2.5 w-2.5 rounded-full bg-red-600" /> : null}
             </button>
           ))}
         </nav>
 
         {sendOpen ? (
           <div className="fixed inset-0 z-50 flex items-end bg-black/40" onClick={() => setSendOpen(false)}>
-            <div className="max-h-[85dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
+            <div className="max-h-[85dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
               <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">Ready to send?</h2><IconBtn label="Close" onClick={() => setSendOpen(false)}><X size={22} /></IconBtn></div>
               <div className="mb-4">{checksPanel}</div>
               {sendActions}
@@ -711,7 +711,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   /* ---------- Desktop layout ---------- */
   return (
     <div className="flex h-screen min-w-0 flex-col overflow-x-hidden bg-mist">
-      <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-line bg-white px-3 min-[1900px]:px-5">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-line bg-surface px-3 min-[1900px]:px-5">
         <div className="flex items-center gap-2 min-[1900px]:gap-4">
           <NavMenu />
                     {ministrySelect}
@@ -722,26 +722,26 @@ export default function Builder({ emailId }: { emailId: string }) {
         </div>
         {deviceToggle(["phone", "desktop", "dark", "text"])}
         <div className="flex items-center gap-1 min-[1900px]:gap-3">
-          {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-[#f4f8fd]"><Globe size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Serving list</span></a> : null}
-          <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2 text-sm font-semibold min-[1900px]:px-3 hover:bg-[#f4f8fd] ${planIso ? "border-line text-ink" : "border-transparent text-[#1e61b9]"}`}><CalendarClock size={18} className={planIso ? "text-[#1e61b9]" : ""} />{planIso ? chipShort(planIso) : "Schedule"}</button>
-          <button onClick={() => setFeedbackOpen(true)} aria-label="Feedback" title="Feedback" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-[#f4f8fd]"><LifeBuoy size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Feedback</span>{inboxNew ? <span className="rounded-full bg-[#c8102e] px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+          {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><Globe size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Serving list</span></a> : null}
+          <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2 text-sm font-semibold min-[1900px]:px-3 hover:bg-mist ${planIso ? "border-line text-ink" : "border-transparent text-brand"}`}><CalendarClock size={18} className={planIso ? "text-brand" : ""} />{planIso ? chipShort(planIso) : "Schedule"}</button>
+          <button onClick={() => setFeedbackOpen(true)} aria-label="Feedback" title="Feedback" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><LifeBuoy size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Feedback</span>{inboxNew ? <span className="rounded-full bg-red-600 px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
           <HelpButton />
-          <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-[#f4f8fd] disabled:opacity-30"><Redo2 size={20} /></button>
-          <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-[#f4f8fd]"><History size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">History</span></button>
-          <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-[#f4f8fd]"><Monitor size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Live preview</span></a>
+          <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-mist disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-mist disabled:opacity-30"><Redo2 size={20} /></button>
+          <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><History size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">History</span></button>
+          <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><Monitor size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Live preview</span></a>
           <div className="relative shrink-0">
             <button onClick={() => setTestMenu((v) => !v)} aria-haspopup="menu" aria-expanded={testMenu} disabled={testBusy} className="pill-btn whitespace-nowrap border-2 border-navy text-navy disabled:opacity-60"><FlaskConical size={16} className="mr-1.5" />{testBusy ? "Sending…" : "Send a test"}<ChevronDown size={16} className="ml-1" /></button>
             {testMenu ? (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setTestMenu(false)} />
-                <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-line bg-white py-1 shadow-lg">
-                  <button role="menuitem" onClick={() => { setTestMenu(false); sendTest().catch(() => {}); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-[#f4f8fd]"><FlaskConical size={18} className="text-muted" />Send to me</button>
-                  <button role="menuitem" onClick={() => { setTestMenu(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-[#f4f8fd]"><Users size={18} className="text-muted" />Send to others…</button>
+                <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-line bg-surface py-1 shadow-lg">
+                  <button role="menuitem" onClick={() => { setTestMenu(false); sendTest().catch(() => {}); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-mist"><FlaskConical size={18} className="text-muted" />Send to me</button>
+                  <button role="menuitem" onClick={() => { setTestMenu(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-mist"><Users size={18} className="text-muted" />Send to others…</button>
                 </div>
               </>
             ) : null}
           </div>
-          <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn shrink-0 whitespace-nowrap ${blocking ? "cursor-not-allowed bg-[#c4cfdc] text-white" : "bg-[#1e61b9] text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
+          <button onClick={() => { if (!confirmPhotos()) return; setSubmitOpen(true); }} disabled={blocking > 0 || locked} className={`pill-btn shrink-0 whitespace-nowrap ${blocking ? "cursor-not-allowed bg-line text-white" : "bg-brand text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
         </div>
       </header>
       {status ? <div className="bg-[#e8f5ee] px-5 py-2 text-sm text-[#0d3b2c]">{status}</div> : null}
@@ -750,18 +750,18 @@ export default function Builder({ emailId }: { emailId: string }) {
       {sheets}
       {feedbackSheet}
       <div className="grid min-h-0 flex-1 grid-cols-[280px_minmax(0,1fr)_360px]">
-        <aside className="overflow-y-auto border-r border-line bg-white p-4">{blocksPanel}</aside>
+        <aside className="overflow-y-auto border-r border-line bg-surface p-4">{blocksPanel}</aside>
         <main className="min-w-0 overflow-auto p-6">
           {device === "text" ? textPreview : (
             <div className="mx-auto" style={{ width: frameWidth }}>
-              <div className={device === "phone" ? "overflow-hidden rounded-[40px] border-[10px] border-[#1b2a41] bg-white" : "overflow-hidden rounded-xl border border-line bg-white shadow-sm"}>
-                <iframe ref={iframeRef} title="Email preview" className="block w-full bg-white" style={{ height: device === "phone" ? 760 : "calc(100vh - 170px)" }} />
+              <div className={device === "phone" ? "overflow-hidden rounded-[40px] border-[10px] border-ink bg-surface" : "overflow-hidden rounded-xl border border-line bg-surface shadow-sm"}>
+                <iframe ref={iframeRef} title="Email preview" className="block w-full bg-surface" style={{ height: device === "phone" ? 760 : "calc(100vh - 170px)" }} />
               </div>
               <p className="mt-3 text-center text-sm text-muted">Click any part of the email to edit it.</p>
             </div>
           )}
         </main>
-        <aside className="overflow-y-auto border-l border-line bg-[#f7f9fc] p-5">
+        <aside className="overflow-y-auto border-l border-line bg-mist p-5">
           {inspector ?? detailsPanel}
           <div className="mt-8">{checksPanel}</div>
         </aside>
@@ -772,6 +772,6 @@ export default function Builder({ emailId }: { emailId: string }) {
 
 function IconBtn({ children, label, onClick, disabled, danger }: { children: React.ReactNode; label: string; onClick: () => void; disabled?: boolean; danger?: boolean }) {
   return (
-    <button type="button" aria-label={label} title={label} disabled={disabled} onClick={onClick} className={`flex h-11 w-11 items-center justify-center rounded-lg text-muted transition active:bg-black/5 disabled:opacity-30 ${danger ? "lg:hover:text-[#c8102e]" : "lg:hover:text-ink"}`}>{children}</button>
+    <button type="button" aria-label={label} title={label} disabled={disabled} onClick={onClick} className={`flex h-11 w-11 items-center justify-center rounded-lg text-muted transition active:bg-black/5 disabled:opacity-30 ${danger ? "lg:hover:text-red-600" : "lg:hover:text-ink"}`}>{children}</button>
   );
 }

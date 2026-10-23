@@ -19,7 +19,7 @@ export const hourName = (h: number) => `${h % 12 === 0 ? 12 : h % 12}${h < 12 ? 
 // ---- Card shell ----
 export function Card({ title, note, right, children, id }: { title: string; note?: ReactNode; right?: ReactNode; children: ReactNode; id?: string }) {
   return (
-    <section id={id} className="overflow-hidden rounded-2xl border border-line bg-white">
+    <section id={id} className="overflow-hidden rounded-2xl border border-line bg-surface">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
         <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted">{title}</h2>
         {right}
@@ -34,7 +34,7 @@ export function Card({ title, note, right, children, id }: { title: string; note
 export function Tile({ label, value, sub, delta, goodWhenDown, hint }: { label: string; value: string; sub?: string; delta?: { text: string; dir: -1 | 0 | 1 } | null; goodWhenDown?: boolean; hint?: string }) {
   const tone = !delta || delta.dir === 0 ? "text-muted" : (delta.dir > 0) !== !!goodWhenDown ? "text-[#0d6b44]" : "text-[#9a1b1b]";
   return (
-    <div className="min-w-0 rounded-2xl border border-line bg-white p-4" title={hint}>
+    <div className="min-w-0 rounded-2xl border border-line bg-surface p-4" title={hint}>
       <div className="truncate text-[11px] font-bold uppercase tracking-[0.1em] text-muted">{label}</div>
       <div className="mt-1 font-serif text-[28px] font-semibold leading-none text-navy">{value}</div>
       <div className="mt-1.5 flex min-h-[18px] flex-wrap items-center gap-x-2 text-[12px] text-muted">
@@ -111,7 +111,7 @@ export function HBars({ rows, fmt = num, color = C.brand, max }: { rows: { label
             <span className="min-w-0 truncate font-semibold text-ink">{r.label}</span>
             <span className="shrink-0 tabular-nums text-ink">{fmt(r.value)}{r.sub ? <span className="ml-2 text-[12px] text-muted">{r.sub}</span> : null}</span>
           </div>
-          <div className="mt-1 h-2 overflow-hidden rounded-full bg-[#eaf0f7]"><div className="h-full rounded-full" style={{ width: `${Math.max(r.value > 0 ? 2 : 0, (r.value / m) * 100)}%`, background: r.color ?? color }} /></div>
+          <div className="mt-1 h-2 overflow-hidden rounded-full bg-line/50"><div className="h-full rounded-full" style={{ width: `${Math.max(r.value > 0 ? 2 : 0, (r.value / m) * 100)}%`, background: r.color ?? color }} /></div>
         </li>
       ))}
     </ul>
@@ -124,7 +124,7 @@ export function Split({ parts, fmt = num }: { parts: { label: string; value: num
   if (!total) return <p className="text-[13px] text-muted">Nothing yet.</p>;
   return (
     <div>
-      <div role="img" aria-label={parts.map((p) => `${p.label} ${Math.round((p.value / total) * 100)}%`).join(", ")} className="flex h-4 overflow-hidden rounded-full bg-[#eaf0f7]">
+      <div role="img" aria-label={parts.map((p) => `${p.label} ${Math.round((p.value / total) * 100)}%`).join(", ")} className="flex h-4 overflow-hidden rounded-full bg-line/50">
         {parts.filter((p) => p.value > 0).map((p) => <div key={p.label} style={{ width: `${(p.value / total) * 100}%`, background: p.color }} title={`${p.label}: ${fmt(p.value)}`} />)}
       </div>
       <ul className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[13px] sm:grid-cols-3">
@@ -142,7 +142,7 @@ export function Funnel({ steps }: { steps: { label: string; n: number }[] }) {
       {steps.map((s, i) => (
         <li key={s.label}>
           <div className="flex items-baseline justify-between text-[14px]"><span className="font-semibold text-ink">{s.label}</span><span className="tabular-nums text-ink">{num(s.n)} <span className="text-[12px] text-muted">{i === 0 ? "" : pct(s.n / top)}</span></span></div>
-          <div className="mt-1 h-3 overflow-hidden rounded-full bg-[#eaf0f7]"><div className="h-full rounded-full" style={{ width: `${Math.max(s.n > 0 ? 2 : 0, (s.n / top) * 100)}%`, background: [C.navy, C.brand, C.teal, C.green][i] ?? C.brand }} /></div>
+          <div className="mt-1 h-3 overflow-hidden rounded-full bg-line/50"><div className="h-full rounded-full" style={{ width: `${Math.max(s.n > 0 ? 2 : 0, (s.n / top) * 100)}%`, background: [C.navy, C.brand, C.teal, C.green][i] ?? C.brand }} /></div>
         </li>
       ))}
     </ol>
@@ -150,7 +150,7 @@ export function Funnel({ steps }: { steps: { label: string; n: number }[] }) {
 }
 
 export function Chip({ children, tone = "gray" }: { children: ReactNode; tone?: "gray" | "blue" | "amber" | "green" | "red" }) {
-  const t = { gray: "bg-[#eef2f6] text-[#41536a]", blue: "bg-[#e8f0fb] text-[#17458c]", amber: "bg-[#fdf1d8] text-[#7a4a05]", green: "bg-[#e3f4ea] text-[#0d5a37]", red: "bg-[#fbe6e8] text-[#8a1020]" }[tone];
+  const t = { gray: "bg-line/40 text-muted", blue: "bg-brand/10 text-navy", amber: "bg-[#fdf1d8] text-[#7a4a05]", green: "bg-[#e3f4ea] text-[#0d5a37]", red: "bg-[#fbe6e8] text-[#8a1020]" }[tone];
   return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold ${t}`}>{children}</span>;
 }
 

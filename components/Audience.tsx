@@ -54,21 +54,21 @@ export function Audience() {
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-[#00abc9]/15 bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-4xl items-center gap-3"><NavMenu /><HeaderBrand label="Audiences" /><span className="flex-1" /><HelpButton /></div>
       </header>
       <main className="mx-auto max-w-4xl space-y-5 px-4 pt-5">
         <p className="text-[14px] leading-snug text-muted">Pick each ministry&apos;s ClearStream list, then Check. Mail reads the list (it never changes anything in ClearStream) and shows how many people it would actually email, and exactly who is left out and why.</p>
         {!configured ? <p className="rounded-xl bg-[#fdf1d8] px-4 py-3 text-sm text-[#7a4a05]">ClearStream isn&apos;t connected yet. The owner needs to add the ClearStream key to Mail&apos;s settings in Vercel. Until then, nothing can be checked.</p> : null}
         {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-        {!rows ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-white" /> : rows.map((r) => {
+        {!rows ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-surface" /> : rows.map((r) => {
           const c = checks[r.ministry];
           const gap = c && c.expected !== null ? c.mailCount - c.expected : null;
           return (
             <Card key={r.ministry} title={r.label} right={r.latest ? <span className="text-[12px] text-muted">Last check {etDate(r.latest.taken_at, true)}</span> : <Chip>Never checked</Chip>}>
               <div className="grid gap-3 sm:grid-cols-[1fr_9rem_auto] sm:items-end">
                 <label className="block"><span className="label">ClearStream list</span>
-                  <select value={r.list_id ?? ""} disabled={!lists} onChange={(e) => { const l = lists?.find((x) => x.id === e.target.value); if (l) patch(r.ministry, { list_id: l.id, list_name: l.name }); }} className="h-11 w-full rounded-lg border border-line bg-white px-3 text-[16px]">
+                  <select value={r.list_id ?? ""} disabled={!lists} onChange={(e) => { const l = lists?.find((x) => x.id === e.target.value); if (l) patch(r.ministry, { list_id: l.id, list_name: l.name }); }} className="h-11 w-full rounded-lg border border-line bg-surface px-3 text-[16px]">
                     <option value="">{lists ? "Choose a list…" : configured ? "Loading lists…" : "Not connected"}</option>
                     {r.list_id && !lists?.some((l) => l.id === r.list_id) ? <option value={r.list_id}>{r.list_name || r.list_id}</option> : null}
                     {(lists ?? []).map((l) => <option key={l.id} value={l.id}>{l.name}{l.count !== null ? ` (${num(l.count)})` : ""}</option>)}
@@ -81,8 +81,8 @@ export function Audience() {
               {c && open === r.ministry ? (
                 <div className="mt-4 space-y-4 border-t border-line pt-4">
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-xl bg-[#f4f8fd] p-3"><div className="font-serif text-2xl font-semibold text-navy">{num(c.total)}</div><div className="text-[12px] text-muted">in ClearStream</div></div>
-                    <div className="rounded-xl bg-[#f4f8fd] p-3"><div className="font-serif text-2xl font-semibold text-navy">−{num(c.excluded.length)}</div><div className="text-[12px] text-muted">left out</div></div>
+                    <div className="rounded-xl bg-mist p-3"><div className="font-serif text-2xl font-semibold text-navy">{num(c.total)}</div><div className="text-[12px] text-muted">in ClearStream</div></div>
+                    <div className="rounded-xl bg-mist p-3"><div className="font-serif text-2xl font-semibold text-navy">−{num(c.excluded.length)}</div><div className="text-[12px] text-muted">left out</div></div>
                     <div className="rounded-xl bg-[#e3f4ea] p-3"><div className="font-serif text-2xl font-semibold text-[#0d5a37]">{num(c.mailCount)}</div><div className="text-[12px] text-muted">Mail would email</div></div>
                   </div>
                   {gap === null ? <p className="text-[13px] text-muted">Type the number you expect above to compare it.</p>

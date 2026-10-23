@@ -54,20 +54,20 @@ export function PolishPanel({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d
   };
 
   return (
-    <div className="rounded-xl border border-line bg-white p-4">
+    <div className="rounded-xl border border-line bg-surface p-4">
       <div className="mb-1 flex items-center justify-between">
         <h3 className="flex items-center gap-1.5 text-[15px] font-bold text-ink"><Sparkles size={16} className="text-brand" />Polish</h3>
         <span className={`text-xs font-bold ${tone}`}>{summary.label}</span>
       </div>
       <p className="mb-3 text-xs text-muted">Ideas to make this feel more finished. Your words stay yours: only spacing and layout fixes apply on their own.</p>
       {list.length === 0 ? (
-        <p className="flex items-center gap-2 text-[15px] text-[#33445d]"><Check size={18} className="text-[#1e7a4c]" />Nothing to improve. This looks polished.</p>
+        <p className="flex items-center gap-2 text-[15px] text-ink"><Check size={18} className="text-[#1e7a4c]" />Nothing to improve. This looks polished.</p>
       ) : (
         <ul className="space-y-4">
           {list.map((s) => (
-            <li key={s.id} className="text-[15px] text-[#33445d]">
+            <li key={s.id} className="text-[15px] text-ink">
               <div className="flex gap-2">
-                <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${s.level === "improve" ? "bg-[#c8102e]" : "bg-[#9a5a00]"}`} />
+                <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${s.level === "improve" ? "bg-red-600" : "bg-[#9a5a00]"}`} />
                 <div className="min-w-0">
                   <div className="font-semibold text-ink">{s.title}</div>
                   {s.detail ? <div className="text-xs text-muted">{s.detail}</div> : null}
@@ -92,10 +92,10 @@ export function PolishPanel({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d
         </div>
         {aiError ? <p className="text-sm text-[#c8102e]">{aiError}</p> : null}
         {!ideas && !aiError && !busy ? <p className="text-xs text-muted">Claude reads your email and suggests clearer wording or a better order. You choose what to apply.</p> : null}
-        {ideas && liveIdeas.length === 0 && !busy ? <p className="flex items-center gap-2 text-[15px] text-[#33445d]"><Check size={18} className="text-[#1e7a4c]" />No more ideas. The writing reads well.</p> : null}
+        {ideas && liveIdeas.length === 0 && !busy ? <p className="flex items-center gap-2 text-[15px] text-ink"><Check size={18} className="text-[#1e7a4c]" />No more ideas. The writing reads well.</p> : null}
         <ul className="space-y-4">
           {liveIdeas.map((e) => (
-            <li key={ideaKey(e)} className="rounded-lg bg-[#f4f8fd] p-3 text-[15px] text-[#33445d]">
+            <li key={ideaKey(e)} className="rounded-lg bg-mist p-3 text-[15px] text-ink">
               <div className="mb-1 text-xs font-bold uppercase tracking-wide text-muted">{e.kind === "move" ? `Move ${blockName(e.blockId)} block` : `${blockName(e.blockId)} · ${e.field.replace("button.label", "button")}`}</div>
               {e.kind === "rewrite" ? (
                 <>

@@ -160,13 +160,13 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
       {days.map((day) => {
         const list = byDay.get(day) ?? [];
         return (
-          <div key={day} className={`rounded-xl border bg-white ${day === sel ? "border-[#1e61b9] ring-2 ring-[#1e61b9]/25" : "border-line"}`}>
+          <div key={day} className={`rounded-xl border bg-surface ${day === sel ? "border-brand ring-2 ring-brand/25" : "border-line"}`}>
             <button onClick={() => setSel(day)} className="flex w-full items-center gap-2 border-b border-line px-3 py-2 text-left">
-              <span className={`flex h-7 min-w-7 items-center justify-center rounded-full px-1 text-xs font-bold ${day === today ? "bg-[#1e61b9] text-white" : "text-ink"}`}>{Number(day.slice(8))}</span>
+              <span className={`flex h-7 min-w-7 items-center justify-center rounded-full px-1 text-xs font-bold ${day === today ? "bg-brand text-white" : "text-ink"}`}>{Number(day.slice(8))}</span>
               <span className="text-xs font-semibold text-muted">{new Date(day + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: day.endsWith("-01") ? "short" : undefined, timeZone: "UTC" })}</span>
             </button>
             <div className="min-h-[56px] space-y-2 p-2 sm:min-h-[220px]">
-              {list.length === 0 ? <p className="px-1 text-xs text-[#9aa8bd]">Nothing planned</p> : list.map((en) => {
+              {list.length === 0 ? <p className="px-1 text-xs text-muted">Nothing planned</p> : list.map((en) => {
                 const p = paletteFor(en.type === "email" ? en.e.ministry : en.s.ministry);
                 const text = en.type === "email" ? en.e.title || "Untitled" : en.s.label || "Open slot";
                 const note = en.type === "email" ? timingNote(en.e, now) : null;
@@ -191,26 +191,26 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
 
   return (
     <div className="min-h-full bg-mist pb-16">
-      <header className="sticky top-0 z-10 border-b border-[#00abc9]/15 bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center gap-3">
           <NavMenu />
           <HeaderBrand label="Mail" />
           <span className="flex-1" />
           <HelpButton />
-          {buildable.length ? <button onClick={openAdd} className="pill-btn shrink-0 whitespace-nowrap bg-[#1e61b9] text-white"><Plus size={16} className="mr-1.5" /><span className="sm:hidden">Plan</span><span className="hidden sm:inline">Plan an email</span></button> : null}
+          {buildable.length ? <button onClick={openAdd} className="pill-btn shrink-0 whitespace-nowrap bg-brand text-white"><Plus size={16} className="mr-1.5" /><span className="sm:hidden">Plan</span><span className="hidden sm:inline">Plan an email</span></button> : null}
         </div>
       </header>
 
       <main className="mx-auto max-w-5xl space-y-4 px-4 pt-6">
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="mr-2 font-serif text-2xl font-semibold text-navy">{view === "week" ? weekTitle(weekStart) : monthTitle(ym)}</h1>
-          <Link href={view === "week" ? `/calendar?v=week&d=${addDays(weekStart, -7)}` : `/calendar?m=${shiftMonth(ym, -1)}`} aria-label={view === "week" ? "Previous week" : "Previous month"} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink"><ChevronLeft size={20} /></Link>
-          <Link href={view === "week" ? `/calendar?v=week&d=${addDays(weekStart, 7)}` : `/calendar?m=${shiftMonth(ym, 1)}`} aria-label={view === "week" ? "Next week" : "Next month"} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-ink"><ChevronRight size={20} /></Link>
-          <Link href={view === "week" ? "/calendar?v=week" : "/calendar"} className="flex h-11 items-center rounded-full border border-line bg-white px-4 text-sm font-semibold text-ink">Today</Link>
+          <Link href={view === "week" ? `/calendar?v=week&d=${addDays(weekStart, -7)}` : `/calendar?m=${shiftMonth(ym, -1)}`} aria-label={view === "week" ? "Previous week" : "Previous month"} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink"><ChevronLeft size={20} /></Link>
+          <Link href={view === "week" ? `/calendar?v=week&d=${addDays(weekStart, 7)}` : `/calendar?m=${shiftMonth(ym, 1)}`} aria-label={view === "week" ? "Next week" : "Next month"} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink"><ChevronRight size={20} /></Link>
+          <Link href={view === "week" ? "/calendar?v=week" : "/calendar"} className="flex h-11 items-center rounded-full border border-line bg-surface px-4 text-sm font-semibold text-ink">Today</Link>
           <span className="flex-1" />
-          <div role="tablist" aria-label="Calendar view" className="flex items-center gap-1 rounded-full bg-[#e3eaf2] p-1">
-            <Link role="tab" aria-selected={view === "month"} href={`/calendar?m=${sel.slice(0, 7)}`} className={`flex h-9 items-center rounded-full px-4 text-sm font-semibold ${view === "month" ? "bg-white text-navy shadow-sm" : "text-muted"}`}>Month</Link>
-            <Link role="tab" aria-selected={view === "week"} href={`/calendar?v=week&d=${sel}`} className={`flex h-9 items-center rounded-full px-4 text-sm font-semibold ${view === "week" ? "bg-white text-navy shadow-sm" : "text-muted"}`}>Week</Link>
+          <div role="tablist" aria-label="Calendar view" className="flex items-center gap-1 rounded-full bg-line p-1">
+            <Link role="tab" aria-selected={view === "month"} href={`/calendar?m=${sel.slice(0, 7)}`} className={`flex h-9 items-center rounded-full px-4 text-sm font-semibold ${view === "month" ? "bg-surface text-navy shadow-sm" : "text-muted"}`}>Month</Link>
+            <Link role="tab" aria-selected={view === "week"} href={`/calendar?v=week&d=${sel}`} className={`flex h-9 items-center rounded-full px-4 text-sm font-semibold ${view === "week" ? "bg-surface text-navy shadow-sm" : "text-muted"}`}>Week</Link>
           </div>
         </div>
 
@@ -224,7 +224,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
         {present.length > 1 ? (
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
             {["all", ...present].map((m) => (
-              <button key={m} onClick={() => setFilter(m)} className={`h-9 shrink-0 rounded-full border px-4 text-sm font-semibold ${filter === m ? "border-navy bg-navy text-white" : "border-line bg-white text-ink"}`}>{m === "all" ? "All" : paletteFor(m).label}</button>
+              <button key={m} onClick={() => setFilter(m)} className={`h-9 shrink-0 rounded-full border px-4 text-sm font-semibold ${filter === m ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink"}`}>{m === "all" ? "All" : paletteFor(m).label}</button>
             ))}
           </div>
         ) : null}
@@ -232,8 +232,8 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
         {err && !adding ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
         {view === "week" ? weekView : (
-        <div className="overflow-hidden rounded-xl border border-line bg-white">
-          <div className="grid grid-cols-7 border-b border-line bg-[#f7f9fc] text-center text-xs font-semibold text-muted">
+        <div className="overflow-hidden rounded-xl border border-line bg-surface">
+          <div className="grid grid-cols-7 border-b border-line bg-mist text-center text-xs font-semibold text-muted">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <div key={d} className="py-2">{d}</div>)}
           </div>
           {grid.map((week, wi) => (
@@ -243,8 +243,8 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                 const inMonth = day.startsWith(ym);
                 const isSel = day === sel;
                 return (
-                  <div key={day} onClick={() => setSel(day)} className={`min-h-[56px] cursor-pointer border-r border-line p-1 last:border-r-0 sm:min-h-[104px] sm:p-1.5 ${inMonth ? "bg-white" : "bg-[#f7f9fc]"} ${isSel ? "ring-2 ring-inset ring-[#1e61b9]" : ""}`}>
-                    <div className={`mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${day === today ? "bg-[#1e61b9] text-white" : inMonth ? "text-ink" : "text-[#9aa8bd]"}`}>{Number(day.slice(8))}</div>
+                  <div key={day} onClick={() => setSel(day)} className={`min-h-[56px] cursor-pointer border-r border-line p-1 last:border-r-0 sm:min-h-[104px] sm:p-1.5 ${inMonth ? "bg-surface" : "bg-mist"} ${isSel ? "ring-2 ring-inset ring-brand" : ""}`}>
+                    <div className={`mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${day === today ? "bg-brand text-white" : inMonth ? "text-ink" : "text-muted"}`}>{Number(day.slice(8))}</div>
                     <div className="flex flex-wrap gap-0.5 sm:hidden">
                       {list.slice(0, 6).map((en, i) => <span key={i} className="h-2 w-2 rounded-full" style={{ background: swatch(paletteFor(en.type === "email" ? en.e.ministry : en.s.ministry)) }} />)}
                     </div>
@@ -271,10 +271,10 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
         <section aria-label={dayTitle(sel)} className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-serif text-xl font-semibold text-navy">{dayTitle(sel)}</h2>
-            {buildable.length ? <button onClick={openAdd} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-[#1e61b9] hover:bg-[#f4f8fd]"><Plus size={16} />Plan an email</button> : null}
+            {buildable.length ? <button onClick={openAdd} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-brand hover:bg-mist"><Plus size={16} />Plan an email</button> : null}
           </div>
           {dayList.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-line bg-white p-6 text-center text-[15px] text-muted">Nothing planned for this day.</div>
+            <div className="rounded-xl border border-dashed border-line bg-surface p-6 text-center text-[15px] text-muted">Nothing planned for this day.</div>
           ) : (
             <ul className="space-y-3">
               {dayList.map((en) => {
@@ -286,7 +286,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                 const ser = en.type === "slot" && en.s.series_id ? seriesById.get(en.s.series_id) : en.type === "email" && en.e.series_id ? seriesById.get(en.e.series_id) : undefined;
                 const dueIso = plan && new Date(plan).getTime() > now ? approvalDeadline(plan) : null;
                 return (
-                  <li key={id} className={`flex overflow-hidden rounded-xl border border-line bg-white ${busy === id ? "opacity-60" : ""}`}>
+                  <li key={id} className={`flex overflow-hidden rounded-xl border border-line bg-surface ${busy === id ? "opacity-60" : ""}`}>
                     <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
                     <div className="min-w-0 flex-1 p-4">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
@@ -305,7 +305,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                           </p>
                           {en.e.status === "draft" && dueIso ? <p className="mt-1 text-sm text-muted">Send it for approval by {fullWhen(dueIso)} to allow 72 hours.</p> : null}
                           <div className="mt-3 flex flex-wrap gap-2">
-                            <Link href={hrefFor(en.e)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold text-[#1e61b9]"><ExternalLink size={15} />Open email</Link>
+                            <Link href={hrefFor(en.e)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold text-brand"><ExternalLink size={15} />Open email</Link>
                             {en.e.status !== "sent" && en.e.status !== "cancelled" && can(en.e.ministry) ? (
                               <button onClick={() => { setMarkOpen(markOpen === en.e.id ? null : en.e.id); setMarkAt(toLocalInput(new Date())); }} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold text-ink"><Check size={15} />Mark as sent</button>
                             ) : null}
@@ -315,15 +315,15 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                             ) : null}
                           </div>
                           {markOpen === en.e.id ? (
-                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-[#f7f9fc] p-3">
+                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-mist p-3">
                               <label className="block"><span className="label">When did it go out?</span><input type="datetime-local" className="field" value={markAt} onChange={(ev) => setMarkAt(ev.target.value)} /></label>
-                              <button onClick={() => markSent(en.e)} disabled={busy === en.e.id} className="pill-btn bg-[#1e61b9] text-white disabled:opacity-60">Mark as sent</button>
+                              <button onClick={() => markSent(en.e)} disabled={busy === en.e.id} className="pill-btn bg-brand text-white disabled:opacity-60">Mark as sent</button>
                             </div>
                           ) : null}
                           {moveOpen === en.e.id ? (
-                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-[#f7f9fc] p-3">
+                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-mist p-3">
                               <label className="block"><span className="label">Planned to go out</span><input type="datetime-local" className="field" value={moveAt} onChange={(ev) => setMoveAt(ev.target.value)} /></label>
-                              <button onClick={() => moveEmail(en.e)} disabled={busy === en.e.id} className="pill-btn bg-[#1e61b9] text-white disabled:opacity-60">Save</button>
+                              <button onClick={() => moveEmail(en.e)} disabled={busy === en.e.id} className="pill-btn bg-brand text-white disabled:opacity-60">Save</button>
                             </div>
                           ) : null}
                         </>
@@ -338,16 +338,16 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                               <button onClick={() => restoreSlot(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold text-ink disabled:opacity-60"><Undo2 size={15} />Restore</button>
                             ) : (
                               <>
-                                <button onClick={() => startEmail(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-[#1e61b9] px-4 text-sm font-semibold text-white disabled:opacity-60"><Plus size={15} />Start the email</button>
+                                <button onClick={() => startEmail(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-brand px-4 text-sm font-semibold text-white disabled:opacity-60"><Plus size={15} />Start the email</button>
                                 <button onClick={() => { setMoveOpen(moveOpen === en.s.id ? null : en.s.id); setMoveAt(toLocalInput(new Date(en.s.planned_at))); }} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted"><Clock size={15} />Change time</button>
                                 <button onClick={() => removeSlot(en.s)} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-muted disabled:opacity-60">{en.s.series_id ? <><SkipForward size={15} />Skip this one</> : <><Trash2 size={15} />Remove</>}</button>
                               </>
                             )}
                           </div>
                           {moveOpen === en.s.id ? (
-                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-[#f7f9fc] p-3">
+                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-mist p-3">
                               <label className="block"><span className="label">Goes out</span><input type="datetime-local" className="field" value={moveAt} onChange={(ev) => setMoveAt(ev.target.value)} /></label>
-                              <button onClick={() => moveSlot(en.s)} disabled={busy === en.s.id} className="pill-btn bg-[#1e61b9] text-white disabled:opacity-60">Save</button>
+                              <button onClick={() => moveSlot(en.s)} disabled={busy === en.s.id} className="pill-btn bg-brand text-white disabled:opacity-60">Save</button>
                             </div>
                           ) : null}
                         </>
@@ -367,14 +367,14 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
               {series.map((s) => {
                 const p = paletteFor(s.ministry);
                 return (
-                  <li key={s.id} className={`flex items-center gap-3 rounded-xl border border-line bg-white p-3 ${busy === s.id ? "opacity-60" : ""}`}>
+                  <li key={s.id} className={`flex items-center gap-3 rounded-xl border border-line bg-surface p-3 ${busy === s.id ? "opacity-60" : ""}`}>
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: swatch(p) }} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[15px] font-semibold text-ink">{s.label}{s.paused ? " (paused)" : ""}</span>
                       <span className="block truncate text-xs text-muted">{p.label} &middot; {describe(s)}{s.ends_on ? ` until ${s.ends_on}` : ""}</span>
                     </span>
                     {can(s.ministry) ? <button onClick={() => pauseSeries(s)} disabled={!!busy} aria-label={s.paused ? "Resume" : "Pause"} title={s.paused ? "Resume" : "Pause"} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 disabled:opacity-40">{s.paused ? <Play size={18} /> : <Pause size={18} />}</button> : null}
-                    {can(s.ministry) ? <button onClick={() => stopSeries(s)} disabled={!!busy} aria-label="Stop repeating" title="Stop repeating" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-[#c8102e] disabled:opacity-40"><Trash2 size={18} /></button> : null}
+                    {can(s.ministry) ? <button onClick={() => stopSeries(s)} disabled={!!busy} aria-label="Stop repeating" title="Stop repeating" className="flex h-11 w-11 items-center justify-center rounded-lg text-muted active:bg-black/5 lg:hover:text-red-600 disabled:opacity-40"><Trash2 size={18} /></button> : null}
                   </li>
                 );
               })}
@@ -388,7 +388,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
             <p className="text-sm text-muted">Drafts with no planned time. Open one and set when it should go out.</p>
             <ul className="space-y-2">
               {undated.map((e) => (
-                <li key={e.id}><Link href={hrefFor(e)} className="flex items-center gap-3 rounded-xl border border-line bg-white p-3 active:bg-[#f4f8fd]"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: swatch(paletteFor(e.ministry)) }} /><span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-ink">{e.title || "Untitled"}</span><span className="shrink-0 text-xs text-muted">{paletteFor(e.ministry).label}</span></Link></li>
+                <li key={e.id}><Link href={hrefFor(e)} className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3 active:bg-mist"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: swatch(paletteFor(e.ministry)) }} /><span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-ink">{e.title || "Untitled"}</span><span className="shrink-0 text-xs text-muted">{paletteFor(e.ministry).label}</span></Link></li>
               ))}
             </ul>
           </section>
@@ -397,7 +397,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
 
       {adding ? (
         <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={() => busy !== "slot" && setAdding(false)}>
-          <div className="max-h-[92dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
+          <div className="max-h-[92dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
             <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">Plan an email</h2><button aria-label="Close" onClick={() => setAdding(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
             <p className="mb-4 text-sm text-muted">Hold a day and time for a ministry before the email exists, once or on a repeat, so everyone can see the plan.</p>
             <label className="mb-3 block"><span className="label">Ministry</span>
@@ -412,7 +412,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
             </label>
             <label className="mb-5 block"><span className="label">{sRepeat === "none" ? "What is it for? (optional)" : "Name"}</span><input className="field" value={sLabel} maxLength={120} onChange={(e) => setSLabel(e.target.value)} placeholder={sRepeat === "none" ? "Fall Fest announcement, …" : "Monthly Kids update"} /></label>
             {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
-            <button onClick={addSlot} disabled={busy === "slot"} className="pill-btn w-full bg-[#1e61b9] text-white disabled:opacity-60">{busy === "slot" ? "Saving…" : sRepeat === "none" ? "Reserve slot" : "Start repeating"}</button>
+            <button onClick={addSlot} disabled={busy === "slot"} className="pill-btn w-full bg-brand text-white disabled:opacity-60">{busy === "slot" ? "Saving…" : sRepeat === "none" ? "Reserve slot" : "Start repeating"}</button>
           </div>
         </div>
       ) : null}

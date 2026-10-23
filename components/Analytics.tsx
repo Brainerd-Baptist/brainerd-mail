@@ -137,17 +137,17 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
   const exportLinks = () => data && downloadCsv("brainerd-mail-links.csv", ["Link", "Destination", "Email", "Ministry", "Total clicks", "People who clicked", "Share of clicks"], data.topLinks.map((l) => [l.label, l.url, l.emailTitle, l.ministry, l.clicks, l.unique, l.share.toFixed(4)]));
 
   const seg = (value: string, cur: string, set: (v: any) => void, opts: [string, string][], label: string) => (
-    <div role="group" aria-label={label} className="inline-flex overflow-hidden rounded-full border border-line bg-white text-[13px] font-semibold">
-      {opts.map(([v, l]) => <button key={v} onClick={() => set(v)} aria-pressed={cur === v} className={`min-h-9 px-3 ${cur === v ? "bg-navy text-white" : "text-ink hover:bg-[#f4f8fd]"}`}>{l}</button>)}
+    <div role="group" aria-label={label} className="inline-flex overflow-hidden rounded-full border border-line bg-surface text-[13px] font-semibold">
+      {opts.map(([v, l]) => <button key={v} onClick={() => set(v)} aria-pressed={cur === v} className={`min-h-9 px-3 ${cur === v ? "bg-navy text-white" : "text-ink hover:bg-mist"}`}>{l}</button>)}
     </div>
   );
 
   const FilterBar = (
-    <div className="space-y-4 rounded-2xl border border-line bg-white p-4">
+    <div className="space-y-4 rounded-2xl border border-line bg-surface p-4">
       <div>
         <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted">Dates (Eastern time)</div>
         <div className="flex flex-wrap items-center gap-2">
-          {PRESETS.map((p) => <button key={p.id} onClick={() => upd(p.range())} aria-pressed={activePreset === p.id} className={`min-h-9 rounded-full border px-3 text-[13px] font-semibold ${activePreset === p.id ? "border-navy bg-navy text-white" : "border-line bg-white text-ink hover:bg-[#f4f8fd]"}`}>{p.label}</button>)}
+          {PRESETS.map((p) => <button key={p.id} onClick={() => upd(p.range())} aria-pressed={activePreset === p.id} className={`min-h-9 rounded-full border px-3 text-[13px] font-semibold ${activePreset === p.id ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink hover:bg-mist"}`}>{p.label}</button>)}
           <label className="flex items-center gap-1.5 text-[13px] text-muted">From <input type="date" value={f.from ?? ""} max={f.to ?? undefined} onChange={(e) => upd({ from: e.target.value || null })} className="h-9 rounded-lg border border-line px-2 text-[14px] text-ink" /></label>
           <label className="flex items-center gap-1.5 text-[13px] text-muted">To <input type="date" value={f.to ?? ""} min={f.from ?? undefined} onChange={(e) => upd({ to: e.target.value || null })} className="h-9 rounded-lg border border-line px-2 text-[14px] text-ink" /></label>
         </div>
@@ -157,7 +157,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
           <div className="mb-1.5 flex items-center justify-between"><span className="text-[11px] font-bold uppercase tracking-[0.1em] text-muted">Ministries</span>{f.ministries.length ? <button onClick={() => upd({ ministries: [] })} className="text-[12px] font-semibold text-brand">Show all</button> : null}</div>
           <div className="flex flex-wrap gap-2">
             {ministries.map((mm) => { const on = f.ministries.includes(mm.key); return (
-              <button key={mm.key} aria-pressed={on} onClick={() => upd({ ministries: on ? f.ministries.filter((x) => x !== mm.key) : [...f.ministries, mm.key] })} className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold ${on ? "border-navy bg-[#e8f0fb] text-navy" : "border-line bg-white text-ink hover:bg-[#f4f8fd]"}`}>
+              <button key={mm.key} aria-pressed={on} onClick={() => upd({ ministries: on ? f.ministries.filter((x) => x !== mm.key) : [...f.ministries, mm.key] })} className={`inline-flex min-h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold ${on ? "border-navy bg-brand/10 text-navy" : "border-line bg-surface text-ink hover:bg-mist"}`}>
                 <i className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: mm.color }} />{mm.label}
               </button>); })}
           </div>
@@ -180,7 +180,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-[#00abc9]/15 bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-5xl items-center gap-3"><NavMenu /><HeaderBrand label="Analytics" /><span className="flex-1" /><HelpButton /></div>
       </header>
 
@@ -190,31 +190,31 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
             <h1 className="font-serif text-2xl font-semibold text-navy">Analytics</h1>
             <p className="mt-0.5 text-[14px] text-muted">{rangeText}{own ? " · your ministries" : ""}{data ? ` · ${data.totals.sends} send${data.totals.sends === 1 ? "" : "s"}` : ""}</p>
           </div>
-          <button onClick={() => setOpen((v) => !v)} aria-expanded={open} className="pill-btn border border-line bg-white text-ink"><Filter size={16} className="mr-1.5" />Filters{activeCount ? <span className="ml-1.5 rounded-full bg-navy px-1.5 text-[11px] text-white">{activeCount}</span> : null}<ChevronDown size={16} className={`ml-1 transition ${open ? "rotate-180" : ""}`} /></button>
+          <button onClick={() => setOpen((v) => !v)} aria-expanded={open} className="pill-btn border border-line bg-surface text-ink"><Filter size={16} className="mr-1.5" />Filters{activeCount ? <span className="ml-1.5 rounded-full bg-navy px-1.5 text-[11px] text-white">{activeCount}</span> : null}<ChevronDown size={16} className={`ml-1 transition ${open ? "rotate-180" : ""}`} /></button>
         </div>
 
         {/* Dates and the two most-used choices are always visible; the rest sits in the Filters panel. */}
         {open ? FilterBar : (
           <div className="flex flex-wrap items-center gap-2">
-            {PRESETS.map((p) => <button key={p.id} onClick={() => upd(p.range())} aria-pressed={activePreset === p.id} className={`min-h-9 rounded-full border px-3 text-[13px] font-semibold ${activePreset === p.id ? "border-navy bg-navy text-white" : "border-line bg-white text-ink hover:bg-[#f4f8fd]"}`}>{p.label}</button>)}
+            {PRESETS.map((p) => <button key={p.id} onClick={() => upd(p.range())} aria-pressed={activePreset === p.id} className={`min-h-9 rounded-full border px-3 text-[13px] font-semibold ${activePreset === p.id ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink hover:bg-mist"}`}>{p.label}</button>)}
             {activePreset === "custom" ? <Chip tone="blue">Custom dates</Chip> : null}
             <span className="mx-1 hidden h-5 w-px bg-line sm:block" />
             {seg(f.kind, f.kind, (v) => upd({ kind: v }), [["real", "Real"], ["test", "Tests"], ["all", "Both"]], "Send type")}
           </div>
         )}
 
-        {note ? <p role="status" className="flex items-start gap-2 rounded-xl bg-[#e8f0fb] px-4 py-3 text-sm text-[#17458c]"><Info size={16} className="mt-0.5 shrink-0" />{note}</p> : null}
+        {note ? <p role="status" className="flex items-start gap-2 rounded-xl bg-brand/10 px-4 py-3 text-sm text-navy"><Info size={16} className="mt-0.5 shrink-0" />{note}</p> : null}
         {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err} <button onClick={() => load(f)} className="font-semibold underline">Try again</button></p> : null}
-        {loading && !data ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-[98px] animate-pulse rounded-2xl border border-line bg-white" />)}</div> : null}
+        {loading && !data ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-[98px] animate-pulse rounded-2xl border border-line bg-surface" />)}</div> : null}
 
         {data && T ? (
           <div className={loading ? "opacity-60 transition" : "transition"} aria-busy={loading}>
             {empty ? (
-              <div className="rounded-2xl border border-line bg-white p-8 text-center">
+              <div className="rounded-2xl border border-line bg-surface p-8 text-center">
                 <BarChart3 size={36} className="mx-auto text-[#9db3cc]" />
                 <h2 className="mt-3 font-serif text-xl font-semibold text-navy">Nothing to show for these filters</h2>
                 <p className="mx-auto mt-1 max-w-md text-[14px] text-muted">{data.meta.realSends === 0 && data.meta.testSends === 0 ? "Numbers appear here after the first email goes out. Send yourself a test from the editor to see how it works." : "Try a longer date range, another ministry, or switch Send type."}</p>
-                <div className="mt-4 flex flex-wrap justify-center gap-2"><button className="pill-btn bg-navy text-white" onClick={reset}>Reset filters</button>{f.kind === "real" && data.meta.testSends ? <button className="pill-btn border border-line bg-white text-ink" onClick={() => upd({ kind: "test", from: null, to: null })}>Show test sends</button> : null}</div>
+                <div className="mt-4 flex flex-wrap justify-center gap-2"><button className="pill-btn bg-navy text-white" onClick={reset}>Reset filters</button>{f.kind === "real" && data.meta.testSends ? <button className="pill-btn border border-line bg-surface text-ink" onClick={() => upd({ kind: "test", from: null, to: null })}>Show test sends</button> : null}</div>
               </div>
             ) : (
               <div className="space-y-5">
@@ -233,7 +233,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
 
                 {data.insights.length ? (
                   <Card title="Highlights">
-                    <ul className="space-y-1.5 text-[14px] text-ink">{data.insights.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#00abc9]" /><span>{s}</span></li>)}</ul>
+                    <ul className="space-y-1.5 text-[14px] text-ink">{data.insights.map((s, i) => <li key={i} className="flex gap-2"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-brand" /><span>{s}</span></li>)}</ul>
                     {P && data.prevRange ? <p className="mt-3 text-[12px] text-muted">Arrows compare with the {Math.round((new Date(data.prevRange.to).getTime() - new Date(data.prevRange.from).getTime()) / 86400000) + 1} days before.</p> : null}
                   </Card>
                 ) : null}
@@ -241,7 +241,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
                 {/* Trend */}
                 <Card title="Over time" right={
                   <label className="flex items-center gap-2 text-[13px] text-muted"><span className="sr-only sm:not-sr-only">Show</span>
-                    <select value={metric} onChange={(e) => setMetric(e.target.value)} className="h-9 rounded-lg border border-line bg-white px-2 text-[14px] font-semibold text-ink">{METRICS.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}</select>
+                    <select value={metric} onChange={(e) => setMetric(e.target.value)} className="h-9 rounded-lg border border-line bg-surface px-2 text-[14px] font-semibold text-ink">{METRICS.map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}</select>
                   </label>}
                   note={`By the ${f.group} each email was sent. ${m.rate ? "Rates are shown as a percent of people reached." : ""}`}>
                   <VBars labels={data.series.map((s) => s.label)} aria={`${m.label} by ${f.group}`} labelEvery={Math.ceil(data.series.length / 12)}
@@ -343,7 +343,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
                             <span className="shrink-0 tabular-nums font-semibold text-navy">{num(l.clicks)} <span className="text-[12px] font-normal text-muted">{pct(l.share)}</span></span>
                           </div>
                           <div className="mt-0.5 truncate text-[12px] text-muted">{l.domain} · {l.emailTitle} · {num(l.unique)} {l.unique === 1 ? "person" : "people"}</div>
-                          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#eaf0f7]"><div className="h-full rounded-full bg-[#1e61b9]" style={{ width: `${Math.max(2, (l.clicks / data.topLinks[0].clicks) * 100)}%` }} /></div>
+                          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-line/50"><div className="h-full rounded-full bg-brand" style={{ width: `${Math.max(2, (l.clicks / data.topLinks[0].clicks) * 100)}%` }} /></div>
                         </li>))}
                     </ul>
                   ) : <p className="text-[13px] text-muted">No clicks yet.</p>}

@@ -46,9 +46,9 @@ export function Toggle({ label, checked, onChange }: { label: string; checked: b
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative h-6 w-11 rounded-full transition ${checked ? "bg-brand" : "bg-[#c4cfdc]"}`}
+        className={`relative h-6 w-11 rounded-full transition ${checked ? "bg-brand" : "bg-line"}`}
       >
-        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${checked ? "left-[22px]" : "left-0.5"}`} />
+        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-surface shadow transition-all ${checked ? "left-[22px]" : "left-0.5"}`} />
       </button>
     </label>
   );
@@ -58,9 +58,9 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
   return (
     <div>
       <span className="label">{label}</span>
-      <div className="flex gap-1 rounded-full bg-[#e3eaf2] p-1">
+      <div className="flex gap-1 rounded-full bg-line p-1">
         {options.map((o) => (
-          <button key={o.value} type="button" onClick={() => onChange(o.value)} className={`flex-1 rounded-full px-3 py-1.5 text-sm font-semibold transition ${value === o.value ? "bg-white text-navy shadow-sm" : "text-muted"}`}>
+          <button key={o.value} type="button" onClick={() => onChange(o.value)} className={`flex-1 rounded-full px-3 py-1.5 text-sm font-semibold transition ${value === o.value ? "bg-surface text-navy shadow-sm" : "text-muted"}`}>
             {o.label}
           </button>
         ))}
@@ -93,7 +93,7 @@ export function LinkField({ value, onChange }: { value: string; onChange: (v: st
 export function ButtonFields({ label = "Button", value, onChange }: { label?: string; value?: Btn; onChange: (v: Btn | undefined) => void }) {
   const v = value ?? { label: "", url: "" };
   return (
-    <div className="space-y-3 rounded-xl border border-line bg-white p-3">
+    <div className="space-y-3 rounded-xl border border-line bg-surface p-3">
       <span className="label !mb-0">{label}</span>
       <Field label="Words on the button" value={v.label} onChange={(x) => onChange({ ...v, label: x })} />
       <LinkField value={v.url} onChange={(x) => onChange({ ...v, url: x })} />
@@ -121,10 +121,10 @@ export function ImageFields({ label = "Photo", value, onChange, aspect }: { labe
   }
 
   return (
-    <div className="space-y-3 rounded-xl border border-line bg-white p-3">
+    <div className="space-y-3 rounded-xl border border-line bg-surface p-3">
       <span className="label !mb-0">{label}</span>
       {v.url ? <img src={v.url} alt="" className={shape === "circle" ? "mx-auto h-40 w-40 rounded-full object-cover" : "h-40 w-full rounded-lg object-cover"} /> : (
-        <button type="button" onClick={() => input.current?.click()} className="flex h-32 w-full flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-line text-muted active:bg-[#f4f8fd]">
+        <button type="button" onClick={() => input.current?.click()} className="flex h-32 w-full flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-line text-muted active:bg-mist">
           <ImagePlus size={28} /><span className="text-sm font-semibold">Tap to add a photo</span>
         </button>
       )}

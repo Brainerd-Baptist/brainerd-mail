@@ -46,7 +46,7 @@ export function ActionPage({ token, title, subject, ministry, sendAt, approverNa
       <div role="status">
         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#e3f4ea] text-[#0d5a37]"><Check size={26} /></div>
         <h1 className="font-serif text-2xl font-semibold text-navy">{done.kind === "approve" ? "Approved" : "Sent back for changes"}</h1>
-        <p className="mt-2 text-[16px] leading-snug text-[#33445d]">{done.kind === "approve" ? `“${title}” is approved${done.at ? ` for ${pretty(done.at)}` : ""}. The person who sent it has been told.` : `“${title}” went back to its editor with your note. They’ve been told.`}</p>
+        <p className="mt-2 text-[16px] leading-snug text-ink">{done.kind === "approve" ? `“${title}” is approved${done.at ? ` for ${pretty(done.at)}` : ""}. The person who sent it has been told.` : `“${title}” went back to its editor with your note. They’ve been told.`}</p>
         <a href={dashUrl} className="mt-4 inline-block text-[15px] font-bold text-brand">Open it in Brainerd Mail</a>
       </div>
     );
@@ -56,14 +56,14 @@ export function ActionPage({ token, title, subject, ministry, sendAt, approverNa
     <>
       <p className="text-[13px] font-bold uppercase tracking-[0.12em] text-muted">Waiting for your approval</p>
       <h1 className="mt-1 font-serif text-2xl font-semibold leading-tight text-navy">{title}</h1>
-      <dl className="mt-3 divide-y divide-line rounded-xl bg-[#f4f8fd] text-[15px]">
+      <dl className="mt-3 divide-y divide-line rounded-xl bg-mist text-[15px]">
         <div className="flex gap-3 px-4 py-2.5"><dt className="w-24 shrink-0 text-[12px] font-bold uppercase tracking-wider text-muted">Ministry</dt><dd className="text-ink">{ministry}</dd></div>
         <div className="flex gap-3 px-4 py-2.5"><dt className="w-24 shrink-0 text-[12px] font-bold uppercase tracking-wider text-muted">Subject</dt><dd className="min-w-0 break-words text-ink">{subject}</dd></div>
         {sendAt ? <div className="flex gap-3 px-4 py-2.5"><dt className="w-24 shrink-0 text-[12px] font-bold uppercase tracking-wider text-muted">Planned send</dt><dd className="text-ink">{pretty(sendAt)}</dd></div> : null}
       </dl>
 
       <button onClick={() => setPreview((v) => !v)} className="mt-3 inline-flex min-h-11 items-center gap-2 text-[15px] font-bold text-brand"><Eye size={18} />{preview ? "Hide the email" : "Look at the email"}</button>
-      {preview ? <iframe title="The email" src={`/api/a/${encodeURIComponent(token)}/preview`} sandbox="" className="mb-2 h-[520px] w-full rounded-xl border border-line bg-white" /> : null}
+      {preview ? <iframe title="The email" src={`/api/a/${encodeURIComponent(token)}/preview`} sandbox="" className="mb-2 h-[520px] w-full rounded-xl border border-line bg-surface" /> : null}
 
       {own ? <p className="mt-3 rounded-xl bg-[#fdf1d8] px-4 py-3 text-[14px] text-[#7a4a05]">Hi {approverName}. You sent this one for approval, so someone else needs to approve it.</p> : (
         <>

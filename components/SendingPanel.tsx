@@ -65,17 +65,17 @@ export function SendingPanel() {
   }
 
   const mode = s?.send_mode ?? "off";
-  const banner = mode === "off" ? { c: "bg-[#eef2f6] text-[#41536a]", t: "Sending is OFF. Nothing real can go out." } : mode === "staff" ? { c: "bg-[#fdf1d8] text-[#7a4a05]", t: `Staff-only. Real sends reach only the ${s?.safe_list.length ?? 0} on the safe list.` } : { c: "bg-[#fbe6e8] text-[#8a1020]", t: `LIVE. Real sends can reach audiences, up to ${s?.live_cap} people per send.` };
+  const banner = mode === "off" ? { c: "bg-line/40 text-muted", t: "Sending is OFF. Nothing real can go out." } : mode === "staff" ? { c: "bg-[#fdf1d8] text-[#7a4a05]", t: `Staff-only. Real sends reach only the ${s?.safe_list.length ?? 0} on the safe list.` } : { c: "bg-[#fbe6e8] text-[#8a1020]", t: `LIVE. Real sends can reach audiences, up to ${s?.live_cap} people per send.` };
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-[#00abc9]/15 bg-white/95 px-4 py-4 backdrop-blur sm:px-6">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-3"><NavMenu /><HeaderBrand label="Sending" /><span className="flex-1" /><HelpButton /></div>
       </header>
       <main className="mx-auto max-w-3xl space-y-5 px-4 pt-5">
         {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
         {msg ? <p role="status" className="rounded-xl bg-[#e3f4ea] px-4 py-3 text-sm text-[#0d5a37]">{msg}</p> : null}
-        {!s ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-white" /> : (
+        {!s ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-surface" /> : (
           <>
             <div className={`flex flex-wrap items-center gap-3 rounded-2xl px-4 py-3 ${banner.c}`}>
               <span className="min-w-0 flex-1 text-[15px] font-bold">{banner.t}</span>
@@ -90,8 +90,8 @@ export function SendingPanel() {
                   const disabled = !canChange && m.key !== "off";
                   return (
                     <button key={m.key} type="button" role="radio" aria-checked={on} disabled={disabled || saving} onClick={() => { if (on) return; if (m.key === "live") setLiveOpen(true); else save({ send_mode: m.key }, `Mode is now ${m.title}.`); }}
-                      className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left disabled:opacity-50 ${on ? "border-[#1e61b9] bg-[#f4f8fd]" : "border-line bg-white"}`}>
-                      <span className={`mt-1 h-4 w-4 shrink-0 rounded-full border-2 ${on ? "border-[#1e61b9] bg-[#1e61b9] shadow-[inset_0_0_0_3px_#fff]" : "border-line"}`} />
+                      className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left disabled:opacity-50 ${on ? "border-brand bg-mist" : "border-line bg-surface"}`}>
+                      <span className={`mt-1 h-4 w-4 shrink-0 rounded-full border-2 ${on ? "border-brand bg-brand shadow-[inset_0_0_0_3px_#fff]" : "border-line"}`} />
                       <span className="min-w-0"><span className="flex items-center gap-2 text-[15px] font-semibold text-ink"><Icon size={16} className="text-muted" />{m.title}</span><span className="block text-sm text-muted">{m.body}</span></span>
                     </button>
                   );

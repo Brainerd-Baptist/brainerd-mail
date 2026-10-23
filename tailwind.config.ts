@@ -1,19 +1,27 @@
 import type { Config } from "tailwindcss";
 
+function withOpacity(variableName: string) {
+  return ({ opacityValue }: { opacityValue?: string }) => {
+    if (opacityValue === undefined) return `rgb(var(${variableName}))`;
+    return `rgb(var(${variableName}) / ${opacityValue})`;
+  };
+}
+
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/calendar.ts"],
   theme: {
     extend: {
       colors: {
-        navy: "#00205b",
-        brand: "#1e61b9",
-        line: "#dbe3ec",
-        mist: "#f1f5f9",
-        ink: "#1b2a41",
-        muted: "#5b6b80",
-      },
+        navy:    withOpacity("--color-navy"),
+        brand:   withOpacity("--color-brand"),
+        line:    withOpacity("--color-line"),
+        mist:    withOpacity("--color-mist"),
+        ink:     withOpacity("--color-ink"),
+        muted:   withOpacity("--color-muted"),
+        surface: withOpacity("--color-surface"),
+      } as any,
       fontFamily: {
-        sans: ["Barlow", "system-ui", "sans-serif"],
+        sans:  ["Barlow", "system-ui", "sans-serif"],
         serif: ['"Source Serif 4"', "Georgia", "serif"],
       },
     },
