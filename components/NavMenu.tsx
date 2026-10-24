@@ -61,7 +61,7 @@ export function NavMenu() {
               {team ? link("/team", "Team", Users, path.startsWith("/team")) : null}
               {team ? link("/audience", "Audiences", UsersRound, path.startsWith("/audience")) : null}
               {team ? link("/sending", "Sending", Send, path.startsWith("/sending")) : null}
-              {admin ? link("/feedback", "Feedback inbox", LifeBuoy, path.startsWith("/feedback"), fresh) : null}
+              {admin ? link("/feedback", "Feedback Inbox", LifeBuoy, path.startsWith("/feedback"), fresh) : null}
             </div>
           </nav>
         </div>,

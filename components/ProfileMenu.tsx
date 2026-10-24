@@ -61,19 +61,31 @@ export function ProfileMenu() {
             {who?.role ? <span className="mt-1.5 inline-block rounded-full border border-brand/20 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted">{who.role}</span> : null}
           </div>
           <div className="my-1 border-t border-brand/10" />
-          <p className="px-2 pb-1 pt-1.5 text-[10px] uppercase tracking-wide text-muted/70">Appearance</p>
-          <div className="grid grid-cols-3 gap-1 px-1 pb-1.5">
-            {THEME_MODES.map((m) => {
-              const Icon = m.id === "auto" ? Monitor : m.id === "light" ? Sun : Moon;
-              return (
-                <button key={m.id} type="button" onClick={() => chooseMode(m.id)} title={m.description} aria-pressed={mode === m.id} className={`flex flex-col items-center gap-1 rounded-md border px-2 py-1.5 text-xs transition-colors ${mode === m.id ? "border-brand/50 bg-brand/15 text-ink" : "border-transparent text-muted hover:bg-brand/5 hover:text-brand-soft"}`}>
-                  <Icon size={14} />{m.label}
-                </button>
-              );
-            })}
+          <div className="flex items-center justify-between px-2 py-1.5">
+            <span className="text-[10px] uppercase tracking-wide text-muted/70">Appearance</span>
+            <div className="inline-flex items-center rounded-full border border-brand/20 p-0.5" role="group" aria-label="Appearance">
+              {THEME_MODES.map((m) => {
+                const Icon = m.id === "auto" ? Monitor : m.id === "light" ? Sun : Moon;
+                return (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => chooseMode(m.id)}
+                    title={`${m.label}: ${m.description}`}
+                    aria-label={m.label}
+                    aria-pressed={mode === m.id}
+                    className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
+                      mode === m.id ? "bg-brand/20 text-ink" : "text-muted hover:text-brand-soft"
+                    }`}
+                  >
+                    <Icon size={14} />
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="my-1 border-t border-brand/10" />
-          <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-tour")); }} className="flex w-full items-center gap-1.5 rounded-md px-3 py-2 text-sm text-ink transition-colors hover:bg-brand/5"><Compass size={13} className="text-muted" />Take the tour</button>
+          <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-tour")); }} className="flex w-full items-center gap-1.5 rounded-md px-3 py-2 text-sm text-ink transition-colors hover:bg-brand/5"><Compass size={13} className="text-muted" />Take the Tour</button>
           <form action="/auth/signout" method="post">
             <button className="flex w-full items-center gap-1.5 rounded-md px-3 py-2 text-sm text-muted transition-colors hover:bg-brand/5 hover:text-red-600"><LogOut size={13} />Sign out</button>
           </form>
