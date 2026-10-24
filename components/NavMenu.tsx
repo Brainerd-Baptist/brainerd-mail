@@ -46,8 +46,8 @@ export function NavMenu() {
   function chooseMode(next: ThemeMode) { applyMode(next); setMode(next); }
 
   const link = (href: string, label: string, Icon: typeof Mail, active: boolean, badge?: number) => (
-    <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`flex min-h-12 items-center gap-3 rounded-lg px-4 text-[16px] font-semibold ${active ? "bg-brand/10 text-navy" : "text-ink active:bg-mist"}`}>
-      <Icon size={20} className={active ? "text-brand" : "text-muted"} />
+    <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`mx-2 my-0.5 flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors ${active ? "bg-brand/15 font-medium text-brand-soft" : "text-ink hover:bg-brand/5"}`}>
+      <Icon size={18} className="shrink-0" />
       <span className="flex-1">{label}</span>
       {badge ? <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">{badge}</span> : null}
     </Link>
@@ -59,22 +59,23 @@ export function NavMenu() {
       {open ? createPortal(
         <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <nav className="absolute inset-y-0 left-0 flex w-[min(320px,86vw)] flex-col bg-surface pb-[env(safe-area-inset-bottom)] shadow-xl">
-            <div className="flex items-center justify-between border-b border-line px-4 py-4">
-              <HeaderBrand label="Mail" />
-              <button onClick={() => setOpen(false)} aria-label="Close menu" className="flex h-11 w-11 items-center justify-center rounded-full text-muted active:bg-mist"><X size={22} /></button>
+          <nav className="absolute inset-y-0 left-0 flex w-full flex-col border-r border-brand/15 sm:max-w-sm" style={{ backgroundColor: "rgb(var(--color-surface))" }}>
+            <div className="flex items-center justify-between border-b border-brand/15 px-4 pb-3" style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}>
+              <span className="text-base text-ink">Menu</span>
+              <button onClick={() => setOpen(false)} aria-label="Close menu" className="-m-1 p-1 text-muted transition-colors hover:text-navy"><X size={22} /></button>
             </div>
-            <div className="flex-1 space-y-1 overflow-y-auto p-3">
+            <div className="flex-1 overflow-y-auto px-2 pb-8 pt-1">
               {ITEMS.filter((i) => i.href !== "/roster" || roster).map((i) => link(i.href, i.label, i.icon, i.match(path)))}
+              {team || admin ? <div className="mt-3 border-t border-brand/10 pt-3"><p className="px-5 pb-1 pt-1 text-[0.68rem] uppercase tracking-wider text-muted/70">Admin</p></div> : null}
               {team ? link("/team", "Team", Users, path.startsWith("/team")) : null}
               {team ? link("/audience", "Audiences", UsersRound, path.startsWith("/audience")) : null}
               {team ? link("/sending", "Sending", Send, path.startsWith("/sending")) : null}
               {admin ? link("/feedback", "Feedback inbox", LifeBuoy, path.startsWith("/feedback"), fresh) : null}
             </div>
-            <form action="/auth/signout" method="post" className="border-t border-line p-3">
-              {who ? <p className="px-4 pb-2 text-sm text-muted"><span className="font-semibold text-ink">{who.name}</span>{who.role ? ` · ${who.role}` : ""}</p> : null}
-              <p className="px-4 pb-1 pt-1 text-xs font-bold uppercase tracking-[0.12em] text-muted">Appearance</p>
-              <div className="grid grid-cols-3 gap-1 px-3 pb-2">
+            <form action="/auth/signout" method="post" className="border-t border-brand/10 px-2 pb-[env(safe-area-inset-bottom)] pt-3">
+              {who ? <p className="px-5 pb-2 text-xs text-muted"><span className="text-ink">{who.name}</span>{who.role ? ` · ${who.role}` : ""}</p> : null}
+              <p className="px-5 pb-1 pt-1 text-[0.68rem] uppercase tracking-wider text-muted/70">Appearance</p>
+              <div className="mx-2 mb-2 grid grid-cols-3 gap-1">
                 {THEME_MODES.map((m) => {
                   const Icon = m.id === "auto" ? Monitor : m.id === "light" ? Sun : Moon;
                   return (
@@ -84,9 +85,9 @@ export function NavMenu() {
                   );
                 })}
               </div>
-              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-help")); }} className="flex min-h-12 w-full items-center gap-3 rounded-lg px-4 text-[16px] font-semibold text-muted active:bg-mist"><HelpCircle size={20} />Help</button>
-              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-tour")); }} className="flex min-h-12 w-full items-center gap-3 rounded-lg px-4 text-[16px] font-semibold text-muted active:bg-mist"><Compass size={20} />Take the tour</button>
-              <button className="flex min-h-12 w-full items-center gap-3 rounded-lg px-4 text-[16px] font-semibold text-muted active:bg-mist"><LogOut size={20} />Sign out</button>
+              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-help")); }} className="mx-2 my-0.5 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3 text-sm text-ink transition-colors hover:bg-brand/5"><HelpCircle size={18} />Help</button>
+              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-tour")); }} className="mx-2 my-0.5 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3 text-sm text-ink transition-colors hover:bg-brand/5"><Compass size={18} />Take the tour</button>
+              <button className="mx-2 my-0.5 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3 text-sm text-ink transition-colors hover:bg-brand/5"><LogOut size={18} />Sign out</button>
             </form>
           </nav>
         </div>,
