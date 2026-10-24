@@ -2,36 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Theme tokens ─────────────────────────────────────────────────────────── */
-/* Mail-blue palette: light mode */
+/* ── Theme tokens — the Brainerd standard look (same as Personnel and HQ) ───────
+   Mail keeps its own token NAMES (so every existing class still works) but the
+   values are Personnel's: Daylight = light, Midnight = dark. `data-theme` on
+   <html> is "light" or "dark", resolved from the user's mode (Auto follows the
+   device) by lib/theme.ts. */
 :root,
 :root[data-theme="light"] {
-  --color-navy:    0 32 91;       /* #00205b — navy links / pressed states */
-  --color-brand:   30 97 185;     /* #1e61b9 — Mail blue accent             */
-  --color-line:    219 227 236;   /* #dbe3ec — borders                      */
-  --color-mist:    241 245 249;   /* #f1f5f9 — page background              */
-  --color-ink:     27 42 65;      /* #1b2a41 — body text                    */
-  --color-muted:   91 107 128;    /* #5b6b80 — secondary text               */
-  --color-surface: 255 255 255;   /* #ffffff — card / panel                 */
+  color-scheme: light;
+  --color-navy:    0 32 91;       /* navy links / pressed states            */
+  --color-brand:   0 171 201;     /* Brainerd Blue accent                   */
+  --color-line:    204 238 244;   /* borders (Brainerd Blue at 20%)         */
+  --color-mist:    238 242 247;   /* page background                        */
+  --color-ink:     30 41 59;      /* body text                              */
+  --color-muted:   100 116 139;   /* secondary text                         */
+  --color-surface: 255 255 255;   /* card / panel                           */
 }
-
-/* Mail-blue palette: dark mode */
 :root[data-theme="dark"] {
-  --color-navy:    147 186 240;   /* lighter tint for dark bg */
-  --color-brand:   99 160 230;    /* brighter brand on dark   */
-  --color-line:    37 52 72;      /* dark border              */
-  --color-mist:    14 22 38;      /* dark page bg             */
-  --color-ink:     226 235 245;   /* near-white body text     */
-  --color-muted:   148 163 184;   /* muted light              */
-  --color-surface: 22 33 55;      /* dark card / panel        */
+  color-scheme: dark;
+  --color-navy:    125 211 252;
+  --color-brand:   56 189 248;
+  --color-line:    35 71 97;
+  --color-mist:    12 16 24;
+  --color-ink:     241 245 249;
+  --color-muted:   148 163 184;
+  --color-surface: 30 41 59;
 }
 
-/* ── Base ─────────────────────────────────────────────────────────────────── */
-html, body { height: 100%; }
-body { background: rgb(var(--color-mist)); color: rgb(var(--color-ink)); font-family: Barlow, system-ui, sans-serif; }
+/* ── Base ─────────────────────────────────────────────────────────────── */
+html, body { min-height: 100%; }
+body { background: rgb(var(--color-mist)); color: rgb(var(--color-ink)); font-family: Georgia, "Times New Roman", serif; }
+::-webkit-scrollbar { height: 8px; width: 8px; }
+::-webkit-scrollbar-thumb { background: rgb(var(--color-brand) / 0.35); border-radius: 8px; }
+
+/* ── Glass: soft gradient backdrop + frosted panels (ported from Personnel) ── */
+:root:not([data-theme="dark"]) body {
+  background: radial-gradient(circle at 15% 10%, rgb(0 171 201 / 0.16), transparent 60%),
+    radial-gradient(circle at 85% 0%, rgb(0 32 91 / 0.08), transparent 55%),
+    radial-gradient(circle at 50% 100%, rgb(56 189 248 / 0.12), transparent 65%),
+    rgb(var(--color-mist));
+  background-repeat: no-repeat;
+}
+[data-theme="dark"] body {
+  background: radial-gradient(circle at 15% 15%, rgb(56 189 248 / 0.16), transparent 60%),
+    radial-gradient(circle at 85% 0%, rgb(129 140 248 / 0.14), transparent 55%),
+    radial-gradient(circle at 50% 100%, rgb(52 211 153 / 0.1), transparent 65%),
+    rgb(var(--color-mist));
+  background-repeat: no-repeat;
+}
+.bg-surface {
+  background-color: rgb(var(--color-surface) / 0.55) !important;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.12), inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+.bg-surface\/60 {
+  background-color: rgb(var(--color-surface) / 0.4) !important;
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+/* Whole-page wrappers stay see-through so the gradient shows; small bg-mist chips keep their fill. */
+[class*="min-h-"].bg-mist { background-color: transparent !important; }
+/* Drawers, menus and pop-ups stay solid so they read over page content. */
+.bg-surface.shadow-xl, .bg-surface.shadow-2xl, .bg-surface.dropdown-solid {
+  background-color: rgb(var(--color-surface) / 0.97) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+/* Primary buttons: pill with a soft brand glow (Personnel's "umph" rule). */
+.pill-btn.bg-brand, button.bg-brand.rounded-full {
+  box-shadow: 0 0 0 1px rgb(var(--color-brand) / 0.18), 0 4px 16px rgb(var(--color-brand) / 0.28);
+}
+.pill-btn.bg-brand:hover, button.bg-brand.rounded-full:hover {
+  box-shadow: 0 0 0 1px rgb(var(--color-brand) / 0.28), 0 6px 20px rgb(var(--color-brand) / 0.4);
+}
+/* Logo swap — color lockup in light, white lockup in dark. */
+.brand-logo-dark { display: none; }
+[data-theme="dark"] .brand-logo-light { display: none; }
+[data-theme="dark"] .brand-logo-dark { display: inline-block; }
 
 /* ── Form utilities ───────────────────────────────────────────────────────── */
-.field { @apply w-full rounded-lg border border-line bg-surface px-3 py-2 text-[16px] text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20; }
+.field { @apply w-full rounded-md border border-line bg-surface px-3 py-2 text-[16px] text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20; }
 select.field { appearance: none; -webkit-appearance: none; padding-right: 2.5rem; background-repeat: no-repeat; background-position: right 14px center; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 /* iPhone Safari lets date/time inputs grow past their box and centers the text; keep them inside the column, left-aligned, same height as other fields. */
 input[type="datetime-local"], input[type="date"], input[type="time"] { display: block; -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; max-width: 100%; min-height: 44px; box-sizing: border-box; text-align: left; }

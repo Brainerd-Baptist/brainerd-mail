@@ -99,10 +99,10 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
           </div>
         ) : null}
 
-        {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
+        {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
         {shown.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-line bg-surface p-8 text-center text-[15px] text-muted">
+          <div className="rounded-lg border border-dashed border-line bg-surface p-8 text-center text-[15px] text-muted">
             {items.length === 0 ? (buildable.length ? "No emails yet. Tap New email to start one." : "No emails yet.") : "Nothing matches. Clear the search or filter."}
           </div>
         ) : (
@@ -111,7 +111,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
               const p = paletteFor(it.ministry);
               const st = STATUS[it.status] ?? STATUS.draft;
               return (
-                <li key={it.id} className={`flex items-stretch overflow-hidden rounded-xl border border-line bg-surface ${busy === it.id ? "opacity-60" : ""}`}>
+                <li key={it.id} className={`flex items-stretch overflow-hidden rounded-lg border border-line bg-surface ${busy === it.id ? "opacity-60" : ""}`}>
                   <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
                   <Link href={it.status === "pending_approval" ? `/review/${it.id}` : `/editor?e=${it.id}`} className="min-w-0 flex-1 p-4 active:bg-mist">
                     <span className="block truncate text-[16px] font-semibold text-ink">{it.title || "Untitled"}</span>
@@ -148,7 +148,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
               {([["blank", "A blank email", "A header and a text block."], ["starter", STARTERS[ministry]?.label ?? "A starter", STARTERS[ministry]?.blurb ?? "A ready-made layout to fill in."], ["october", OCTOBER[ministry]?.label ?? "October email", OCTOBER[ministry]?.blurb ?? ""], ["homegoing", "Homegoing announcement", "Announcing the passing of a church member: name, photo, visitation and service details."]] as const).map(([k, t, d]) => {
                 const off = (k === "october" && !OCTOBER[ministry]) || (k === "homegoing" && ministry !== "church-wide");
                 return (
-                  <label key={k} className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 ${start === k ? "border-brand bg-mist" : "border-line"} ${off ? "opacity-40" : ""}`}>
+                  <label key={k} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${start === k ? "border-brand bg-mist" : "border-line"} ${off ? "opacity-40" : ""}`}>
                     <input type="radio" name="start" className="mt-1" checked={start === k} disabled={off} onChange={() => setStart(k)} />
                     <span><span className="block text-[15px] font-semibold text-ink">{t}</span><span className="block text-sm text-muted">{off ? (k === "homegoing" ? "Only for Church-Wide." : "Only for Missions and the BX.") : d}</span></span>
                   </label>

@@ -32,12 +32,12 @@ export function FeedbackSheet({ onClose, context, inboxNew }: { onClose: () => v
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 lg:items-center lg:justify-center" onClick={onClose}>
-      <div className="max-h-[92dvh] w-full overflow-y-auto rounded-t-2xl bg-surface p-4 pb-8 lg:max-w-md lg:rounded-2xl lg:pb-4" onClick={(e) => e.stopPropagation()}>
+      <div className="max-h-[92dvh] w-full overflow-y-auto rounded-t-2xl bg-surface p-4 pb-8 lg:max-w-md lg:rounded-lg lg:pb-4" onClick={(e) => e.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-serif text-xl font-semibold text-navy">Help us improve Brainerd Mail</h2>
           <button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-full text-muted"><X size={22} /></button>
         </div>
-        {inboxNew != null ? <a href="/feedback" className="mb-3 flex min-h-11 items-center justify-between rounded-xl bg-mist px-3 text-[15px] font-semibold text-navy">Open the feedback inbox<span className="text-sm text-muted">{inboxNew ? `${inboxNew} new` : "all caught up"}</span></a> : null}
+        {inboxNew != null ? <a href="/feedback" className="mb-3 flex min-h-11 items-center justify-between rounded-lg bg-mist px-3 text-[15px] font-semibold text-navy">Open the feedback inbox<span className="text-sm text-muted">{inboxNew ? `${inboxNew} new` : "all caught up"}</span></a> : null}
         {state === "sent" ? (
           <div className="py-6 text-center">
             <Check size={36} className="mx-auto mb-2 text-[#1e7a4c]" />
@@ -49,7 +49,7 @@ export function FeedbackSheet({ onClose, context, inboxNew }: { onClose: () => v
           <>
             <div className="mb-3 grid gap-2">
               {KINDS.map(({ k, label, Icon }) => (
-                <button key={k} onClick={() => setKind(k)} className={`flex min-h-12 items-center gap-2 rounded-xl border px-3 text-left text-[15px] font-semibold ${kind === k ? "border-brand bg-mist text-navy" : "border-line text-ink"}`}><Icon size={18} className="text-brand" />{label}</button>
+                <button key={k} onClick={() => setKind(k)} className={`flex min-h-12 items-center gap-2 rounded-lg border px-3 text-left text-[15px] font-semibold ${kind === k ? "border-brand bg-mist text-navy" : "border-line text-ink"}`}><Icon size={18} className="text-brand" />{label}</button>
               ))}
             </div>
             <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={5} placeholder={cur.ph} className="field w-full" autoFocus />

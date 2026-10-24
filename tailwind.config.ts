@@ -21,8 +21,8 @@ const config: Config = {
         surface: withOpacity("--color-surface"),
       } as any,
       fontFamily: {
-        sans:  ["Barlow", "system-ui", "sans-serif"],
-        serif: ['"Source Serif 4"', "Georgia", "serif"],
+        sans:  ["Georgia", '"Times New Roman"', "serif"],
+        serif: ["Georgia", '"Times New Roman"', "serif"],
       },
     },
   },

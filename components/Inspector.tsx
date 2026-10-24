@@ -35,7 +35,7 @@ export default function Inspector({ block, onChange }: P) {
           <Segmented label="Layout" value={block.layout} options={[{ value: "side-by-side", label: "Side by side" }, { value: "stacked", label: "Stacked" }]} onChange={(v) => set({ layout: v })} />
           <Field label="Section label" value={block.heading} onChange={(v) => set({ heading: v })} />
           {block.teams.map((t, i) => (
-            <div key={t.id} className="space-y-3 rounded-xl border border-line bg-surface p-3">
+            <div key={t.id} className="space-y-3 rounded-lg border border-line bg-surface p-3">
               <div className="flex items-center justify-between">
                 <span className="label !mb-0">Team {i + 1}</span>
                 <button type="button" aria-label="Remove team" className="text-muted hover:text-red-600" onClick={() => set({ teams: block.teams.filter((x) => x.id !== t.id) })}><Trash2 size={16} /></button>
@@ -58,7 +58,7 @@ export default function Inspector({ block, onChange }: P) {
           <Field label="Section label" value={block.heading} onChange={(v) => set({ heading: v })} />
           <Toggle label="Show pictures" checked={block.showImages} onChange={(v) => set({ showImages: v })} />
           {block.items.map((it, i) => (
-            <div key={it.id} className="space-y-3 rounded-xl border border-line bg-surface p-3">
+            <div key={it.id} className="space-y-3 rounded-lg border border-line bg-surface p-3">
               <div className="flex items-center justify-between">
                 <span className="label !mb-0">Update {i + 1}</span>
                 <button type="button" aria-label="Remove update" className="text-muted hover:text-red-600" onClick={() => set({ items: block.items.filter((x) => x.id !== it.id) })}><Trash2 size={16} /></button>

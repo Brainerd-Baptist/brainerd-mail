@@ -22,7 +22,7 @@ function Frame({ html, width, height, phone }: { html: string; width: number; he
     requestAnimationFrame(() => { if (d.scrollingElement) d.scrollingElement.scrollTop = y; });
   }, [html]);
   return (
-    <div className={phone ? "overflow-hidden rounded-[40px] border-[10px] border-ink bg-surface shadow-lg" : "overflow-hidden rounded-xl border border-line bg-surface shadow-sm"} style={{ width, maxWidth: "100%" }}>
+    <div className={phone ? "overflow-hidden rounded-[40px] border-[10px] border-ink bg-surface shadow-lg" : "overflow-hidden rounded-lg border border-line bg-surface shadow-sm"} style={{ width, maxWidth: "100%" }}>
       <iframe ref={ref} title={phone ? "Phone preview" : "Desktop preview"} className="block w-full bg-surface" style={{ height }} />
     </div>
   );
@@ -101,7 +101,7 @@ export default function LivePreview({ emailId }: { emailId: string }) {
         </div>
         <button onClick={() => setDark((d) => !d)} aria-pressed={dark} className={`flex h-11 items-center rounded-full border px-4 text-sm font-semibold ${dark ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink"}`}>{dark ? "Dark on" : "Dark mode"}</button>
       </header>
-      {err ? <p className="m-4 rounded-xl bg-[#fdecec] px-4 py-3 text-sm text-[#8a1c1c]">{err}</p> : null}
+      {err ? <p className="m-4 rounded-lg bg-[#fdecec] px-4 py-3 text-sm text-[#8a1c1c]">{err}</p> : null}
       {doc ? (
         <main className="flex flex-wrap items-start justify-center gap-8 p-6">
           {showPhone ? <Frame phone html={html} width={400} height="min(820px, calc(100dvh - 130px))" /> : null}

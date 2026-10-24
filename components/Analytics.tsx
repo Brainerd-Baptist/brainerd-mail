@@ -143,7 +143,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
   );
 
   const FilterBar = (
-    <div className="space-y-4 rounded-2xl border border-line bg-surface p-4">
+    <div className="space-y-4 rounded-lg border border-line bg-surface p-4">
       <div>
         <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-muted">Dates (Eastern time)</div>
         <div className="flex flex-wrap items-center gap-2">
@@ -203,14 +203,14 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
           </div>
         )}
 
-        {note ? <p role="status" className="flex items-start gap-2 rounded-xl bg-brand/10 px-4 py-3 text-sm text-navy"><Info size={16} className="mt-0.5 shrink-0" />{note}</p> : null}
-        {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err} <button onClick={() => load(f)} className="font-semibold underline">Try again</button></p> : null}
-        {loading && !data ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-[98px] animate-pulse rounded-2xl border border-line bg-surface" />)}</div> : null}
+        {note ? <p role="status" className="flex items-start gap-2 rounded-lg bg-brand/10 px-4 py-3 text-sm text-navy"><Info size={16} className="mt-0.5 shrink-0" />{note}</p> : null}
+        {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err} <button onClick={() => load(f)} className="font-semibold underline">Try again</button></p> : null}
+        {loading && !data ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-[98px] animate-pulse rounded-lg border border-line bg-surface" />)}</div> : null}
 
         {data && T ? (
           <div className={loading ? "opacity-60 transition" : "transition"} aria-busy={loading}>
             {empty ? (
-              <div className="rounded-2xl border border-line bg-surface p-8 text-center">
+              <div className="rounded-lg border border-line bg-surface p-8 text-center">
                 <BarChart3 size={36} className="mx-auto text-[#9db3cc]" />
                 <h2 className="mt-3 font-serif text-xl font-semibold text-navy">Nothing to show for these filters</h2>
                 <p className="mx-auto mt-1 max-w-md text-[14px] text-muted">{data.meta.realSends === 0 && data.meta.testSends === 0 ? "Numbers appear here after the first email goes out. Send yourself a test from the editor to see how it works." : "Try a longer date range, another ministry, or switch Send type."}</p>
@@ -275,7 +275,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
 
                 {/* All emails */}
                 <Card title={`Emails · ${emailRows.length}`} right={<button onClick={exportEmails} className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand"><Download size={14} />CSV</button>}>
-                  <div className="relative mb-3"><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" /><input value={q} onChange={(e) => { setQ(e.target.value); setRows(15); }} placeholder="Search by subject, name or ministry" aria-label="Search emails" className="h-11 w-full rounded-xl border border-line pl-9 pr-3 text-[16px]" /></div>
+                  <div className="relative mb-3"><Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" /><input value={q} onChange={(e) => { setQ(e.target.value); setRows(15); }} placeholder="Search by subject, name or ministry" aria-label="Search emails" className="h-11 w-full rounded-lg border border-line pl-9 pr-3 text-[16px]" /></div>
                   <div className="-mx-4 overflow-x-auto px-4">
                     <table className="w-full min-w-[700px] text-[14px]">
                       <thead><tr className="text-[11px] text-muted"><th scope="col" className="py-2 pr-3 text-left font-bold uppercase tracking-wide"><button onClick={() => setSort((s) => ({ k: "lastSent", dir: s.k === "lastSent" ? (s.dir === 1 ? -1 : 1) : -1 }))} className="inline-flex items-center gap-0.5">EMAIL{sort.k === "lastSent" ? <span aria-hidden>{sort.dir > 0 ? "▲" : "▼"}</span> : null}</button></th>{head("recipients", "Sent")}{head("delivered", "Delivered")}{head("openRate", "Opens")}{head("clickRate", "Click rate")}{head("clicks", "Clicks")}{head("unsubs", "Unsubs", "pl-3")}<th className="w-6" /></tr></thead>
@@ -300,7 +300,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
                     </table>
                   </div>
                   {emailRows.length === 0 ? <p className="py-4 text-center text-[14px] text-muted">No emails match.</p> : null}
-                  {emailRows.length > rows ? <button onClick={() => setRows((r) => r + 20)} className="mt-3 w-full rounded-xl border border-line py-2.5 text-[14px] font-semibold text-brand">Show {Math.min(20, emailRows.length - rows)} more</button> : null}
+                  {emailRows.length > rows ? <button onClick={() => setRows((r) => r + 20)} className="mt-3 w-full rounded-lg border border-line py-2.5 text-[14px] font-semibold text-brand">Show {Math.min(20, emailRows.length - rows)} more</button> : null}
                 </Card>
 
                 {/* When and on what */}
@@ -359,7 +359,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
                       <div><dt className="text-muted">Failed to send</dt><dd className="font-semibold tabular-nums text-ink">{num(data.deliverability.failed)}</dd></div>
                       <div><dt className="text-muted">Unsubscribed</dt><dd className="font-semibold tabular-nums text-ink">{num(data.deliverability.unsubscribed)} <span className="text-[12px] font-normal text-muted">{pct(T.unsubRate, 2)}</span></dd></div>
                     </dl>
-                    {data.deliverability.openUnsubTasks ? <p className="mt-4 rounded-xl bg-[#fdf1d8] px-3 py-2 text-[13px] text-[#7a4a05]">{data.deliverability.openUnsubTasks} unsubscribe{data.deliverability.openUnsubTasks === 1 ? " is" : "s are"} waiting for someone to remove the person in ClearStream.</p> : null}
+                    {data.deliverability.openUnsubTasks ? <p className="mt-4 rounded-lg bg-[#fdf1d8] px-3 py-2 text-[13px] text-[#7a4a05]">{data.deliverability.openUnsubTasks} unsubscribe{data.deliverability.openUnsubTasks === 1 ? " is" : "s are"} waiting for someone to remove the person in ClearStream.</p> : null}
                     {T.botClicks ? <p className="mt-3 text-[12px] text-muted">{num(T.botClicks)} click{T.botClicks === 1 ? "" : "s"} from link scanners {f.bots ? "included above" : "left out of the counts"}.</p> : null}
                   </Card>
                   <Card title="Web version and prayer" note="People who opened “View in browser”, and “I'm praying” taps.">

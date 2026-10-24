@@ -28,7 +28,7 @@ export function ReviewActions({ id, status, admin, expedited, editHref }: { id: 
 
   return (
     <div className="space-y-3 border-b border-line bg-surface p-4">
-      {expedited ? <label className="flex items-start gap-2 rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]"><input type="checkbox" className="mt-1" checked={confirmExp} onChange={(e) => setConfirmExp(e.target.checked)} /><span>This is an <b>expedited</b> send, under 72 hours. I approve it knowing that.</span></label> : null}
+      {expedited ? <label className="flex items-start gap-2 rounded-lg bg-[#fff3d6] p-3 text-sm text-[#5c3a00]"><input type="checkbox" className="mt-1" checked={confirmExp} onChange={(e) => setConfirmExp(e.target.checked)} /><span>This is an <b>expedited</b> send, under 72 hours. I approve it knowing that.</span></label> : null}
       {asking ? (
         <div>
           <label className="label" htmlFor="note">What should change?</label>
@@ -44,7 +44,7 @@ export function ReviewActions({ id, status, admin, expedited, editHref }: { id: 
           <button disabled={busy} onClick={() => setAsking(true)} className="pill-btn flex-1 border-2 border-navy text-navy"><MessageSquareWarning size={16} className="mr-1.5" />Request changes</button>
         </div>
       )}
-      {msg ? <p role="alert" className="rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{msg}</p> : null}
+      {msg ? <p role="alert" className="rounded-lg bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{msg}</p> : null}
     </div>
   );
 }

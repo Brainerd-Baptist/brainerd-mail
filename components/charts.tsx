@@ -19,7 +19,7 @@ export const hourName = (h: number) => `${h % 12 === 0 ? 12 : h % 12}${h < 12 ? 
 // ---- Card shell ----
 export function Card({ title, note, right, children, id }: { title: string; note?: ReactNode; right?: ReactNode; children: ReactNode; id?: string }) {
   return (
-    <section id={id} className="overflow-hidden rounded-2xl border border-line bg-surface">
+    <section id={id} className="overflow-hidden rounded-lg border border-line bg-surface">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
         <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted">{title}</h2>
         {right}
@@ -34,7 +34,7 @@ export function Card({ title, note, right, children, id }: { title: string; note
 export function Tile({ label, value, sub, delta, goodWhenDown, hint }: { label: string; value: string; sub?: string; delta?: { text: string; dir: -1 | 0 | 1 } | null; goodWhenDown?: boolean; hint?: string }) {
   const tone = !delta || delta.dir === 0 ? "text-muted" : (delta.dir > 0) !== !!goodWhenDown ? "text-[#0d6b44]" : "text-[#9a1b1b]";
   return (
-    <div className="min-w-0 rounded-2xl border border-line bg-surface p-4" title={hint}>
+    <div className="min-w-0 rounded-lg border border-line bg-surface p-4" title={hint}>
       <div className="truncate text-[11px] font-bold uppercase tracking-[0.1em] text-muted">{label}</div>
       <div className="mt-1 font-serif text-[28px] font-semibold leading-none text-navy">{value}</div>
       <div className="mt-1.5 flex min-h-[18px] flex-wrap items-center gap-x-2 text-[12px] text-muted">

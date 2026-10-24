@@ -28,11 +28,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* Blocking theme script — must run before any paint to avoid flash */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap"
-        />
       </head>
       <body>{children}<TourHost /><HelpHost /></body>
     </html>

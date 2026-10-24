@@ -28,7 +28,7 @@ export function EmailInsights({ id, url, title = "What’s happening", scopeNote
   useEffect(() => { load(); /* eslint-disable-next-line */ }, [id, url]);
 
   return (
-    <section aria-label="Summary" className="rounded-2xl border border-[#cfe3f3] bg-[#f4f9fe] p-5">
+    <section aria-label="Summary" className="rounded-lg border border-[#cfe3f3] bg-[#f4f9fe] p-5">
       <div className="flex items-start justify-between gap-3">
         <h2 className="flex items-center gap-2 font-serif text-lg font-semibold text-navy"><Sparkles size={18} className="text-brand" />{title}</h2>
         <button onClick={() => load(true)} disabled={busy} aria-label="Refresh summary" className="flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-brand hover:bg-surface disabled:opacity-50"><RefreshCw size={14} className={busy ? "animate-spin" : ""} />Refresh</button>
