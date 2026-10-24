@@ -23,8 +23,8 @@ export default function Login({ searchParams }: { searchParams: { error?: string
     <main className="min-h-dvh flex items-center justify-center px-4" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div className="w-full max-w-sm">
         <div className="mb-10 flex flex-col items-center text-center">
-          <img className="brand-logo-light mb-3" src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={200} height={30} style={{ height: "auto", width: 200 }} />
-          <img className="brand-logo-dark mb-3" src="/brand/brainerd-logo-white.png" alt="Brainerd Baptist Church" width={200} height={30} style={{ height: "auto", width: 200 }} />
+          <img className="brand-logo-light mb-3" src="/brand/brainerd-full.png" alt="Brainerd Baptist Church" width={200} height={47} style={{ height: "auto", width: 200 }} />
+          <img className="brand-logo-dark mb-3" src="/brand/brainerd-full-white.png" alt="Brainerd Baptist Church" width={200} height={47} style={{ height: "auto", width: 200 }} />
           <p className="text-xs uppercase tracking-[0.3em] text-muted">Mail</p>
         </div>
         <div className="space-y-5 rounded-lg border border-brand/20 bg-surface p-8 shadow-lg">
