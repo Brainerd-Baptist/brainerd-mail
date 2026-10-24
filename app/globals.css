@@ -91,3 +91,7 @@ input[type="datetime-local"]::-webkit-date-and-time-value, input[type="date"]::-
 .pill-btn { @apply inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold transition; }
 
 @media (max-width: 1023px) { html { -webkit-tap-highlight-color: transparent; } button, select { touch-action: manipulation; } }
+/* Logo swap must win over any inline display rule. */
+.brand-logo-dark { display: none !important; }
+[data-theme="dark"] .brand-logo-light { display: none !important; }
+[data-theme="dark"] .brand-logo-dark { display: inline-block !important; }
