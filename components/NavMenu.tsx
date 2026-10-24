@@ -4,10 +4,8 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CalendarDays, Globe, Map as MapIcon, Compass, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Monitor, Moon, Send, Sun, UsersRound, Users, X } from "lucide-react";
+import { BarChart3, CalendarDays, Globe, Map as MapIcon, LifeBuoy, Mail, Menu, Send, UsersRound, Users, X } from "lucide-react";
 import { HeaderBrand } from "@/components/HeaderBrand";
-import { ROLE_LABEL, type Role } from "@/lib/roles-ui";
-import { THEME_MODES, applyMode, getMode, type ThemeMode } from "@/lib/theme";
 
 // The one menu for every section of Brainerd Mail. Same hamburger on every screen size.
 const ITEMS = [
@@ -24,11 +22,7 @@ export function NavMenu() {
   const [admin, setAdmin] = useState(false);
   const [team, setTeam] = useState(false);
   const [roster, setRoster] = useState(true);
-  const [who, setWho] = useState<{ name: string; role: string } | null>(null);
   const [fresh, setFresh] = useState(0);
-  const [mode, setMode] = useState<ThemeMode>("auto");
-
-  useEffect(() => { setMode(getMode()); }, []);
 
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
@@ -36,14 +30,11 @@ export function NavMenu() {
     fetch("/api/feedback?summary=1").then((r) => (r.ok ? r.json() : null)).then((j) => {
       if (!j?.role) return;
       setAdmin(!!j.admin); setTeam(!!j.team); setRoster(!!j.roster); setFresh(j.new ?? 0);
-      setWho({ name: j.name || String(j.email || "").split("@")[0], role: ROLE_LABEL[j.role as Role] ?? "" });
     }).catch(() => {});
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
-
-  function chooseMode(next: ThemeMode) { applyMode(next); setMode(next); }
 
   const link = (href: string, label: string, Icon: typeof Mail, active: boolean, badge?: number) => (
     <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`mx-2 my-0.5 flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors ${active ? "bg-brand/15 font-medium text-brand-soft" : "text-ink hover:bg-brand/5"}`}>
@@ -72,23 +63,6 @@ export function NavMenu() {
               {team ? link("/sending", "Sending", Send, path.startsWith("/sending")) : null}
               {admin ? link("/feedback", "Feedback inbox", LifeBuoy, path.startsWith("/feedback"), fresh) : null}
             </div>
-            <form action="/auth/signout" method="post" className="border-t border-brand/10 px-2 pb-[env(safe-area-inset-bottom)] pt-3">
-              {who ? <p className="px-5 pb-2 text-xs text-muted"><span className="text-ink">{who.name}</span>{who.role ? ` · ${who.role}` : ""}</p> : null}
-              <p className="px-5 pb-1 pt-1 text-[0.68rem] uppercase tracking-wider text-muted/70">Appearance</p>
-              <div className="mx-2 mb-2 grid grid-cols-3 gap-1">
-                {THEME_MODES.map((m) => {
-                  const Icon = m.id === "auto" ? Monitor : m.id === "light" ? Sun : Moon;
-                  return (
-                    <button key={m.id} type="button" onClick={() => chooseMode(m.id)} title={m.description} aria-pressed={mode === m.id} className={`flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-lg border text-xs font-semibold ${mode === m.id ? "border-brand/50 bg-brand/15 text-ink" : "border-transparent text-muted active:bg-mist"}`}>
-                      <Icon size={16} />{m.label}
-                    </button>
-                  );
-                })}
-              </div>
-              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-help")); }} className="mx-2 my-0.5 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3 text-sm text-ink transition-colors hover:bg-brand/5"><HelpCircle size={18} />Help</button>
-              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-tour")); }} className="mx-2 my-0.5 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3 text-sm text-ink transition-colors hover:bg-brand/5"><Compass size={18} />Take the tour</button>
-              <button className="mx-2 my-0.5 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg px-3 py-3 text-sm text-ink transition-colors hover:bg-brand/5"><LogOut size={18} />Sign out</button>
-            </form>
           </nav>
         </div>,
         document.body
