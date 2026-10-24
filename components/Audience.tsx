@@ -5,6 +5,7 @@ import { RefreshCw, Download, CheckCircle2, AlertTriangle } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { Card, Chip, num, etDate, downloadCsv } from "@/components/charts";
 
 type Row = { ministry: string; label: string; list_id: string | null; list_name: string | null; expected: number | null; latest: { taken_at: string; total: number; email_ok: number } | null };
@@ -54,8 +55,8 @@ export function Audience() {
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-4xl items-center gap-3"><NavMenu /><HeaderBrand label="Audiences" /><span className="flex-1" /><HelpButton /></div>
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><HelpButton /><HqLink /></div>
       </header>
       <main className="mx-auto max-w-4xl space-y-5 px-4 pt-5">
         <p className="text-[14px] leading-snug text-muted">Pick each ministry&apos;s ClearStream list, then Check. Mail reads the list (it never changes anything in ClearStream) and shows how many people it would actually email, and exactly who is left out and why.</p>
@@ -81,8 +82,8 @@ export function Audience() {
               {c && open === r.ministry ? (
                 <div className="mt-4 space-y-4 border-t border-line pt-4">
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-lg bg-mist p-3"><div className="font-serif text-2xl font-medium text-navy">{num(c.total)}</div><div className="text-[12px] text-muted">in ClearStream</div></div>
-                    <div className="rounded-lg bg-mist p-3"><div className="font-serif text-2xl font-medium text-navy">−{num(c.excluded.length)}</div><div className="text-[12px] text-muted">left out</div></div>
+                    <div className="rounded-lg bg-mist p-3"><div className="font-serif text-2xl text-ink">{num(c.total)}</div><div className="text-[12px] text-muted">in ClearStream</div></div>
+                    <div className="rounded-lg bg-mist p-3"><div className="font-serif text-2xl text-ink">−{num(c.excluded.length)}</div><div className="text-[12px] text-muted">left out</div></div>
                     <div className="rounded-lg bg-[#e3f4ea] p-3"><div className="font-serif text-2xl font-medium text-[#0d5a37]">{num(c.mailCount)}</div><div className="text-[12px] text-muted">Mail would email</div></div>
                   </div>
                   {gap === null ? <p className="text-[13px] text-muted">Type the number you expect above to compare it.</p>

@@ -34,7 +34,7 @@ export function FeedbackSheet({ onClose, context, inboxNew }: { onClose: () => v
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 lg:items-center lg:justify-center" onClick={onClose}>
       <div className="max-h-[92dvh] w-full overflow-y-auto rounded-t-2xl bg-surface p-4 pb-8 lg:max-w-md lg:rounded-lg lg:pb-4" onClick={(e) => e.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-serif text-xl font-medium text-navy">Help us improve Brainerd Mail</h2>
+          <h2 className="font-serif text-xl text-ink">Help us improve Brainerd Mail</h2>
           <button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-full text-muted"><X size={22} /></button>
         </div>
         {inboxNew != null ? <a href="/feedback" className="mb-3 flex min-h-11 items-center justify-between rounded-lg bg-mist px-3 text-sm font-medium text-navy">Open the feedback inbox<span className="text-sm text-muted">{inboxNew ? `${inboxNew} new` : "all caught up"}</span></a> : null}

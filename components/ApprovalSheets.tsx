@@ -19,7 +19,7 @@ function Sheet({ title, onClose, children }: { title: string; onClose: () => voi
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={onClose}>
       <div className="max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">{title}</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
+        <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl text-ink">{title}</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
         {children}
       </div>
     </div>

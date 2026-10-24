@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { useRouter } from "next/navigation";
@@ -191,19 +192,20 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
 
   return (
     <div className="min-h-full bg-mist pb-16">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-5xl items-center gap-3">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3">
           <NavMenu />
           <HeaderBrand label="Mail" />
           <span className="flex-1" />
           <HelpButton />
+          <HqLink />
           {buildable.length ? <button onClick={openAdd} className="pill-btn shrink-0 whitespace-nowrap bg-brand text-white"><Plus size={16} className="mr-1.5" /><span className="sm:hidden">Plan</span><span className="hidden sm:inline">Plan an email</span></button> : null}
         </div>
       </header>
 
       <main className="mx-auto max-w-5xl space-y-4 px-4 pt-6">
         <div className="flex flex-wrap items-center gap-2">
-          <h1 className="mr-2 font-serif text-2xl font-medium text-navy">{view === "week" ? weekTitle(weekStart) : monthTitle(ym)}</h1>
+          <h1 className="mr-2 font-serif text-2xl text-ink">{view === "week" ? weekTitle(weekStart) : monthTitle(ym)}</h1>
           <Link href={view === "week" ? `/calendar?v=week&d=${addDays(weekStart, -7)}` : `/calendar?m=${shiftMonth(ym, -1)}`} aria-label={view === "week" ? "Previous week" : "Previous month"} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink"><ChevronLeft size={20} /></Link>
           <Link href={view === "week" ? `/calendar?v=week&d=${addDays(weekStart, 7)}` : `/calendar?m=${shiftMonth(ym, 1)}`} aria-label={view === "week" ? "Next week" : "Next month"} className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface text-ink"><ChevronRight size={20} /></Link>
           <Link href={view === "week" ? "/calendar?v=week" : "/calendar"} className="flex h-11 items-center rounded-full border border-line bg-surface px-4 text-sm font-medium text-ink">Today</Link>
@@ -270,7 +272,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
 
         <section aria-label={dayTitle(sel)} className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="font-serif text-xl font-medium text-navy">{dayTitle(sel)}</h2>
+            <h2 className="font-serif text-xl text-ink">{dayTitle(sel)}</h2>
             {buildable.length ? <button onClick={openAdd} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-brand hover:bg-mist"><Plus size={16} />Plan an email</button> : null}
           </div>
           {dayList.length === 0 ? (
@@ -362,7 +364,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
 
         {series.length > 0 ? (
           <section className="space-y-2 pt-2">
-            <h2 className="font-serif text-lg font-medium text-navy">Repeating emails</h2>
+            <h2 className="font-serif text-lg text-ink">Repeating emails</h2>
             <ul className="space-y-2">
               {series.map((s) => {
                 const p = paletteFor(s.ministry);
@@ -384,7 +386,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
 
         {undated.length > 0 ? (
           <section className="space-y-2 pt-2">
-            <h2 className="font-serif text-lg font-medium text-navy">Not on the calendar yet</h2>
+            <h2 className="font-serif text-lg text-ink">Not on the calendar yet</h2>
             <p className="text-sm text-muted">Drafts with no planned time. Open one and set when it should go out.</p>
             <ul className="space-y-2">
               {undated.map((e) => (
@@ -398,7 +400,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
       {adding ? (
         <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={() => busy !== "slot" && setAdding(false)}>
           <div className="max-h-[92dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">Plan an email</h2><button aria-label="Close" onClick={() => setAdding(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
+            <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl text-ink">Plan an email</h2><button aria-label="Close" onClick={() => setAdding(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
             <p className="mb-4 text-sm text-muted">Hold a day and time for a ministry before the email exists, once or on a repeat, so everyone can see the plan.</p>
             <label className="mb-3 block"><span className="label">Ministry</span>
               <select className="field" value={sMin} onChange={(e) => setSMin(e.target.value)}>{buildable.map((k) => <option key={k} value={k}>{PALETTES[k].label}</option>)}</select>

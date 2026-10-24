@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BarChart3, ChevronDown, ChevronRight, Download, Filter, Info, RotateCcw, Search } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { HelpButton } from "@/components/HelpButton";
 import { C, Card, Chip, HBars, Split, Tile, VBars, deltaCount, deltaRate, downloadCsv, etDate, hourName, num, pct } from "@/components/charts";
 import type { Filters, Overview, Tally } from "@/lib/analytics";
@@ -180,14 +181,14 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-5xl items-center gap-3"><NavMenu /><HeaderBrand label="Analytics" /><span className="flex-1" /><HelpButton /></div>
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><HelpButton /><HqLink /></div>
       </header>
 
       <main className="mx-auto max-w-5xl space-y-5 px-4 pt-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="font-serif text-2xl font-medium text-navy">Analytics</h1>
+            <h1 className="font-serif text-2xl text-ink">Analytics</h1>
             <p className="mt-0.5 text-[14px] text-muted">{rangeText}{own ? " · your ministries" : ""}{data ? ` · ${data.totals.sends} send${data.totals.sends === 1 ? "" : "s"}` : ""}</p>
           </div>
           <button onClick={() => setOpen((v) => !v)} aria-expanded={open} className="pill-btn border border-line bg-surface text-ink"><Filter size={16} className="mr-1.5" />Filters{activeCount ? <span className="ml-1.5 rounded-full bg-navy px-1.5 text-[11px] text-white">{activeCount}</span> : null}<ChevronDown size={16} className={`ml-1 transition ${open ? "rotate-180" : ""}`} /></button>
@@ -212,7 +213,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
             {empty ? (
               <div className="rounded-lg border border-line bg-surface p-8 text-center">
                 <BarChart3 size={36} className="mx-auto text-[#9db3cc]" />
-                <h2 className="mt-3 font-serif text-xl font-medium text-navy">Nothing to show for these filters</h2>
+                <h2 className="mt-3 font-serif text-xl text-ink">Nothing to show for these filters</h2>
                 <p className="mx-auto mt-1 max-w-md text-[14px] text-muted">{data.meta.realSends === 0 && data.meta.testSends === 0 ? "Numbers appear here after the first email goes out. Send yourself a test from the editor to see how it works." : "Try a longer date range, another ministry, or switch Send type."}</p>
                 <div className="mt-4 flex flex-wrap justify-center gap-2"><button className="pill-btn bg-navy text-white" onClick={reset}>Reset filters</button>{f.kind === "real" && data.meta.testSends ? <button className="pill-btn border border-line bg-surface text-ink" onClick={() => upd({ kind: "test", from: null, to: null })}>Show test sends</button> : null}</div>
               </div>

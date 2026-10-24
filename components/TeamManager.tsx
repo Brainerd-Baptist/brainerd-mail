@@ -6,6 +6,7 @@ import { Crown, MailPlus, RotateCw, ShieldCheck, UserPlus, X } from "lucide-reac
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { ROLES, ROLE_BLURB, ROLE_LABEL, canManageTarget, rolesICanGrant, type Role } from "@/lib/roles-ui";
 
@@ -29,7 +30,7 @@ function Sheet({ title, onClose, children }: { title: string; onClose: () => voi
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={onClose}>
       <div className="max-h-[90dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">{title}</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
+        <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl text-ink">{title}</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
         {children}
       </div>
     </div>
@@ -100,18 +101,19 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
 
   return (
     <div className="min-h-full bg-mist pb-16">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-3xl items-center gap-3">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3">
           <NavMenu />
-          <HeaderBrand label="Team" />
+          <HeaderBrand label="Mail" />
           <span className="flex-1" />
           <HelpButton />
+          <HqLink />
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl space-y-5 px-4 pt-6">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="font-serif text-2xl font-medium text-navy">Team</h1>
+          <h1 className="font-serif text-2xl text-ink">Team</h1>
           <button onClick={() => { setNote(""); setErr(""); setInviteOpen(true); }} className="pill-btn shrink-0 whitespace-nowrap bg-brand text-white"><UserPlus size={16} className="mr-1.5" />Invite someone</button>
         </div>
 

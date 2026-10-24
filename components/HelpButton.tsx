@@ -74,7 +74,7 @@ function HelpSheet({ onClose }: { onClose: () => void }) {
   const header = (title: string, back?: () => void) => (
     <div className="mb-4 flex items-center gap-1">
       {back ? <button onClick={back} aria-label="Back" className="-ml-2 flex h-11 w-11 items-center justify-center rounded-lg text-muted"><ArrowLeft size={22} /></button> : null}
-      <h2 className="flex-1 font-serif text-xl font-medium text-navy">{title}</h2>
+      <h2 className="flex-1 font-serif text-xl text-ink">{title}</h2>
       <button aria-label="Close help" onClick={onClose} className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button>
     </div>
   );

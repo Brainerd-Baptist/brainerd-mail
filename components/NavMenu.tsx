@@ -14,8 +14,8 @@ const ITEMS = [
   { href: "/emails", label: "Emails", icon: Mail, match: (p: string) => p === "/emails" || p.startsWith("/editor") || p.startsWith("/review") },
   { href: "/calendar", label: "Calendar", icon: CalendarDays, match: (p: string) => p.startsWith("/calendar") },
   { href: "/analytics", label: "Analytics", icon: BarChart3, match: (p: string) => p.startsWith("/analytics") },
-  { href: "/missions", label: "Missions map", icon: MapIcon, match: (p: string) => p.startsWith("/missions") },
-  { href: "/roster", label: "Serving list", icon: Globe, match: (p: string) => p.startsWith("/roster") },
+  { href: "/missions", label: "Missions Map", icon: MapIcon, match: (p: string) => p.startsWith("/missions") },
+  { href: "/roster", label: "Serving List", icon: Globe, match: (p: string) => p.startsWith("/roster") },
 ];
 
 export function NavMenu() {

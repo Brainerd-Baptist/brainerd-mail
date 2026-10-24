@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ChevronDown, Download, ExternalLink, Info } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { HelpButton } from "@/components/HelpButton";
 import { EmailInsights } from "@/components/EmailInsights";
 import { C, Card, Chip, Funnel, HBars, Split, Tile, VBars, downloadCsv, etDate, hourName, num, pct } from "@/components/charts";
@@ -48,8 +49,8 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-4xl items-center gap-3"><NavMenu /><HeaderBrand label="Analytics" /><span className="flex-1" /><HelpButton /></div>
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><HelpButton /><HqLink /></div>
       </header>
       <main className="mx-auto max-w-4xl space-y-5 px-4 pt-5">
         <Link href="/analytics" className="inline-flex min-h-9 items-center gap-1.5 text-[14px] font-medium text-brand"><ArrowLeft size={16} />All analytics</Link>
@@ -60,7 +61,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
           <div className={`space-y-5 ${loading ? "opacity-60 transition" : "transition"}`}>
             <div>
               <div className="flex flex-wrap items-center gap-2"><Chip tone="blue">{r.email.ministryLabel}</Chip><Chip>{r.email.status}</Chip>{r.sends.some((s) => s.kind === "test") ? <Chip tone="amber">includes test sends</Chip> : null}</div>
-              <h1 className="mt-2 font-serif text-2xl font-medium leading-tight text-navy">{r.email.subject}</h1>
+              <h1 className="mt-2 font-serif text-2xl leading-tight text-ink">{r.email.subject}</h1>
               <p className="mt-1 text-[13px] text-muted">{r.sends.length ? `${r.sends.length} send${r.sends.length === 1 ? "" : "s"} · last ${etDate(r.sends[0].at, true)}` : "Not sent yet"}{r.email.slug ? <> · <a href={`/w/${r.email.slug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-brand">Web version<ExternalLink size={12} /></a></> : null}</p>
             </div>
 
@@ -71,7 +72,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
             </div>
 
             {r.t.recipients === 0 ? (
-              <div className="rounded-lg border border-line bg-surface p-8 text-center"><h2 className="font-serif text-xl font-medium text-navy">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
+              <div className="rounded-lg border border-line bg-surface p-8 text-center"><h2 className="font-serif text-xl text-ink">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
             ) : (
               <>
                 <EmailInsights id={id} />

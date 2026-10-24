@@ -67,7 +67,7 @@ export function TourHost() {
           <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted">Step {i + 1} of {steps.length}</span>
           <button onClick={finish} aria-label="Close tour" className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button>
         </div>
-        <h2 className="font-serif text-2xl font-medium text-navy">{s.title}</h2>
+        <h2 className="font-serif text-2xl text-ink">{s.title}</h2>
         <p className="mt-2 text-sm leading-relaxed text-ink">{s.body}</p>
         {s.hint ? <p className="mt-3 inline-block rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-navy">{s.hint}</p> : null}
         <div className="mt-5 flex justify-center gap-1.5" aria-hidden>

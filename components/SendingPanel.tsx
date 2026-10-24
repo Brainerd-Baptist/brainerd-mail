@@ -5,6 +5,7 @@ import { OctagonX, ShieldCheck, Users, Zap } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { Card, Chip } from "@/components/charts";
 
 type Mode = "off" | "staff" | "live";
@@ -69,8 +70,8 @@ export function SendingPanel() {
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-3xl items-center gap-3"><NavMenu /><HeaderBrand label="Sending" /><span className="flex-1" /><HelpButton /></div>
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><HelpButton /><HqLink /></div>
       </header>
       <main className="mx-auto max-w-3xl space-y-5 px-4 pt-5">
         {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}

@@ -479,7 +479,7 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   const detailsPanel = (
     <div className="space-y-4">
-      <h2 className="font-serif text-xl font-medium text-navy">Email details</h2>
+      <h2 className="font-serif text-xl text-ink">Email details</h2>
       <Field label="Subject line" value={doc.subject} onChange={(v) => setDoc({ ...doc, subject: v })} hint={`${doc.subject.length} characters`} />
       <Area label="Preview text" value={doc.previewText} onChange={(v) => setDoc({ ...doc, previewText: v })} rows={2} hint="The gray line people see next to the subject" />
       {colorSelect}
@@ -548,7 +548,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const inspector = sel ? (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="font-serif text-xl font-medium text-navy">{BLOCK_LABELS[sel.type]}</h2>
+        <h2 className="font-serif text-xl text-ink">{BLOCK_LABELS[sel.type]}</h2>
         <div className="flex items-center">
           {isPhoneLayout ? (<>
             <IconBtn label="Move up" onClick={() => move(sel.id, -1)}><ChevronUp size={20} /></IconBtn>
@@ -698,7 +698,7 @@ export default function Builder({ emailId }: { emailId: string }) {
         {sendOpen ? (
           <div className="fixed inset-0 z-50 flex items-end bg-black/40" onClick={() => setSendOpen(false)}>
             <div className="max-h-[85dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
-              <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-medium text-navy">Ready to send?</h2><IconBtn label="Close" onClick={() => setSendOpen(false)}><X size={22} /></IconBtn></div>
+              <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl text-ink">Ready to send?</h2><IconBtn label="Close" onClick={() => setSendOpen(false)}><X size={22} /></IconBtn></div>
               <div className="mb-4">{checksPanel}</div>
               {sendActions}
             </div>

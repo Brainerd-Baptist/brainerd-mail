@@ -62,7 +62,7 @@ export function FeedbackInbox({ initial }: { initial: Note[] }) {
   return (
     <div className="mx-auto min-h-[100dvh] max-w-2xl bg-mist px-4 pb-16 pt-4">
       <a href="/" className="mb-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brand"><ArrowLeft size={16} />Back to Brainerd Mail</a>
-      <h1 className="mb-3 font-serif text-2xl font-medium text-navy">Feedback inbox</h1>
+      <h1 className="mb-3 font-serif text-2xl text-ink">Feedback inbox</h1>
       <div className="mb-4 flex flex-wrap gap-1.5">
         {FILTERS.map((x) => (
           <button key={x.k} onClick={() => setFilter(x.k)} className={`min-h-10 rounded-full px-4 text-sm font-semibold ${filter === x.k ? "bg-navy text-white" : "bg-surface text-ink border border-line"}`}>{x.label} <span className="opacity-70">{items.filter(x.match).length}</span></button>
