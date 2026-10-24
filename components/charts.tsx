@@ -21,7 +21,7 @@ export function Card({ title, note, right, children, id }: { title: string; note
   return (
     <section id={id} className="overflow-hidden rounded-lg border border-line bg-surface">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
-        <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-muted">{title}</h2>
+        <h2 className="text-xs font-medium uppercase tracking-[0.12em] text-muted">{title}</h2>
         {right}
       </div>
       {note ? <p className="px-4 pt-3 text-[13px] leading-snug text-muted">{note}</p> : null}
@@ -35,11 +35,11 @@ export function Tile({ label, value, sub, delta, goodWhenDown, hint }: { label: 
   const tone = !delta || delta.dir === 0 ? "text-muted" : (delta.dir > 0) !== !!goodWhenDown ? "text-[#0d6b44]" : "text-[#9a1b1b]";
   return (
     <div className="min-w-0 rounded-lg border border-line bg-surface p-4" title={hint}>
-      <div className="truncate text-[11px] font-bold uppercase tracking-[0.1em] text-muted">{label}</div>
-      <div className="mt-1 font-serif text-[28px] font-semibold leading-none text-navy">{value}</div>
+      <div className="truncate text-[11px] font-medium uppercase tracking-[0.1em] text-muted">{label}</div>
+      <div className="mt-1 font-serif text-[28px] font-medium leading-none text-navy">{value}</div>
       <div className="mt-1.5 flex min-h-[18px] flex-wrap items-center gap-x-2 text-[12px] text-muted">
         {sub ? <span>{sub}</span> : null}
-        {delta ? <span className={`font-semibold ${tone}`}>{delta.dir > 0 ? "▲" : delta.dir < 0 ? "▼" : "•"} {delta.text}</span> : null}
+        {delta ? <span className={`font-medium ${tone}`}>{delta.dir > 0 ? "▲" : delta.dir < 0 ? "▼" : "•"} {delta.text}</span> : null}
       </div>
     </div>
   );
@@ -108,7 +108,7 @@ export function HBars({ rows, fmt = num, color = C.brand, max }: { rows: { label
       {rows.map((r, i) => (
         <li key={i}>
           <div className="flex items-baseline justify-between gap-3 text-[14px]">
-            <span className="min-w-0 truncate font-semibold text-ink">{r.label}</span>
+            <span className="min-w-0 truncate font-medium text-ink">{r.label}</span>
             <span className="shrink-0 tabular-nums text-ink">{fmt(r.value)}{r.sub ? <span className="ml-2 text-[12px] text-muted">{r.sub}</span> : null}</span>
           </div>
           <div className="mt-1 h-2 overflow-hidden rounded-full bg-line/50"><div className="h-full rounded-full" style={{ width: `${Math.max(r.value > 0 ? 2 : 0, (r.value / m) * 100)}%`, background: r.color ?? color }} /></div>
@@ -128,7 +128,7 @@ export function Split({ parts, fmt = num }: { parts: { label: string; value: num
         {parts.filter((p) => p.value > 0).map((p) => <div key={p.label} style={{ width: `${(p.value / total) * 100}%`, background: p.color }} title={`${p.label}: ${fmt(p.value)}`} />)}
       </div>
       <ul className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[13px] sm:grid-cols-3">
-        {parts.map((p) => <li key={p.label} className="flex items-center gap-2"><i className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: p.color }} /><span className="text-muted">{p.label}</span><span className="ml-auto font-semibold tabular-nums text-ink">{fmt(p.value)} <span className="font-normal text-muted">{Math.round((p.value / total) * 100)}%</span></span></li>)}
+        {parts.map((p) => <li key={p.label} className="flex items-center gap-2"><i className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm" style={{ background: p.color }} /><span className="text-muted">{p.label}</span><span className="ml-auto font-medium tabular-nums text-ink">{fmt(p.value)} <span className="font-normal text-muted">{Math.round((p.value / total) * 100)}%</span></span></li>)}
       </ul>
     </div>
   );
@@ -141,7 +141,7 @@ export function Funnel({ steps }: { steps: { label: string; n: number }[] }) {
     <ol className="space-y-2">
       {steps.map((s, i) => (
         <li key={s.label}>
-          <div className="flex items-baseline justify-between text-[14px]"><span className="font-semibold text-ink">{s.label}</span><span className="tabular-nums text-ink">{num(s.n)} <span className="text-[12px] text-muted">{i === 0 ? "" : pct(s.n / top)}</span></span></div>
+          <div className="flex items-baseline justify-between text-[14px]"><span className="font-medium text-ink">{s.label}</span><span className="tabular-nums text-ink">{num(s.n)} <span className="text-[12px] text-muted">{i === 0 ? "" : pct(s.n / top)}</span></span></div>
           <div className="mt-1 h-3 overflow-hidden rounded-full bg-line/50"><div className="h-full rounded-full" style={{ width: `${Math.max(s.n > 0 ? 2 : 0, (s.n / top) * 100)}%`, background: [C.navy, C.brand, C.teal, C.green][i] ?? C.brand }} /></div>
         </li>
       ))}
@@ -151,7 +151,7 @@ export function Funnel({ steps }: { steps: { label: string; n: number }[] }) {
 
 export function Chip({ children, tone = "gray" }: { children: ReactNode; tone?: "gray" | "blue" | "amber" | "green" | "red" }) {
   const t = { gray: "bg-line/40 text-muted", blue: "bg-brand/10 text-navy", amber: "bg-[#fdf1d8] text-[#7a4a05]", green: "bg-[#e3f4ea] text-[#0d5a37]", red: "bg-[#fbe6e8] text-[#8a1020]" }[tone];
-  return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold ${t}`}>{children}</span>;
+  return <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${t}`}>{children}</span>;
 }
 
 export function downloadCsv(name: string, header: string[], rows: (string | number | null)[][]) {

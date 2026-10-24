@@ -6,6 +6,7 @@ import { STARTERS } from "@/lib/templates/starters";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { useRouter } from "next/navigation";
@@ -69,25 +70,26 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
 
   return (
     <div className="min-h-full bg-mist pb-16">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-3xl items-center gap-3">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3">
           <NavMenu />
           <HeaderBrand label="Mail" />
           <span className="flex-1" />
           <HelpButton />
+          <HqLink />
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl space-y-4 px-4 pt-6">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="font-serif text-2xl font-semibold text-navy">Emails</h1>
+          <h1 className="font-serif text-2xl text-ink">Emails</h1>
           {buildable.length ? <button onClick={() => setCreating(true)} className="pill-btn bg-brand text-white"><Plus size={16} className="mr-1.5" />New email</button> : null}
         </div>
 
         {items.length > 4 ? (
           <label className="flex items-center gap-2 rounded-full border border-line bg-surface px-4">
             <Search size={16} className="text-muted" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or subject" className="h-11 min-w-0 flex-1 bg-transparent text-[15px] outline-none" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or subject" className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none" />
           </label>
         ) : null}
 
@@ -102,7 +104,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
         {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
         {shown.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-line bg-surface p-8 text-center text-[15px] text-muted">
+          <div className="rounded-lg border border-dashed border-line bg-surface p-8 text-center text-sm text-muted">
             {items.length === 0 ? (buildable.length ? "No emails yet. Tap New email to start one." : "No emails yet.") : "Nothing matches. Clear the search or filter."}
           </div>
         ) : (
@@ -114,11 +116,11 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
                 <li key={it.id} className={`flex items-stretch overflow-hidden rounded-lg border border-line bg-surface ${busy === it.id ? "opacity-60" : ""}`}>
                   <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
                   <Link href={it.status === "pending_approval" ? `/review/${it.id}` : `/editor?e=${it.id}`} className="min-w-0 flex-1 p-4 active:bg-mist">
-                    <span className="block truncate text-[16px] font-semibold text-ink">{it.title || "Untitled"}</span>
+                    <span className="block truncate text-sm font-medium text-ink">{it.title || "Untitled"}</span>
                     {it.subject ? <span className="mt-0.5 block truncate text-sm text-muted">{it.subject}</span> : null}
                     <span className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-                      <span className="font-semibold" style={{ color: p.dark }}>{p.label}</span>
-                      <span className={`rounded-full px-2 py-0.5 font-semibold ${st.cls}`}>{st.label}</span>
+                      <span className="font-medium" style={{ color: p.dark }}>{p.label}</span>
+                      <span className={`rounded-full px-2 py-0.5 font-medium ${st.cls}`}>{st.label}</span>
                       <span>{it.scheduled_at && ["pending_approval", "approved", "scheduled"].includes(it.status) ? `Goes out ${when(it.scheduled_at)}` : `Edited ${ago(it.updated_at)}`}</span>
                     </span>
                   </Link>
@@ -136,7 +138,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
       {creating ? (
         <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={() => !busy && setCreating(false)}>
           <div className="w-full rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">New email</h2><button aria-label="Close" onClick={() => setCreating(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
+            <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl text-ink">New email</h2><button aria-label="Close" onClick={() => setCreating(false)} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
             <label className="mb-4 block">
               <span className="label">Ministry</span>
               <select className="field" value={ministry} onChange={(e) => { setMinistry(e.target.value); if ((start === "october" && !OCTOBER[e.target.value]) || (start === "homegoing" && e.target.value !== "church-wide")) setStart("blank"); }}>
@@ -150,7 +152,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
                 return (
                   <label key={k} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${start === k ? "border-brand bg-mist" : "border-line"} ${off ? "opacity-40" : ""}`}>
                     <input type="radio" name="start" className="mt-1" checked={start === k} disabled={off} onChange={() => setStart(k)} />
-                    <span><span className="block text-[15px] font-semibold text-ink">{t}</span><span className="block text-sm text-muted">{off ? (k === "homegoing" ? "Only for Church-Wide." : "Only for Missions and the BX.") : d}</span></span>
+                    <span><span className="block text-sm font-medium text-ink">{t}</span><span className="block text-sm text-muted">{off ? (k === "homegoing" ? "Only for Church-Wide." : "Only for Missions and the BX.") : d}</span></span>
                   </label>
                 );
               })}

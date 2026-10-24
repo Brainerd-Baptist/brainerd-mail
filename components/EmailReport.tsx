@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ChevronDown, Download, ExternalLink, Info } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { HelpButton } from "@/components/HelpButton";
 import { EmailInsights } from "@/components/EmailInsights";
 import { C, Card, Chip, Funnel, HBars, Split, Tile, VBars, downloadCsv, etDate, hourName, num, pct } from "@/components/charts";
@@ -41,18 +42,18 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
 
   const maxClicks = r ? Math.max(1, ...r.links.map((l) => l.clicks)) : 1;
   const seg = <T extends string>(cur: T, set: (v: T) => void, opts: [T, string][], label: string) => (
-    <div role="group" aria-label={label} className="inline-flex overflow-hidden rounded-full border border-line bg-surface text-[13px] font-semibold">
+    <div role="group" aria-label={label} className="inline-flex overflow-hidden rounded-full border border-line bg-surface text-[13px] font-medium">
       {opts.map(([v, l]) => <button key={v} onClick={() => set(v)} aria-pressed={cur === v} className={`min-h-9 px-3 ${cur === v ? "bg-navy text-white" : "text-ink hover:bg-mist"}`}>{l}</button>)}
     </div>
   );
 
   return (
     <div className="min-h-full bg-mist pb-20">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-4xl items-center gap-3"><NavMenu /><HeaderBrand label="Analytics" /><span className="flex-1" /><HelpButton /></div>
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><HelpButton /><HqLink /></div>
       </header>
       <main className="mx-auto max-w-4xl space-y-5 px-4 pt-5">
-        <Link href="/analytics" className="inline-flex min-h-9 items-center gap-1.5 text-[14px] font-semibold text-brand"><ArrowLeft size={16} />All analytics</Link>
+        <Link href="/analytics" className="inline-flex min-h-9 items-center gap-1.5 text-[14px] font-medium text-brand"><ArrowLeft size={16} />All analytics</Link>
         {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
         {loading && !r ? <div className="h-40 animate-pulse rounded-lg border border-line bg-surface" /> : null}
 
@@ -60,8 +61,8 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
           <div className={`space-y-5 ${loading ? "opacity-60 transition" : "transition"}`}>
             <div>
               <div className="flex flex-wrap items-center gap-2"><Chip tone="blue">{r.email.ministryLabel}</Chip><Chip>{r.email.status}</Chip>{r.sends.some((s) => s.kind === "test") ? <Chip tone="amber">includes test sends</Chip> : null}</div>
-              <h1 className="mt-2 font-serif text-2xl font-semibold leading-tight text-navy">{r.email.subject}</h1>
-              <p className="mt-1 text-[13px] text-muted">{r.sends.length ? `${r.sends.length} send${r.sends.length === 1 ? "" : "s"} · last ${etDate(r.sends[0].at, true)}` : "Not sent yet"}{r.email.slug ? <> · <a href={`/w/${r.email.slug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-brand">Web version<ExternalLink size={12} /></a></> : null}</p>
+              <h1 className="mt-2 font-serif text-2xl leading-tight text-ink">{r.email.subject}</h1>
+              <p className="mt-1 text-[13px] text-muted">{r.sends.length ? `${r.sends.length} send${r.sends.length === 1 ? "" : "s"} · last ${etDate(r.sends[0].at, true)}` : "Not sent yet"}{r.email.slug ? <> · <a href={`/w/${r.email.slug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-medium text-brand">Web version<ExternalLink size={12} /></a></> : null}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -71,7 +72,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
             </div>
 
             {r.t.recipients === 0 ? (
-              <div className="rounded-lg border border-line bg-surface p-8 text-center"><h2 className="font-serif text-xl font-semibold text-navy">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
+              <div className="rounded-lg border border-line bg-surface p-8 text-center"><h2 className="font-serif text-xl text-ink">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
             ) : (
               <>
                 <EmailInsights id={id} />
@@ -93,15 +94,15 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                         <li key={l.linkId} className="py-3 first:pt-0 last:pb-0">
                           <button type="button" disabled={!(people && l.clicks)} onClick={() => setOpenLink(openLink === l.linkId ? null : l.linkId)} aria-expanded={openLink === l.linkId} className="block w-full text-left">
                           <div className="flex items-baseline justify-between gap-3">
-                            <div className="min-w-0"><div className="truncate font-semibold text-ink">{l.label}</div><div className="truncate text-[12px] text-muted">{l.inEmail ? `${l.blockType} · block ${l.position}` : "Removed from this email since"} · {l.url.replace(/^https?:\/\/(www\.)?/, "")}</div></div>
-                            <div className="shrink-0 text-right"><div className="font-semibold tabular-nums text-navy">{num(l.clicks)} <span className="text-[12px] font-normal text-muted">click{l.clicks === 1 ? "" : "s"}</span></div><div className="text-[12px] text-muted">{num(l.unique)} {l.unique === 1 ? "person" : "people"}{l.shareOfDelivered !== null ? ` · ${pct(l.shareOfDelivered)}` : ""}</div></div>
+                            <div className="min-w-0"><div className="truncate font-medium text-ink">{l.label}</div><div className="truncate text-[12px] text-muted">{l.inEmail ? `${l.blockType} · block ${l.position}` : "Removed from this email since"} · {l.url.replace(/^https?:\/\/(www\.)?/, "")}</div></div>
+                            <div className="shrink-0 text-right"><div className="font-medium tabular-nums text-navy">{num(l.clicks)} <span className="text-[12px] font-normal text-muted">click{l.clicks === 1 ? "" : "s"}</span></div><div className="text-[12px] text-muted">{num(l.unique)} {l.unique === 1 ? "person" : "people"}{l.shareOfDelivered !== null ? ` · ${pct(l.shareOfDelivered)}` : ""}</div></div>
                           </div></button>
                           <div className="mt-2 h-2 overflow-hidden rounded-full bg-line/50"><div className="h-full rounded-full bg-brand" style={{ width: `${Math.max(l.clicks ? 2 : 0, (l.clicks / maxClicks) * 100)}%` }} /></div>
                           {l.clicks > 0 && (l.phone || l.desktop || l.tablet) ? <div className="mt-1 text-[12px] text-muted">{[l.phone ? `${l.phone} phone` : "", l.desktop ? `${l.desktop} desktop` : "", l.tablet ? `${l.tablet} tablet` : ""].filter(Boolean).join(" · ")}</div> : null}
-                          {people && l.clicks > 0 ? <div className="mt-1 text-[12px] font-semibold text-brand">{openLink === l.linkId ? "Hide who tapped" : "See who tapped"}</div> : null}
+                          {people && l.clicks > 0 ? <div className="mt-1 text-[12px] font-medium text-brand">{openLink === l.linkId ? "Hide who tapped" : "See who tapped"}</div> : null}
                           {openLink === l.linkId && r.linkWho?.[l.linkId] ? (
                             <ul className="mt-2 space-y-1 border-l-2 border-line pl-3 text-[13px]">
-                              {r.linkWho[l.linkId].map((w, i) => <li key={i} className="flex justify-between gap-3"><span className="min-w-0 truncate text-ink">{w.name || w.email}</span><span className="shrink-0 text-muted"><span className="font-semibold text-navy">{w.clicks} tap{w.clicks === 1 ? "" : "s"}</span> · last {etDate(w.last, true)}</span></li>)}
+                              {r.linkWho[l.linkId].map((w, i) => <li key={i} className="flex justify-between gap-3"><span className="min-w-0 truncate text-ink">{w.name || w.email}</span><span className="shrink-0 text-muted"><span className="font-medium text-navy">{w.clicks} tap{w.clicks === 1 ? "" : "s"}</span> · last {etDate(w.last, true)}</span></li>)}
                             </ul>) : null}
                         </li>))}
                     </ul>
@@ -134,12 +135,12 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                           <li key={key} className="py-1 first:pt-0">
                             <button onClick={() => setOpen(isOpen ? null : key)} aria-expanded={isOpen} className="flex w-full items-start justify-between gap-3 rounded-lg py-2 text-left hover:bg-mist">
                               <div className="min-w-0">
-                                <div className="truncate text-[14px] font-semibold text-ink">{p.name || p.email || "(text)"}</div>
+                                <div className="truncate text-[14px] font-medium text-ink">{p.name || p.email || "(text)"}</div>
                                 {p.name ? <div className="truncate text-[12px] text-muted">{p.email}</div> : null}
                                 <div className="mt-0.5 text-[12px] text-muted">{sub}{p.receivedCount > 1 ? ` · received ${p.receivedCount} times` : ""}</div>
                               </div>
                               <div className="flex shrink-0 items-start gap-2 text-right text-[12px] text-muted">
-                                <div>{p.clicks ? <span className="font-semibold text-navy">{p.clicks} tap{p.clicks === 1 ? "" : "s"}</span> : null}{p.lastActivity ? <div>{etDate(p.lastActivity, true)}</div> : null}</div>
+                                <div>{p.clicks ? <span className="font-medium text-navy">{p.clicks} tap{p.clicks === 1 ? "" : "s"}</span> : null}{p.lastActivity ? <div>{etDate(p.lastActivity, true)}</div> : null}</div>
                                 <ChevronDown size={16} className={`mt-0.5 transition-transform ${isOpen ? "rotate-180" : ""}`} />
                               </div>
                             </button>
@@ -147,7 +148,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                               <div className="mb-2 ml-1 space-y-2 border-l-2 border-line pl-3">
                                 {p.receipts.map((rc, j) => (
                                   <div key={j} className="text-[13px]">
-                                    <div className="flex flex-wrap items-center gap-x-2 text-ink"><span className="font-semibold">Sent {rc.at ? etDate(rc.at, true) : ""}</span>{rc.kind === "test" ? <Chip tone="amber">Test</Chip> : null}<span className="text-muted">{["bounced", "complained", "failed"].includes(rc.status) ? rc.status : rc.opened ? `opened ${rc.openCount} time${rc.openCount === 1 ? "" : "s"}, first ${rc.openedAt ? etDate(rc.openedAt, true) : ""}` : "not opened yet"}</span></div>
+                                    <div className="flex flex-wrap items-center gap-x-2 text-ink"><span className="font-medium">Sent {rc.at ? etDate(rc.at, true) : ""}</span>{rc.kind === "test" ? <Chip tone="amber">Test</Chip> : null}<span className="text-muted">{["bounced", "complained", "failed"].includes(rc.status) ? rc.status : rc.opened ? `opened ${rc.openCount} time${rc.openCount === 1 ? "" : "s"}, first ${rc.openedAt ? etDate(rc.openedAt, true) : ""}` : "not opened yet"}</span></div>
                                     {rc.taps.length ? <ul className="mt-1 space-y-0.5">{rc.taps.map((t, k) => <li key={k} className="flex justify-between gap-3 text-muted"><span className="min-w-0 truncate text-ink">{t.label}</span><span className="shrink-0">{etDate(t.at, true)}{t.device ? ` · ${t.device}` : ""}</span></li>)}</ul> : <div className="text-muted">No taps</div>}
                                   </div>))}
                               </div>) : null}

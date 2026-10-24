@@ -30,14 +30,14 @@ export function EmailInsights({ id, url, title = "What’s happening", scopeNote
   return (
     <section aria-label="Summary" className="rounded-lg border border-[#cfe3f3] bg-[#f4f9fe] p-5">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="flex items-center gap-2 font-serif text-lg font-semibold text-navy"><Sparkles size={18} className="text-brand" />{title}</h2>
+        <h2 className="flex items-center gap-2 font-serif text-lg text-ink"><Sparkles size={18} className="text-brand" />{title}</h2>
         <button onClick={() => load(true)} disabled={busy} aria-label="Refresh summary" className="flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-brand hover:bg-surface disabled:opacity-50"><RefreshCw size={14} className={busy ? "animate-spin" : ""} />Refresh</button>
       </div>
       {err ? <p role="alert" className="mt-2 text-sm text-[#8a1020]">{err}</p> : null}
       {!d && busy ? <div className="mt-3 space-y-2"><div className="h-4 w-11/12 animate-pulse rounded bg-surface" /><div className="h-4 w-8/12 animate-pulse rounded bg-surface" /></div> : null}
       {d ? (
         <div className={busy ? "opacity-60 transition" : "transition"}>
-          <p className="mt-2 text-[15px] leading-relaxed text-ink">{d.summary}</p>
+          <p className="mt-2 text-sm leading-relaxed text-ink">{d.summary}</p>
           {d.working.length ? (
             <div className="mt-4"><h3 className="label">Working well</h3>
               <ul className="mt-1 space-y-1.5 text-[14px] leading-snug text-ink">{d.working.map((w, i) => <li key={i} className="flex gap-2"><span aria-hidden className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#33bc53]" />{w}</li>)}</ul></div>

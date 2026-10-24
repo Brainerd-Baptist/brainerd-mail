@@ -72,8 +72,8 @@ export function PhotoEditor({ source, shape: shape0, initial, quality, onCancel,
     <div className="fixed inset-0 z-[60] flex flex-col bg-[rgb(var(--color-mist))] text-white">
       <div className="flex h-14 shrink-0 items-center justify-between px-3">
         <button onClick={onCancel} aria-label="Cancel" className="flex h-11 w-11 items-center justify-center rounded-full"><X size={22} /></button>
-        <span className="text-[15px] font-semibold">Adjust photo</span>
-        <button onClick={save} disabled={!img || busy} className="min-h-11 rounded-full bg-brand px-5 text-[15px] font-semibold disabled:opacity-50">{busy ? "Saving…" : "Save"}</button>
+        <span className="text-sm font-medium">Adjust photo</span>
+        <button onClick={save} disabled={!img || busy} className="min-h-11 rounded-full bg-brand px-5 text-sm font-semibold disabled:opacity-50">{busy ? "Saving…" : "Save"}</button>
       </div>
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-3">
         {err ? <p className="text-sm text-[#ffb4b4]">{err}</p> : !img ? <p className="text-sm text-white/70">Opening photo…</p> : (
@@ -85,18 +85,18 @@ export function PhotoEditor({ source, shape: shape0, initial, quality, onCancel,
       </div>
       <div className="shrink-0 space-y-4 px-5 pb-8 pt-3">
         <div>
-          <span className="mb-1 block text-sm font-semibold">Shape</span>
+          <span className="mb-1 block text-sm font-medium">Shape</span>
           <div className="flex flex-wrap gap-2">
             {SHAPES.map((x) => (
               <button key={x.key} type="button" onClick={() => { setShape(x.key); setEdit((e) => ({ ...e, fx: 0.5, fy: 0.5 })); }}
-                className={`min-h-9 rounded-full border px-3.5 text-sm font-semibold ${shape === x.key ? "border-white bg-surface text-[#0b1220]" : "border-white/30"}`}>{x.label}</button>
+                className={`min-h-9 rounded-full border px-3.5 text-sm font-medium ${shape === x.key ? "border-white bg-surface text-[#0b1220]" : "border-white/30"}`}>{x.label}</button>
             ))}
           </div>
         </div>
-        <label className="block text-sm"><span className="mb-1 block font-semibold">Zoom</span>
+        <label className="block text-sm"><span className="mb-1 block font-medium">Zoom</span>
           <input type="range" min={1} max={3} step={0.01} value={edit.zoom} onChange={(e) => setEdit({ ...edit, zoom: Number(e.target.value) })} className="w-full accent-[#6aa6ff]" />
         </label>
-        <label className="block text-sm"><span className="mb-1 flex items-center justify-between font-semibold"><span className="flex items-center gap-1.5"><Sun size={15} />Brightness</span>
+        <label className="block text-sm"><span className="mb-1 flex items-center justify-between font-medium"><span className="flex items-center gap-1.5"><Sun size={15} />Brightness</span>
           <button type="button" onClick={() => img && setEdit({ ...edit, gamma: autoGamma(quality?.brightness ?? 70) })} className="flex min-h-8 items-center gap-1 rounded-full border border-white/30 px-3 text-xs font-semibold"><Wand2 size={13} />Auto</button></span>
           <input type="range" min={1} max={2.2} step={0.01} value={edit.gamma} onChange={(e) => setEdit({ ...edit, gamma: Number(e.target.value) })} className="w-full accent-[#6aa6ff]" />
         </label>

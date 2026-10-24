@@ -40,7 +40,7 @@ export function Lines({ label, value, onChange }: { label: string; value: string
 export function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex cursor-pointer items-center justify-between gap-3 py-1">
-      <span className="text-[15px] text-ink">{label}</span>
+      <span className="text-sm text-ink">{label}</span>
       <button
         type="button"
         role="switch"
@@ -125,7 +125,7 @@ export function ImageFields({ label = "Photo", value, onChange, aspect }: { labe
       <span className="label !mb-0">{label}</span>
       {v.url ? <img src={v.url} alt="" className={shape === "circle" ? "mx-auto h-40 w-40 rounded-full object-cover" : "h-40 w-full rounded-lg object-cover"} /> : (
         <button type="button" onClick={() => input.current?.click()} className="flex h-32 w-full flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-line text-muted active:bg-mist">
-          <ImagePlus size={28} /><span className="text-sm font-semibold">Tap to add a photo</span>
+          <ImagePlus size={28} /><span className="text-sm font-medium">Tap to add a photo</span>
         </button>
       )}
       <input ref={input} type="file" accept="image/*" className="hidden" onChange={(e) => pick(e.target.files?.[0])} />

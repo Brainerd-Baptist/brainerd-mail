@@ -32,7 +32,7 @@ export function HelpHost() {
 function ArticleCard({ a, onOpen }: { a: Article; onOpen: () => void }) {
   return (
     <button onClick={onOpen} className="flex min-h-14 w-full items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3 text-left active:bg-mist">
-      <span className="min-w-0 flex-1"><span className="block text-[15px] font-semibold text-ink">{a.title}</span><span className="block text-sm text-muted">{a.summary}</span></span>
+      <span className="min-w-0 flex-1"><span className="block text-sm font-medium text-ink">{a.title}</span><span className="block text-sm text-muted">{a.summary}</span></span>
       <ChevronRight size={18} className="shrink-0 text-muted" />
     </button>
   );
@@ -74,13 +74,13 @@ function HelpSheet({ onClose }: { onClose: () => void }) {
   const header = (title: string, back?: () => void) => (
     <div className="mb-4 flex items-center gap-1">
       {back ? <button onClick={back} aria-label="Back" className="-ml-2 flex h-11 w-11 items-center justify-center rounded-lg text-muted"><ArrowLeft size={22} /></button> : null}
-      <h2 className="flex-1 font-serif text-xl font-semibold text-navy">{title}</h2>
+      <h2 className="flex-1 font-serif text-xl text-ink">{title}</h2>
       <button aria-label="Close help" onClick={onClose} className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button>
     </div>
   );
 
   const stuck = (
-    <button onClick={() => setView({ k: "request", q: q.trim() || "", kind: "question" })} className="mt-4 w-full rounded-lg bg-mist px-4 py-3 text-left text-[15px] font-semibold text-navy">Can't find it? Ask us or request it →</button>
+    <button onClick={() => setView({ k: "request", q: q.trim() || "", kind: "question" })} className="mt-4 w-full rounded-lg bg-mist px-4 py-3 text-left text-sm font-semibold text-navy">Can't find it? Ask us or request it →</button>
   );
 
   let body: React.ReactNode;
@@ -89,8 +89,8 @@ function HelpSheet({ onClose }: { onClose: () => void }) {
     body = a ? (
       <>
         {header(a.title, () => setView(view.back))}
-        <p className="text-[16px] text-ink">{a.summary}</p>
-        {a.steps?.length ? <ol className="mt-3 list-decimal space-y-2 pl-5 text-[16px] text-ink">{a.steps.map((s, i) => <li key={i}>{s}</li>)}</ol> : null}
+        <p className="text-sm text-ink">{a.summary}</p>
+        {a.steps?.length ? <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-ink">{a.steps.map((s, i) => <li key={i}>{s}</li>)}</ol> : null}
         {a.note ? <p className="mt-4 rounded-lg bg-brand/10 p-3 text-sm text-navy">{a.note}</p> : null}
         {stuck}
       </>
@@ -101,10 +101,10 @@ function HelpSheet({ onClose }: { onClose: () => void }) {
       <>
         {header("Answer", () => setView({ k: "home" }))}
         <p className="text-sm text-muted">You asked: “{view.q}”</p>
-        <p className={`mt-3 rounded-lg p-4 text-[16px] leading-relaxed ${view.covered ? "bg-mist text-ink" : "bg-[#fff3d6] text-[#5c3a00]"}`}>{view.text}</p>
+        <p className={`mt-3 rounded-lg p-4 text-sm leading-relaxed ${view.covered ? "bg-mist text-ink" : "bg-[#fff3d6] text-[#5c3a00]"}`}>{view.text}</p>
         {src.length ? <div className="mt-4 space-y-2"><div className="label">Related help</div>{src.map((a) => <ArticleCard key={a.id} a={a} onOpen={() => setView({ k: "article", id: a.id, back: view })} />)}</div> : null}
         <div className="mt-5 rounded-lg border border-line p-4">
-          <p className="text-[15px] font-semibold text-ink">{view.covered ? "Did that answer it?" : "This doesn't look like something help covers."}</p>
+          <p className="text-sm font-medium text-ink">{view.covered ? "Did that answer it?" : "This doesn't look like something help covers."}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {view.covered ? <button onClick={onClose} className="pill-btn bg-brand text-white"><Check size={16} className="mr-1.5" />Yes, thanks</button> : null}
             <button onClick={() => setView({ k: "request", q: view.q, kind: "question" })} className="pill-btn border border-line text-ink">{view.covered ? "Not quite" : "Ask us"}</button>
@@ -142,12 +142,12 @@ function HelpSheet({ onClose }: { onClose: () => void }) {
           matches.length ? (
             <div className="space-y-2"><div className="label">Matching help</div>{matches.map((a) => <ArticleCard key={a.id} a={a} onOpen={() => setView({ k: "article", id: a.id, back: { k: "home" } })} />)}{stuck}</div>
           ) : (
-            <div className="rounded-lg border border-dashed border-line p-4 text-[15px] text-muted">No help articles match yet. Tap Get an answer to ask, or send it to us.</div>
+            <div className="rounded-lg border border-dashed border-line p-4 text-sm text-muted">No help articles match yet. Tap Get an answer to ask, or send it to us.</div>
           )
         ) : (
           <>
             {here.length ? <section className="space-y-2"><div className="label">Help for this page</div>{here.map((a) => <ArticleCard key={a.id} a={a} onOpen={() => setView({ k: "article", id: a.id, back: { k: "home" } })} />)}</section> : null}
-            <button onClick={() => setView({ k: "browse" })} className="mt-4 flex min-h-12 w-full items-center justify-between rounded-lg border border-line px-4 text-[15px] font-semibold text-navy">Browse all help<ChevronRight size={18} /></button>
+            <button onClick={() => setView({ k: "browse" })} className="mt-4 flex min-h-12 w-full items-center justify-between rounded-lg border border-line px-4 text-sm font-semibold text-navy">Browse all help<ChevronRight size={18} /></button>
             {stuck}
           </>
         )}
@@ -179,7 +179,7 @@ function RequestForm({ view, path, onBack, onClose, header }: { view: Extract<Vi
   if (state === "sent") return (
     <div className="py-6 text-center">
       <Check size={36} className="mx-auto mb-2 text-[#1e7a4c]" />
-      <p className="text-[17px] font-semibold text-ink">Thank you. We got it.</p>
+      <p className="text-base font-medium text-ink">Thank you. We got it.</p>
       <p className="mt-1 text-sm text-muted">{kind === "feature" ? "We'll look at adding it." : "Someone will get back to you."}</p>
       <button onClick={onClose} className="pill-btn mt-5 w-full bg-brand text-white">Done</button>
     </div>
@@ -189,7 +189,7 @@ function RequestForm({ view, path, onBack, onClose, header }: { view: Extract<Vi
       {header("Ask us or request it", onBack)}
       <div className="mb-3 grid gap-2">
         {([["question", "I need help with something", HelpCircle], ["feature", "Brainerd Mail should do this", Lightbulb]] as const).map(([k, label, Icon]) => (
-          <button key={k} onClick={() => setKind(k)} className={`flex min-h-12 items-center gap-2 rounded-lg border px-3 text-left text-[15px] font-semibold ${kind === k ? "border-brand bg-mist text-navy" : "border-line text-ink"}`}><Icon size={18} />{label}</button>
+          <button key={k} onClick={() => setKind(k)} className={`flex min-h-12 items-center gap-2 rounded-lg border px-3 text-left text-sm font-semibold ${kind === k ? "border-brand bg-mist text-navy" : "border-line text-ink"}`}><Icon size={18} />{label}</button>
         ))}
       </div>
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={5} className="field w-full" placeholder={kind === "feature" ? "What would you like it to do?" : "What are you trying to do?"} autoFocus />

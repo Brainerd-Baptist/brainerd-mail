@@ -14,8 +14,8 @@ const ITEMS = [
   { href: "/emails", label: "Emails", icon: Mail, match: (p: string) => p === "/emails" || p.startsWith("/editor") || p.startsWith("/review") },
   { href: "/calendar", label: "Calendar", icon: CalendarDays, match: (p: string) => p.startsWith("/calendar") },
   { href: "/analytics", label: "Analytics", icon: BarChart3, match: (p: string) => p.startsWith("/analytics") },
-  { href: "/missions", label: "Missions map", icon: MapIcon, match: (p: string) => p.startsWith("/missions") },
-  { href: "/roster", label: "Serving list", icon: Globe, match: (p: string) => p.startsWith("/roster") },
+  { href: "/missions", label: "Missions Map", icon: MapIcon, match: (p: string) => p.startsWith("/missions") },
+  { href: "/roster", label: "Serving List", icon: Globe, match: (p: string) => p.startsWith("/roster") },
 ];
 
 export function NavMenu() {
@@ -49,7 +49,7 @@ export function NavMenu() {
     <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`mx-2 my-0.5 flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors ${active ? "bg-brand/15 font-medium text-brand-soft" : "text-ink hover:bg-brand/5"}`}>
       <Icon size={18} className="shrink-0" />
       <span className="flex-1">{label}</span>
-      {badge ? <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">{badge}</span> : null}
+      {badge ? <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-medium text-white">{badge}</span> : null}
     </Link>
   );
 

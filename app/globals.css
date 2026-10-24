@@ -89,7 +89,7 @@ select.field { appearance: none; -webkit-appearance: none; padding-right: 2.5rem
 /* iPhone Safari lets date/time inputs grow past their box and centers the text; keep them inside the column, left-aligned, same height as other fields. */
 input[type="datetime-local"], input[type="date"], input[type="time"] { display: block; -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; max-width: 100%; min-height: 44px; box-sizing: border-box; text-align: left; }
 input[type="datetime-local"]::-webkit-date-and-time-value, input[type="date"]::-webkit-date-and-time-value, input[type="time"]::-webkit-date-and-time-value { text-align: left; min-height: 1.5em; }
-.label { @apply mb-1 block text-xs font-bold uppercase tracking-[0.12em] text-muted; }
+.label { @apply mb-1 block text-xs uppercase tracking-wide text-muted; }
 .pill-btn { @apply inline-flex h-11 items-center justify-center rounded-full px-5 text-sm font-semibold transition; }
 
 @media (max-width: 1023px) { html { -webkit-tap-highlight-color: transparent; } button, select { touch-action: manipulation; } }

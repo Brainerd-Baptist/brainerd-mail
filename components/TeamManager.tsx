@@ -6,6 +6,7 @@ import { Crown, MailPlus, RotateCw, ShieldCheck, UserPlus, X } from "lucide-reac
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
 import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { PALETTES, paletteFor } from "@/lib/ministries";
 import { ROLES, ROLE_BLURB, ROLE_LABEL, canManageTarget, rolesICanGrant, type Role } from "@/lib/roles-ui";
 
@@ -19,7 +20,7 @@ const PILL: Record<Role, string> = {
   editor: "bg-[#fff3d6] text-[#5c3a00]",
   viewer: "bg-slate-100 text-slate-700",
 };
-const RolePill = ({ role }: { role: Role }) => <span className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-bold ${PILL[role]}`}>{ROLE_LABEL[role]}</span>;
+const RolePill = ({ role }: { role: Role }) => <span className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${PILL[role]}`}>{ROLE_LABEL[role]}</span>;
 const nameOf = (m: { name: string | null; email: string }) => m.name || m.email.split("@")[0];
 const initials = (s: string) => s.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "?";
 const day = (iso: string) => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
@@ -29,7 +30,7 @@ function Sheet({ title, onClose, children }: { title: string; onClose: () => voi
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 sm:items-center sm:justify-center" onClick={onClose}>
       <div className="max-h-[90dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">{title}</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
+        <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl text-ink">{title}</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button></div>
         {children}
       </div>
     </div>
@@ -42,7 +43,7 @@ function RolePicker({ value, onChange, options }: { value: Role; onChange: (r: R
       {options.map((r) => (
         <button key={r} type="button" role="radio" aria-checked={value === r} onClick={() => onChange(r)} className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left ${value === r ? "border-brand bg-mist" : "border-line bg-surface"}`}>
           <span className={`mt-1 h-4 w-4 shrink-0 rounded-full border-2 ${value === r ? "border-brand bg-brand shadow-[inset_0_0_0_3px_#fff]" : "border-line"}`} />
-          <span className="min-w-0"><span className="block text-[15px] font-semibold text-ink">{ROLE_LABEL[r]}</span><span className="block text-sm text-muted">{ROLE_BLURB[r]}</span></span>
+          <span className="min-w-0"><span className="block text-sm font-medium text-ink">{ROLE_LABEL[r]}</span><span className="block text-sm text-muted">{ROLE_BLURB[r]}</span></span>
         </button>
       ))}
     </div>
@@ -100,18 +101,19 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
 
   return (
     <div className="min-h-full bg-mist pb-16">
-      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-4 py-4 backdrop-blur sm:px-6">
-        <div className="mx-auto flex max-w-3xl items-center gap-3">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3">
           <NavMenu />
-          <HeaderBrand label="Team" />
+          <HeaderBrand label="Mail" />
           <span className="flex-1" />
           <HelpButton />
+          <HqLink />
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl space-y-5 px-4 pt-6">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="font-serif text-2xl font-semibold text-navy">Team</h1>
+          <h1 className="font-serif text-2xl text-ink">Team</h1>
           <button onClick={() => { setNote(""); setErr(""); setInviteOpen(true); }} className="pill-btn shrink-0 whitespace-nowrap bg-brand text-white"><UserPlus size={16} className="mr-1.5" />Invite someone</button>
         </div>
 
@@ -119,19 +121,19 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
         {err && !inviteOpen && !editing ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
         <section aria-label="People" className="overflow-hidden rounded-lg border border-line bg-surface">
-          <h2 className="border-b border-line px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">People · {active.length}</h2>
+          <h2 className="border-b border-line px-4 py-3 text-xs font-medium uppercase tracking-[0.12em] text-muted">People · {active.length}</h2>
           <ul className="divide-y divide-line">
             {active.map((m) => {
               const mine = m.user_id === me.userId;
               const can = !mine && canManageTarget(me.role, m.role);
               return (
                 <li key={m.user_id} className="flex items-center gap-3 px-4 py-3">
-                  <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-bold text-navy">{initials(nameOf(m))}</span>
+                  <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/10 text-sm font-semibold text-navy">{initials(nameOf(m))}</span>
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="truncate text-[15px] font-semibold text-ink">{nameOf(m)}{mine ? " (you)" : ""}</span><RolePill role={m.role} />{m.role !== "owner" && m.can_approve ? <span className="inline-flex items-center rounded-full bg-[#e3f4ea] px-2.5 py-0.5 text-xs font-bold text-[#0d5a37]">Approves emails</span> : null}</div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><span className="truncate text-sm font-medium text-ink">{nameOf(m)}{mine ? " (you)" : ""}</span><RolePill role={m.role} />{m.role !== "owner" && m.can_approve ? <span className="inline-flex items-center rounded-full bg-[#e3f4ea] px-2.5 py-0.5 text-xs font-medium text-[#0d5a37]">Approves emails</span> : null}</div>
                     <div className="truncate text-sm text-muted">{m.email}</div>
                     <div className="truncate text-xs text-muted">{scope(m.role, m.ministries)} · joined {day(m.created_at)}</div>
-                    {lastSignIn ? <div className="truncate text-xs font-semibold text-navy">{seen(lastSignIn, m.user_id)}</div> : null}
+                    {lastSignIn ? <div className="truncate text-xs font-medium text-navy">{seen(lastSignIn, m.user_id)}</div> : null}
                   </div>
                   {can ? <button onClick={() => { setErr(""); setNote(""); setEditing(m); }} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink">Manage</button>
                     : me.role === "owner" && !mine ? null : null}
@@ -143,16 +145,16 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
 
         {invites.length ? (
           <section aria-label="Invitations" className="overflow-hidden rounded-lg border border-line bg-surface">
-            <h2 className="border-b border-line px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">Invitations · {invites.length}</h2>
+            <h2 className="border-b border-line px-4 py-3 text-xs font-medium uppercase tracking-[0.12em] text-muted">Invitations · {invites.length}</h2>
             <ul className="divide-y divide-line">
               {invites.map((i) => {
                 const expired = new Date(i.expires_at).getTime() < Date.now();
                 const can = canManageTarget(me.role, i.role);
                 return (
                   <li key={i.id} className="px-4 py-3">
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><MailPlus size={16} className="text-muted" /><span className="truncate text-[15px] font-semibold text-ink">{[i.first_name, i.last_name].filter(Boolean).join(" ") || i.email}</span><RolePill role={i.role} /></div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><MailPlus size={16} className="text-muted" /><span className="truncate text-sm font-medium text-ink">{[i.first_name, i.last_name].filter(Boolean).join(" ") || i.email}</span><RolePill role={i.role} /></div>
                     {i.first_name || i.last_name ? <div className="truncate text-sm text-muted">{i.email}</div> : null}
-                    <div className="mt-0.5 text-xs text-muted">{scope(i.role, i.ministries)} · {expired ? <span className="font-semibold text-[#8a1020]">expired {day(i.expires_at)}</span> : <>sent {day(i.last_sent_at)}, good until {day(i.expires_at)}</>}</div>
+                    <div className="mt-0.5 text-xs text-muted">{scope(i.role, i.ministries)} · {expired ? <span className="font-medium text-[#8a1020]">expired {day(i.expires_at)}</span> : <>sent {day(i.last_sent_at)}, good until {day(i.expires_at)}</>}</div>
                     {can ? (
                       <div className="mt-2 flex gap-2">
                         <button onClick={() => inviteAction(i, "resend")} disabled={!!busy} className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line px-4 text-sm font-semibold text-ink disabled:opacity-60"><RotateCw size={15} />{expired ? "Send a new invitation" : "Resend"}</button>
@@ -168,11 +170,11 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
 
         {off.length ? (
           <section aria-label="Removed" className="overflow-hidden rounded-lg border border-line bg-surface">
-            <h2 className="border-b border-line px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">Removed · {off.length}</h2>
+            <h2 className="border-b border-line px-4 py-3 text-xs font-medium uppercase tracking-[0.12em] text-muted">Removed · {off.length}</h2>
             <ul className="divide-y divide-line">
               {off.map((m) => (
                 <li key={m.user_id} className="flex items-center gap-3 px-4 py-3">
-                  <div className="min-w-0 flex-1"><div className="truncate text-[15px] font-semibold text-muted">{nameOf(m)}</div><div className="truncate text-sm text-muted">{m.email} · {ROLE_LABEL[m.role]}</div>{lastSignIn ? <div className="truncate text-xs text-muted">{seen(lastSignIn, m.user_id)}</div> : null}</div>
+                  <div className="min-w-0 flex-1"><div className="truncate text-sm font-medium text-muted">{nameOf(m)}</div><div className="truncate text-sm text-muted">{m.email} · {ROLE_LABEL[m.role]}</div>{lastSignIn ? <div className="truncate text-xs text-muted">{seen(lastSignIn, m.user_id)}</div> : null}</div>
                   {canManageTarget(me.role, m.role) ? <button disabled={!!busy} onClick={async () => { const r = await call(`/api/team/members/${m.user_id}`, { method: "PATCH", body: JSON.stringify({ disabled: false }) }, m.user_id); if (r.ok) { setNote(`${nameOf(m)} has access again.`); router.refresh(); } }} className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink disabled:opacity-60">Restore access</button> : null}
                 </li>
               ))}
@@ -181,7 +183,7 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
         ) : null}
 
         <section className="rounded-lg border border-line bg-surface">
-          <button onClick={() => setGuide(!guide)} aria-expanded={guide} className="flex min-h-12 w-full items-center gap-2 px-4 text-left text-[15px] font-semibold text-navy"><ShieldCheck size={18} />What each role can do<span className="flex-1" /><span className="text-sm text-muted">{guide ? "Hide" : "Show"}</span></button>
+          <button onClick={() => setGuide(!guide)} aria-expanded={guide} className="flex min-h-12 w-full items-center gap-2 px-4 text-left text-sm font-semibold text-navy"><ShieldCheck size={18} />What each role can do<span className="flex-1" /><span className="text-sm text-muted">{guide ? "Hide" : "Show"}</span></button>
           {guide ? (
             <ul className="space-y-3 border-t border-line px-4 py-4">
               {ROLES.map((r) => <li key={r} className="flex items-start gap-3"><RolePill role={r} /><span className="text-sm text-muted">{ROLE_BLURB[r]}</span></li>)}
@@ -252,7 +254,7 @@ function ManageSheet({ m, me, grant, onClose, onDone, call, busy, err }: { m: Me
       {me.role === "owner" ? (
         <label className="mt-4 flex items-start gap-3 rounded-lg border border-line p-3">
           <input type="checkbox" checked={approves} onChange={(e) => setApproves(e.target.checked)} className="mt-0.5 h-5 w-5" />
-          <span><span className="block text-[15px] font-semibold text-ink">Can approve emails</span><span className="block text-sm text-muted">They get the approval requests and can approve or send emails back. They can't approve an email they sent themselves. You can always approve.</span></span>
+          <span><span className="block text-sm font-medium text-ink">Can approve emails</span><span className="block text-sm text-muted">They get the approval requests and can approve or send emails back. They can't approve an email they sent themselves. You can always approve.</span></span>
         </label>
       ) : null}
       {err ? <p role="alert" className="mt-4 rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}

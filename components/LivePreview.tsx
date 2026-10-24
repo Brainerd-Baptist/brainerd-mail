@@ -85,13 +85,13 @@ export default function LivePreview({ emailId }: { emailId: string }) {
   const pick = (v: View) => { setView(v); try { localStorage.setItem("brainerd-mail:preview-view", v); } catch {} };
   const showPhone = view === "phone" || (view === "both" && wide) || (view === "both" && !wide);
   const showDesktop = view === "desktop" || (view === "both" && wide);
-  const btn = (on: boolean) => `flex h-9 items-center rounded-full px-4 text-sm font-semibold ${on ? "bg-surface text-navy shadow-sm" : "text-muted"}`;
+  const btn = (on: boolean) => `flex h-9 items-center rounded-full px-4 text-sm font-medium ${on ? "bg-surface text-navy shadow-sm" : "text-muted"}`;
 
   return (
     <div className="min-h-[100dvh] bg-mist">
       <header className="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-line bg-surface px-4 py-3">
         <div className="mr-auto">
-          <h1 className="font-serif text-lg font-semibold text-navy">{doc?.subject || "Live preview"}</h1>
+          <h1 className="font-serif text-lg text-ink">{doc?.subject || "Live preview"}</h1>
           <p className="text-xs text-muted">{updated ? `Updated ${updated.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })}` : "Loading…"} · follows your edits automatically</p>
         </div>
         <div className="flex items-center gap-1 rounded-full bg-line p-1">

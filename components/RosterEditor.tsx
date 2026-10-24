@@ -54,14 +54,14 @@ export function RosterEditor({ initial, version }: { initial: Member[]; version:
       <header className="sticky top-0 z-10 border-b border-line bg-surface/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center gap-3">
           <NavMenu />
-          <h1 className="flex-1 truncate text-center font-serif text-lg font-semibold text-navy">Members serving globally</h1>
+          <h1 className="flex-1 truncate text-center font-serif text-lg text-ink">Members serving globally</h1>
           <HelpButton />
-          <a href="/serving" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-semibold text-brand">View<ExternalLink size={14} /></a>
+          <a href="/serving" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-medium text-brand">View<ExternalLink size={14} /></a>
         </div>
       </header>
 
       <main className="mx-auto max-w-2xl space-y-8 px-4 pt-6">
-        <p className="text-[15px] text-muted">This list is the page at <b className="text-ink">mail.brainerdhq.app/serving</b>. The link never changes. Edit, then tap Save.</p>
+        <p className="text-sm text-muted">This list is the page at <b className="text-ink">mail.brainerdhq.app/serving</b>. The link never changes. Edit, then tap Save.</p>
 
         {grouped.map((g) => (
           <section key={g.region} className="space-y-3">
@@ -74,7 +74,7 @@ export function RosterEditor({ initial, version }: { initial: Member[]; version:
                   <button type="button" onClick={() => setOpen(isOpen ? null : m.id)} className="flex w-full items-center gap-3 p-3 text-left" aria-expanded={isOpen}>
                     {m.photo ? <img src={m.photo} alt="" className="h-14 w-[74px] flex-none rounded-md object-cover" /> : <span className="flex h-14 w-[74px] flex-none items-center justify-center rounded-md bg-mist text-xs text-muted">No photo</span>}
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-ink">{m.who || "New person"}</span>
+                      <span className="block truncate font-medium text-ink">{m.who || "New person"}</span>
                       <span className="block truncate text-sm text-muted">{[m.place, m.deployed && `Deployed ${m.deployed}`].filter(Boolean).join(" · ") || "Tap to fill in"}{m.hidden ? " · Hidden" : ""}</span>
                     </span>
                   </button>

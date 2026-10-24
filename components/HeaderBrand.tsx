@@ -3,7 +3,7 @@
 // workspaces (32px logo; 1px x 24px divider in the accent at 20%; 12px uppercase text, 0.2em
 // tracking, muted gray, system font, one line, hidden on phones where space is tight).
 const SYSTEM_UI_FONT_STACK = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const HEIGHT = 32;
+const HEIGHT = 28;
 
 export function HeaderBrand({ label = "Mail" }: { label?: string }) {
   return (
