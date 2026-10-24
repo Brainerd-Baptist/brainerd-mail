@@ -7,6 +7,7 @@ import { NavMenu } from "@/components/NavMenu";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { HqLink } from "@/components/HqLink";
 import { HelpButton } from "@/components/HelpButton";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { C, Card, Chip, HBars, Split, Tile, VBars, deltaCount, deltaRate, downloadCsv, etDate, hourName, num, pct } from "@/components/charts";
 import type { Filters, Overview, Tally } from "@/lib/analytics";
 
@@ -182,7 +183,7 @@ export function Analytics({ ministries, people, own }: { ministries: Min[]; peop
   return (
     <div className="min-h-full bg-mist pb-20">
       <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><HelpButton /><HqLink /></div>
+        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><ProfileMenu /><HelpButton /><HqLink /></div>
       </header>
 
       <main className="mx-auto max-w-5xl space-y-5 px-4 pt-6">

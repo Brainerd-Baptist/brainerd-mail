@@ -6,6 +6,7 @@ import { HeaderBrand } from "@/components/HeaderBrand";
 import { HqLink } from "@/components/HqLink";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Check, ChevronLeft, ChevronRight, CircleDashed, Clock, ExternalLink, Pause, Play, Plus, Repeat, SkipForward, Trash2, Undo2, X } from "lucide-react";
 import { PALETTES, paletteFor, swatch } from "@/lib/ministries";
@@ -197,7 +198,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
           <NavMenu />
           <HeaderBrand label="Mail" />
           <span className="flex-1" />
-          <HelpButton />
+          <ProfileMenu /><HelpButton />
           <HqLink />
           {buildable.length ? <button onClick={openAdd} className="pill-btn shrink-0 whitespace-nowrap bg-brand text-white"><Plus size={16} className="mr-1.5" /><span className="sm:hidden">Plan</span><span className="hidden sm:inline">Plan an email</span></button> : null}
         </div>

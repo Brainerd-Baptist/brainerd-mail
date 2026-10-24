@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Crown, MailPlus, RotateCw, ShieldCheck, UserPlus, X } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { HqLink } from "@/components/HqLink";
 import { PALETTES, paletteFor } from "@/lib/ministries";
@@ -106,7 +107,7 @@ export function TeamManager({ me, members, invites, lastSignIn }: { me: { userId
           <NavMenu />
           <HeaderBrand label="Mail" />
           <span className="flex-1" />
-          <HelpButton />
+          <ProfileMenu /><HelpButton />
           <HqLink />
         </div>
       </header>

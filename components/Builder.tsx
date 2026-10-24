@@ -17,6 +17,7 @@ import { SubmitSheet, HistorySheet, ScheduleSheet } from "@/components/ApprovalS
 import { TestSheet } from "@/components/TestSheet";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { SENDING_ENABLED, when } from "@/lib/approval";
 import { CHURCH_ADDRESS, CONTACT_EMAIL } from "@/lib/church";
 import { Area, Field } from "./fields";
@@ -725,7 +726,7 @@ export default function Builder({ emailId }: { emailId: string }) {
           {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-medium min-[1900px]:px-3 text-muted hover:bg-mist"><Globe size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Serving list</span></a> : null}
           <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2 text-sm font-semibold min-[1900px]:px-3 hover:bg-mist ${planIso ? "border-line text-ink" : "border-transparent text-brand"}`}><CalendarClock size={18} className={planIso ? "text-brand" : ""} />{planIso ? chipShort(planIso) : "Schedule"}</button>
           <button onClick={() => setFeedbackOpen(true)} aria-label="Feedback" title="Feedback" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><LifeBuoy size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Feedback</span>{inboxNew ? <span className="rounded-full bg-red-600 px-1.5 text-xs font-semibold text-white">{inboxNew}</span> : null}</button>
-          <HelpButton />
+          <ProfileMenu /><HelpButton />
           <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-mist disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-mist disabled:opacity-30"><Redo2 size={20} /></button>
           <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><History size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">History</span></button>
           <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-medium min-[1900px]:px-3 text-muted hover:bg-mist"><Monitor size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Live preview</span></a>

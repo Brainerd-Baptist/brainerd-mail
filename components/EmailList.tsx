@@ -9,6 +9,7 @@ import { HeaderBrand } from "@/components/HeaderBrand";
 import { HqLink } from "@/components/HqLink";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { useRouter } from "next/navigation";
 import { CalendarDays, Copy, Globe, LogOut, Plus, Search, Trash2, X } from "lucide-react";
 import { PALETTES, paletteFor, swatch } from "@/lib/ministries";
@@ -75,7 +76,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
           <NavMenu />
           <HeaderBrand label="Mail" />
           <span className="flex-1" />
-          <HelpButton />
+          <ProfileMenu /><HelpButton />
           <HqLink />
         </div>
       </header>

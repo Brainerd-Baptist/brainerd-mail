@@ -2,6 +2,7 @@
 import { useMemo, useState } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { ChevronDown, Copy, ExternalLink, Eye, EyeOff, Plus, Search, Trash2 } from "lucide-react";
 import { Area, Field, Segmented, Toggle } from "@/components/fields";
 import { GEO_LIST, LEVEL_COLOR, type Country, type Level, type LevelInfo } from "@/lib/missions";
@@ -150,7 +151,7 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
         <div className="mx-auto flex max-w-2xl items-center gap-3">
           <NavMenu />
           <h1 className="flex-1 truncate text-center font-serif text-lg text-ink">Missions map</h1>
-          <HelpButton />
+          <ProfileMenu /><HelpButton />
           <a href="/embed/missions-map?standalone=1" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-medium text-brand">View<ExternalLink size={14} /></a>
         </div>
       </header>

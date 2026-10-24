@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { RefreshCw, Download, CheckCircle2, AlertTriangle } from "lucide-react";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
+import { ProfileMenu } from "@/components/ProfileMenu";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { HqLink } from "@/components/HqLink";
 import { Card, Chip, num, etDate, downloadCsv } from "@/components/charts";
@@ -56,7 +57,7 @@ export function Audience() {
   return (
     <div className="min-h-full bg-mist pb-20">
       <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><HelpButton /><HqLink /></div>
+        <div className="mx-auto flex max-w-7xl items-center gap-3"><NavMenu /><HeaderBrand label="Mail" /><span className="flex-1" /><ProfileMenu /><HelpButton /><HqLink /></div>
       </header>
       <main className="mx-auto max-w-4xl space-y-5 px-4 pt-5">
         <p className="text-[14px] leading-snug text-muted">Pick each ministry&apos;s ClearStream list, then Check. Mail reads the list (it never changes anything in ClearStream) and shows how many people it would actually email, and exactly who is left out and why.</p>
