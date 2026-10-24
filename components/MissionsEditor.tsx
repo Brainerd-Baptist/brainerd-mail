@@ -2,6 +2,8 @@
 import { useMemo, useState } from "react";
 import { NavMenu } from "@/components/NavMenu";
 import { HelpButton } from "@/components/HelpButton";
+import { HeaderBrand } from "@/components/HeaderBrand";
+import { HqLink } from "@/components/HqLink";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { ChevronDown, Copy, ExternalLink, Eye, EyeOff, Plus, Search, Trash2 } from "lucide-react";
 import { Area, Field, Segmented, Toggle } from "@/components/fields";
@@ -147,16 +149,19 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
 
   return (
     <div className="min-h-full bg-mist pb-24">
-      <header className="sticky top-0 z-10 border-b border-line bg-surface/95 px-4 py-3 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl items-center gap-3">
+      <header className="sticky top-0 z-10 border-b border-brand/15 bg-surface/95 px-6 py-4 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-3">
           <NavMenu />
-          <h1 className="flex-1 truncate text-center font-serif text-lg text-ink">Missions map</h1>
+          <HeaderBrand label="Mail" />
+          <span className="flex-1" />
           <ProfileMenu /><HelpButton />
           <a href="/embed/missions-map?standalone=1" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-medium text-brand">View<ExternalLink size={14} /></a>
+          <HqLink />
         </div>
       </header>
 
       <main className="mx-auto max-w-2xl space-y-6 px-4 pt-6">
+        <h1 className="font-serif text-2xl text-ink">Missions map</h1>
         {!canEdit ? <p className="rounded-lg border border-line bg-surface p-3 text-sm text-muted">Your role can look at the Missions map but not change it. Ask the Owner or an Admin if you need to edit.</p> : null}
         <p className="text-sm text-muted">This is the map on the website’s missions page and in missions emails. Change a country and tap Save: the website updates within seconds.</p>
 

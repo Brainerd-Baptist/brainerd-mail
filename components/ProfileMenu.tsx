@@ -49,7 +49,7 @@ export function ProfileMenu() {
         aria-label="Profile menu"
         aria-expanded={open}
         title={who?.name || who?.email || "Profile"}
-        className={`flex h-9 w-9 items-center justify-center rounded-full border text-xs font-semibold transition-colors ${open ? "border-brand/50 bg-brand/20 text-brand-soft" : "border-brand/25 bg-brand/10 text-muted hover:border-brand/40 hover:text-brand-soft"}`}
+        className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-medium transition-colors ${open ? "border-brand/50 bg-brand/20 text-brand-soft" : "border-brand/25 bg-brand/10 text-muted hover:border-brand/40 hover:text-brand-soft"}`}
       >
         {who ? initials(who.name, who.email) : "··"}
       </button>

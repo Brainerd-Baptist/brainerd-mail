@@ -15,7 +15,7 @@ type View =
 
 // The ? in every page header. Opens help for the page you're on; or ask in plain English.
 export function HelpButton() {
-  return <button onClick={() => window.dispatchEvent(new Event("bm-help"))} aria-label="Help" title="Help" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted active:bg-mist lg:hover:bg-mist"><HelpCircle size={22} /></button>;
+  return <button onClick={() => window.dispatchEvent(new Event("bm-help"))} aria-label="Help" title="Help" className="shrink-0 text-muted transition-colors hover:text-brand-soft"><HelpCircle size={16} /></button>;
 }
 
 // Mounted once in the layout: opens from any ? button or the menu's Help item.

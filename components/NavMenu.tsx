@@ -46,7 +46,7 @@ export function NavMenu() {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} aria-label="Open menu" aria-expanded={open} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink active:bg-mist lg:hover:bg-mist"><Menu size={24} /></button>
+      <button onClick={() => setOpen(true)} aria-label="Open menu" aria-expanded={open} className="shrink-0 text-muted transition-colors hover:text-brand-soft"><Menu size={20} /></button>
       {open ? createPortal(
         <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
