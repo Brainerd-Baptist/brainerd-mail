@@ -441,7 +441,7 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   const checksPanel = (
     <div className="space-y-4">
-    <div className="rounded-xl border border-line bg-surface p-4">
+    <div className="rounded-lg border border-line bg-surface p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-[15px] font-bold text-ink">Before you send</h3>
         <span className={`text-xs font-bold ${statusColor}`}>{statusPill}</span>
@@ -506,14 +506,14 @@ export default function Builder({ emailId }: { emailId: string }) {
       <div className="label">Add to this email</div>
       <div className="mb-6 grid grid-cols-2 gap-2">
         {ADDABLE.map((t) => (
-          <button key={t} onClick={() => { add(t); if (isPhoneLayout) setTab("edit"); }} className="flex min-h-12 items-center gap-1.5 rounded-xl border border-line bg-surface px-3 py-2.5 text-left text-[15px] font-semibold text-ink transition active:bg-mist lg:hover:border-brand"><Plus size={16} className="shrink-0 text-brand" />{BLOCK_LABELS[t]}</button>
+          <button key={t} onClick={() => { add(t); if (isPhoneLayout) setTab("edit"); }} className="flex min-h-12 items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-2.5 text-left text-[15px] font-semibold text-ink transition active:bg-mist lg:hover:border-brand"><Plus size={16} className="shrink-0 text-brand" />{BLOCK_LABELS[t]}</button>
         ))}
       </div>
       <div className="label">In this email</div>
       <ol className="space-y-1.5">
         {doc.blocks.map((b, i) => (
           <li key={b.id}>
-            <div className={`rounded-xl border px-2 pb-1 pt-1 text-sm transition ${selected === b.id ? "border-brand bg-mist" : "border-line bg-surface"}`}>
+            <div className={`rounded-lg border px-2 pb-1 pt-1 text-sm transition ${selected === b.id ? "border-brand bg-mist" : "border-line bg-surface"}`}>
               <button className={`block min-h-11 w-full min-w-0 px-1 text-left ${b.hidden ? "text-muted line-through" : "text-ink"}`} onClick={() => { setSelected(b.id); if (isPhoneLayout) setTab("edit"); }}>
                 <span className="block truncate text-[15px] font-semibold"><span className="mr-1.5 text-muted">{i + 1}.</span>{BLOCK_LABELS[b.type]}</span>
                 {blockHint(b) ? <span className="block truncate text-[13px] font-normal text-muted">{blockHint(b)}</span> : null}
@@ -535,7 +535,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   const textPreview = (
     <div className="mx-auto max-w-[380px] rounded-[28px] bg-surface p-5 shadow-sm">
       <div className="mb-3 text-center text-xs font-semibold text-muted">Brainerd Baptist Church · Today</div>
-      <div className="rounded-2xl bg-line/60 p-4 text-[16px] leading-snug text-ink">
+      <div className="rounded-lg bg-line/60 p-4 text-[16px] leading-snug text-ink">
         {palette.label === "Church-Wide" ? "Brainerd" : `Brainerd ${palette.label}`}: {doc.previewText || doc.subject}
         <div className="mt-2 text-[#1e5fa8] underline">{origin.replace(/^https?:\/\//, "")}/w/xxxx</div>
         <div className="mt-2 text-sm text-muted">Reply STOP to opt out</div>
@@ -615,7 +615,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   ) : (
     <div className="flex flex-col gap-3">
       <button onClick={() => { sendTest().catch(() => {}); }} disabled={testBusy} className="pill-btn w-full border-2 border-navy text-navy disabled:opacity-60"><FlaskConical size={16} className="mr-1.5" />{testBusy ? "Sending…" : "Send me a test"}</button>
-      {status && /test/i.test(status) ? <p role="status" className="rounded-xl bg-[#e8f5ee] px-3 py-2 text-center text-sm text-navy">{status}</p> : null}
+      {status && /test/i.test(status) ? <p role="status" className="rounded-lg bg-[#e8f5ee] px-3 py-2 text-center text-sm text-navy">{status}</p> : null}
       <button onClick={() => setTestOpen(true)} className="min-h-10 text-center text-[14px] font-semibold text-brand">Send a test to others…</button>
       <button onClick={() => { if (!confirmPhotos()) return; setSendOpen(false); setSubmitOpen(true); }} disabled={blocking > 0} className={`pill-btn w-full ${blocking ? "cursor-not-allowed bg-line text-white" : "bg-brand text-white"}`}><Send size={16} className="mr-1.5" />Send for approval</button>
       {blocking ? <p className="text-center text-xs text-muted">Fix the {blocking} item{blocking > 1 ? "s" : ""} in the checklist first.</p> : null}
@@ -641,7 +641,7 @@ export default function Builder({ emailId }: { emailId: string }) {
               {moreOpen ? (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
-                  <div role="menu" className="absolute right-0 top-12 z-50 w-[min(280px,80vw)] overflow-hidden rounded-2xl border border-line bg-surface py-1.5 shadow-xl">
+                  <div role="menu" className="absolute right-0 top-12 z-50 w-[min(280px,80vw)] overflow-hidden rounded-lg border border-line bg-surface py-1.5 shadow-xl">
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setScheduleOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><CalendarClock size={20} className={planIso ? "text-brand" : "text-muted"} /><span className="min-w-0 flex-1">Schedule{planIso ? <span className="block truncate text-xs font-normal text-muted">{chipWhen(planIso)}</span> : null}</span></button>
                     <button role="menuitem" onClick={() => { setMoreOpen(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><Users size={20} className="text-muted" />Send a test to others</button>
                     <a role="menuitem" href={`/preview/${emailId}`} target="_blank" rel="noopener" onClick={() => setMoreOpen(false)} className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-mist"><Monitor size={20} />Live preview in a new tab</a>
@@ -734,7 +734,7 @@ export default function Builder({ emailId }: { emailId: string }) {
             {testMenu ? (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setTestMenu(false)} />
-                <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-line bg-surface py-1 shadow-lg">
+                <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-lg border border-line bg-surface py-1 shadow-lg">
                   <button role="menuitem" onClick={() => { setTestMenu(false); sendTest().catch(() => {}); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-mist"><FlaskConical size={18} className="text-muted" />Send to me</button>
                   <button role="menuitem" onClick={() => { setTestMenu(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-mist"><Users size={18} className="text-muted" />Send to others…</button>
                 </div>
@@ -754,7 +754,7 @@ export default function Builder({ emailId }: { emailId: string }) {
         <main className="min-w-0 overflow-auto p-6">
           {device === "text" ? textPreview : (
             <div className="mx-auto" style={{ width: frameWidth }}>
-              <div className={device === "phone" ? "overflow-hidden rounded-[40px] border-[10px] border-ink bg-surface" : "overflow-hidden rounded-xl border border-line bg-surface shadow-sm"}>
+              <div className={device === "phone" ? "overflow-hidden rounded-[40px] border-[10px] border-ink bg-surface" : "overflow-hidden rounded-lg border border-line bg-surface shadow-sm"}>
                 <iframe ref={iframeRef} title="Email preview" className="block w-full bg-surface" style={{ height: device === "phone" ? 760 : "calc(100vh - 170px)" }} />
               </div>
               <p className="mt-3 text-center text-sm text-muted">Click any part of the email to edit it.</p>

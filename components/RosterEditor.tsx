@@ -66,11 +66,11 @@ export function RosterEditor({ initial, version }: { initial: Member[]; version:
         {grouped.map((g) => (
           <section key={g.region} className="space-y-3">
             <h2 className="label !mb-0 flex items-center justify-between"><span>{g.region}</span><button type="button" onClick={() => add(g.region)} className="flex items-center gap-1 text-brand normal-case tracking-normal"><Plus size={16} />Add person</button></h2>
-            {g.items.length === 0 ? <p className="rounded-xl border border-dashed border-line bg-surface p-4 text-sm text-muted">No one listed here yet.</p> : null}
+            {g.items.length === 0 ? <p className="rounded-lg border border-dashed border-line bg-surface p-4 text-sm text-muted">No one listed here yet.</p> : null}
             {g.items.map((m) => {
               const isOpen = open === m.id;
               return (
-                <article key={m.id} className={`overflow-hidden rounded-xl border bg-surface ${m.hidden ? "border-dashed opacity-70" : "border-line"}`}>
+                <article key={m.id} className={`overflow-hidden rounded-lg border bg-surface ${m.hidden ? "border-dashed opacity-70" : "border-line"}`}>
                   <button type="button" onClick={() => setOpen(isOpen ? null : m.id)} className="flex w-full items-center gap-3 p-3 text-left" aria-expanded={isOpen}>
                     {m.photo ? <img src={m.photo} alt="" className="h-14 w-[74px] flex-none rounded-md object-cover" /> : <span className="flex h-14 w-[74px] flex-none items-center justify-center rounded-md bg-mist text-xs text-muted">No photo</span>}
                     <span className="min-w-0 flex-1">

@@ -20,15 +20,20 @@ export default function Login({ searchParams }: { searchParams: { error?: string
     });
   }
   return (
-    <main className="min-h-dvh grid place-items-center px-4 bg-slate-100" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-      <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 p-8 text-center shadow-sm">
-        <img src="/brand/brainerd-logo.png" alt="Brainerd Baptist Church" width={200} height={30} className="mx-auto h-auto w-[200px]" />
-        <div className="mt-2 text-[15px] font-bold tracking-[0.3em] text-[#00205b]">MAIL</div>
-        <p className="mt-3 text-[15px] text-slate-600">Sign in with your church Google account.</p>
-        {msg && <p className="mt-4 rounded-lg bg-red-50 text-red-800 text-sm px-3 py-2">{msg}</p>}
-        <button onClick={go} disabled={busy} className="mt-6 w-full h-12 rounded-full bg-[#1e61b9] text-white font-semibold text-base disabled:opacity-60">
-          {busy ? "Opening Google…" : "Continue with Google"}
-        </button>
+    <main className="min-h-dvh flex items-center justify-center px-4" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div className="w-full max-w-sm">
+        <div className="mb-10 flex flex-col items-center text-center">
+          <img className="brand-logo-light mb-3" src="/brand/brainerd-full.png" alt="Brainerd Baptist Church" width={200} height={47} style={{ height: "auto", width: 200 }} />
+          <img className="brand-logo-dark mb-3" src="/brand/brainerd-full-white.png" alt="Brainerd Baptist Church" width={200} height={47} style={{ height: "auto", width: 200 }} />
+          <p className="text-xs uppercase tracking-[0.3em] text-muted">Mail</p>
+        </div>
+        <div className="space-y-5 rounded-lg border border-brand/20 bg-surface p-8 shadow-lg">
+          <p className="text-center text-[15px] text-muted">Sign in with your church Google account.</p>
+          {msg && <p className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600">{msg}</p>}
+          <button onClick={go} disabled={busy} className="w-full rounded-full bg-brand py-2.5 font-semibold text-white disabled:opacity-60" style={{ boxShadow: "0 0 0 1px rgb(var(--color-brand) / 0.18), 0 4px 16px rgb(var(--color-brand) / 0.28)" }}>
+            {busy ? "Opening Google…" : "Continue with Google"}
+          </button>
+        </div>
       </div>
     </main>
   );

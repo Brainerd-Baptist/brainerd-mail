@@ -59,9 +59,9 @@ export function Audience() {
       </header>
       <main className="mx-auto max-w-4xl space-y-5 px-4 pt-5">
         <p className="text-[14px] leading-snug text-muted">Pick each ministry&apos;s ClearStream list, then Check. Mail reads the list (it never changes anything in ClearStream) and shows how many people it would actually email, and exactly who is left out and why.</p>
-        {!configured ? <p className="rounded-xl bg-[#fdf1d8] px-4 py-3 text-sm text-[#7a4a05]">ClearStream isn&apos;t connected yet. The owner needs to add the ClearStream key to Mail&apos;s settings in Vercel. Until then, nothing can be checked.</p> : null}
-        {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-        {!rows ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-surface" /> : rows.map((r) => {
+        {!configured ? <p className="rounded-lg bg-[#fdf1d8] px-4 py-3 text-sm text-[#7a4a05]">ClearStream isn&apos;t connected yet. The owner needs to add the ClearStream key to Mail&apos;s settings in Vercel. Until then, nothing can be checked.</p> : null}
+        {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
+        {!rows ? <div className="h-40 animate-pulse rounded-lg border border-line bg-surface" /> : rows.map((r) => {
           const c = checks[r.ministry];
           const gap = c && c.expected !== null ? c.mailCount - c.expected : null;
           return (
@@ -81,9 +81,9 @@ export function Audience() {
               {c && open === r.ministry ? (
                 <div className="mt-4 space-y-4 border-t border-line pt-4">
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="rounded-xl bg-mist p-3"><div className="font-serif text-2xl font-semibold text-navy">{num(c.total)}</div><div className="text-[12px] text-muted">in ClearStream</div></div>
-                    <div className="rounded-xl bg-mist p-3"><div className="font-serif text-2xl font-semibold text-navy">−{num(c.excluded.length)}</div><div className="text-[12px] text-muted">left out</div></div>
-                    <div className="rounded-xl bg-[#e3f4ea] p-3"><div className="font-serif text-2xl font-semibold text-[#0d5a37]">{num(c.mailCount)}</div><div className="text-[12px] text-muted">Mail would email</div></div>
+                    <div className="rounded-lg bg-mist p-3"><div className="font-serif text-2xl font-semibold text-navy">{num(c.total)}</div><div className="text-[12px] text-muted">in ClearStream</div></div>
+                    <div className="rounded-lg bg-mist p-3"><div className="font-serif text-2xl font-semibold text-navy">−{num(c.excluded.length)}</div><div className="text-[12px] text-muted">left out</div></div>
+                    <div className="rounded-lg bg-[#e3f4ea] p-3"><div className="font-serif text-2xl font-semibold text-[#0d5a37]">{num(c.mailCount)}</div><div className="text-[12px] text-muted">Mail would email</div></div>
                   </div>
                   {gap === null ? <p className="text-[13px] text-muted">Type the number you expect above to compare it.</p>
                     : gap === 0 ? <p className="flex items-center gap-2 text-[14px] font-semibold text-[#0d5a37]"><CheckCircle2 size={18} />Matches the {num(c.expected!)} you expected.</p>
@@ -93,7 +93,7 @@ export function Audience() {
                     <div>
                       <div className="mb-1 flex items-center justify-between"><h3 className="text-xs font-bold uppercase tracking-[0.12em] text-muted">Left out, and why</h3>
                         <button onClick={() => downloadCsv(`${r.ministry}-left-out.csv`, ["Name", "Email", "Reason"], c.excluded.map((x) => [x.name, x.email, REASON[x.reason] + (x.detail ? ` (${x.detail})` : "")]))} className="inline-flex min-h-9 items-center gap-1 text-[13px] font-semibold text-brand"><Download size={14} />CSV</button></div>
-                      <ul className="divide-y divide-line rounded-xl border border-line">
+                      <ul className="divide-y divide-line rounded-lg border border-line">
                         {c.excluded.map((x) => <li key={x.id} className="flex flex-wrap items-baseline justify-between gap-x-3 px-3 py-2 text-[14px]"><span className="min-w-0"><b className="text-ink">{x.name}</b> <span className="break-all text-muted">{x.email}</span></span><Chip tone={x.reason === "mail_unsub" ? "amber" : "gray"}>{REASON[x.reason]}{x.detail ? ` · ${x.detail}` : ""}</Chip></li>)}
                       </ul>
                     </div>

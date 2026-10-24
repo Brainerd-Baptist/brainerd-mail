@@ -160,7 +160,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
       {days.map((day) => {
         const list = byDay.get(day) ?? [];
         return (
-          <div key={day} className={`rounded-xl border bg-surface ${day === sel ? "border-brand ring-2 ring-brand/25" : "border-line"}`}>
+          <div key={day} className={`rounded-lg border bg-surface ${day === sel ? "border-brand ring-2 ring-brand/25" : "border-line"}`}>
             <button onClick={() => setSel(day)} className="flex w-full items-center gap-2 border-b border-line px-3 py-2 text-left">
               <span className={`flex h-7 min-w-7 items-center justify-center rounded-full px-1 text-xs font-bold ${day === today ? "bg-brand text-white" : "text-ink"}`}>{Number(day.slice(8))}</span>
               <span className="text-xs font-semibold text-muted">{new Date(day + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", month: day.endsWith("-01") ? "short" : undefined, timeZone: "UTC" })}</span>
@@ -229,10 +229,10 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
           </div>
         ) : null}
 
-        {err && !adding ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
+        {err && !adding ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
         {view === "week" ? weekView : (
-        <div className="overflow-hidden rounded-xl border border-line bg-surface">
+        <div className="overflow-hidden rounded-lg border border-line bg-surface">
           <div className="grid grid-cols-7 border-b border-line bg-mist text-center text-xs font-semibold text-muted">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => <div key={d} className="py-2">{d}</div>)}
           </div>
@@ -274,7 +274,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
             {buildable.length ? <button onClick={openAdd} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-brand hover:bg-mist"><Plus size={16} />Plan an email</button> : null}
           </div>
           {dayList.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-line bg-surface p-6 text-center text-[15px] text-muted">Nothing planned for this day.</div>
+            <div className="rounded-lg border border-dashed border-line bg-surface p-6 text-center text-[15px] text-muted">Nothing planned for this day.</div>
           ) : (
             <ul className="space-y-3">
               {dayList.map((en) => {
@@ -286,7 +286,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                 const ser = en.type === "slot" && en.s.series_id ? seriesById.get(en.s.series_id) : en.type === "email" && en.e.series_id ? seriesById.get(en.e.series_id) : undefined;
                 const dueIso = plan && new Date(plan).getTime() > now ? approvalDeadline(plan) : null;
                 return (
-                  <li key={id} className={`flex overflow-hidden rounded-xl border border-line bg-surface ${busy === id ? "opacity-60" : ""}`}>
+                  <li key={id} className={`flex overflow-hidden rounded-lg border border-line bg-surface ${busy === id ? "opacity-60" : ""}`}>
                     <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
                     <div className="min-w-0 flex-1 p-4">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
@@ -315,13 +315,13 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                             ) : null}
                           </div>
                           {markOpen === en.e.id ? (
-                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-mist p-3">
+                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg bg-mist p-3">
                               <label className="block"><span className="label">When did it go out?</span><input type="datetime-local" className="field" value={markAt} onChange={(ev) => setMarkAt(ev.target.value)} /></label>
                               <button onClick={() => markSent(en.e)} disabled={busy === en.e.id} className="pill-btn bg-brand text-white disabled:opacity-60">Mark as sent</button>
                             </div>
                           ) : null}
                           {moveOpen === en.e.id ? (
-                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-mist p-3">
+                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg bg-mist p-3">
                               <label className="block"><span className="label">Planned to go out</span><input type="datetime-local" className="field" value={moveAt} onChange={(ev) => setMoveAt(ev.target.value)} /></label>
                               <button onClick={() => moveEmail(en.e)} disabled={busy === en.e.id} className="pill-btn bg-brand text-white disabled:opacity-60">Save</button>
                             </div>
@@ -345,7 +345,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                             )}
                           </div>
                           {moveOpen === en.s.id ? (
-                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl bg-mist p-3">
+                            <div className="mt-3 flex flex-wrap items-end gap-2 rounded-lg bg-mist p-3">
                               <label className="block"><span className="label">Goes out</span><input type="datetime-local" className="field" value={moveAt} onChange={(ev) => setMoveAt(ev.target.value)} /></label>
                               <button onClick={() => moveSlot(en.s)} disabled={busy === en.s.id} className="pill-btn bg-brand text-white disabled:opacity-60">Save</button>
                             </div>
@@ -367,7 +367,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
               {series.map((s) => {
                 const p = paletteFor(s.ministry);
                 return (
-                  <li key={s.id} className={`flex items-center gap-3 rounded-xl border border-line bg-surface p-3 ${busy === s.id ? "opacity-60" : ""}`}>
+                  <li key={s.id} className={`flex items-center gap-3 rounded-lg border border-line bg-surface p-3 ${busy === s.id ? "opacity-60" : ""}`}>
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: swatch(p) }} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[15px] font-semibold text-ink">{s.label}{s.paused ? " (paused)" : ""}</span>
@@ -388,7 +388,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
             <p className="text-sm text-muted">Drafts with no planned time. Open one and set when it should go out.</p>
             <ul className="space-y-2">
               {undated.map((e) => (
-                <li key={e.id}><Link href={hrefFor(e)} className="flex items-center gap-3 rounded-xl border border-line bg-surface p-3 active:bg-mist"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: swatch(paletteFor(e.ministry)) }} /><span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-ink">{e.title || "Untitled"}</span><span className="shrink-0 text-xs text-muted">{paletteFor(e.ministry).label}</span></Link></li>
+                <li key={e.id}><Link href={hrefFor(e)} className="flex items-center gap-3 rounded-lg border border-line bg-surface p-3 active:bg-mist"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: swatch(paletteFor(e.ministry)) }} /><span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-ink">{e.title || "Untitled"}</span><span className="shrink-0 text-xs text-muted">{paletteFor(e.ministry).label}</span></Link></li>
               ))}
             </ul>
           </section>
@@ -411,7 +411,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
               </select>
             </label>
             <label className="mb-5 block"><span className="label">{sRepeat === "none" ? "What is it for? (optional)" : "Name"}</span><input className="field" value={sLabel} maxLength={120} onChange={(e) => setSLabel(e.target.value)} placeholder={sRepeat === "none" ? "Fall Fest announcement, …" : "Monthly Kids update"} /></label>
-            {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
+            {err ? <p role="alert" className="mb-3 rounded-lg bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
             <button onClick={addSlot} disabled={busy === "slot"} className="pill-btn w-full bg-brand text-white disabled:opacity-60">{busy === "slot" ? "Saving…" : sRepeat === "none" ? "Reserve slot" : "Start repeating"}</button>
           </div>
         </div>

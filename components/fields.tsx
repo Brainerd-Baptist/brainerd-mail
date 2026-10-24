@@ -93,7 +93,7 @@ export function LinkField({ value, onChange }: { value: string; onChange: (v: st
 export function ButtonFields({ label = "Button", value, onChange }: { label?: string; value?: Btn; onChange: (v: Btn | undefined) => void }) {
   const v = value ?? { label: "", url: "" };
   return (
-    <div className="space-y-3 rounded-xl border border-line bg-surface p-3">
+    <div className="space-y-3 rounded-lg border border-line bg-surface p-3">
       <span className="label !mb-0">{label}</span>
       <Field label="Words on the button" value={v.label} onChange={(x) => onChange({ ...v, label: x })} />
       <LinkField value={v.url} onChange={(x) => onChange({ ...v, url: x })} />
@@ -121,7 +121,7 @@ export function ImageFields({ label = "Photo", value, onChange, aspect }: { labe
   }
 
   return (
-    <div className="space-y-3 rounded-xl border border-line bg-surface p-3">
+    <div className="space-y-3 rounded-lg border border-line bg-surface p-3">
       <span className="label !mb-0">{label}</span>
       {v.url ? <img src={v.url} alt="" className={shape === "circle" ? "mx-auto h-40 w-40 rounded-full object-cover" : "h-40 w-full rounded-lg object-cover"} /> : (
         <button type="button" onClick={() => input.current?.click()} className="flex h-32 w-full flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-line text-muted active:bg-mist">

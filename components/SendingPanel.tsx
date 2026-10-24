@@ -73,11 +73,11 @@ export function SendingPanel() {
         <div className="mx-auto flex max-w-3xl items-center gap-3"><NavMenu /><HeaderBrand label="Sending" /><span className="flex-1" /><HelpButton /></div>
       </header>
       <main className="mx-auto max-w-3xl space-y-5 px-4 pt-5">
-        {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-        {msg ? <p role="status" className="rounded-xl bg-[#e3f4ea] px-4 py-3 text-sm text-[#0d5a37]">{msg}</p> : null}
-        {!s ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-surface" /> : (
+        {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
+        {msg ? <p role="status" className="rounded-lg bg-[#e3f4ea] px-4 py-3 text-sm text-[#0d5a37]">{msg}</p> : null}
+        {!s ? <div className="h-40 animate-pulse rounded-lg border border-line bg-surface" /> : (
           <>
-            <div className={`flex flex-wrap items-center gap-3 rounded-2xl px-4 py-3 ${banner.c}`}>
+            <div className={`flex flex-wrap items-center gap-3 rounded-lg px-4 py-3 ${banner.c}`}>
               <span className="min-w-0 flex-1 text-[15px] font-bold">{banner.t}</span>
               {mode !== "off" ? <button disabled={saving} onClick={() => save({ send_mode: "off" }, "Sending is off.")} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#ad0b1c] px-5 text-[15px] font-bold text-white disabled:opacity-60"><OctagonX size={18} />Stop all sending</button> : null}
             </div>
@@ -90,7 +90,7 @@ export function SendingPanel() {
                   const disabled = !canChange && m.key !== "off";
                   return (
                     <button key={m.key} type="button" role="radio" aria-checked={on} disabled={disabled || saving} onClick={() => { if (on) return; if (m.key === "live") setLiveOpen(true); else save({ send_mode: m.key }, `Mode is now ${m.title}.`); }}
-                      className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left disabled:opacity-50 ${on ? "border-brand bg-mist" : "border-line bg-surface"}`}>
+                      className={`flex w-full items-start gap-3 rounded-lg border p-3 text-left disabled:opacity-50 ${on ? "border-brand bg-mist" : "border-line bg-surface"}`}>
                       <span className={`mt-1 h-4 w-4 shrink-0 rounded-full border-2 ${on ? "border-brand bg-brand shadow-[inset_0_0_0_3px_#fff]" : "border-line"}`} />
                       <span className="min-w-0"><span className="flex items-center gap-2 text-[15px] font-semibold text-ink"><Icon size={16} className="text-muted" />{m.title}</span><span className="block text-sm text-muted">{m.body}</span></span>
                     </button>
@@ -98,7 +98,7 @@ export function SendingPanel() {
                 })}
               </div>
               {liveOpen && canChange ? (
-                <div className="mt-3 rounded-xl border border-[#ad0b1c]/40 bg-[#fff7f8] p-3">
+                <div className="mt-3 rounded-lg border border-[#ad0b1c]/40 bg-[#fff7f8] p-3">
                   <p className="text-[14px] text-ink">Live lets Mail send to real people. Type <b>SEND LIVE</b> to confirm.</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <input value={typed} onChange={(e) => setTyped(e.target.value)} aria-label="Type SEND LIVE" autoCapitalize="characters" className="h-11 min-w-0 flex-1 rounded-lg border border-line px-3 text-[16px]" placeholder="SEND LIVE" />

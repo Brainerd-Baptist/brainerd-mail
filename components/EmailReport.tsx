@@ -53,8 +53,8 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
       </header>
       <main className="mx-auto max-w-4xl space-y-5 px-4 pt-5">
         <Link href="/analytics" className="inline-flex min-h-9 items-center gap-1.5 text-[14px] font-semibold text-brand"><ArrowLeft size={16} />All analytics</Link>
-        {err ? <p role="alert" className="rounded-xl bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
-        {loading && !r ? <div className="h-40 animate-pulse rounded-2xl border border-line bg-surface" /> : null}
+        {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
+        {loading && !r ? <div className="h-40 animate-pulse rounded-lg border border-line bg-surface" /> : null}
 
         {r ? (
           <div className={`space-y-5 ${loading ? "opacity-60 transition" : "transition"}`}>
@@ -71,7 +71,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
             </div>
 
             {r.t.recipients === 0 ? (
-              <div className="rounded-2xl border border-line bg-surface p-8 text-center"><h2 className="font-serif text-xl font-semibold text-navy">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
+              <div className="rounded-lg border border-line bg-surface p-8 text-center"><h2 className="font-serif text-xl font-semibold text-navy">No sends yet</h2><p className="mx-auto mt-1 max-w-md text-[14px] text-muted">Numbers appear after this email is sent. Use Send me a test in the editor to see tracking work.</p></div>
             ) : (
               <>
                 <EmailInsights id={id} />
@@ -155,7 +155,7 @@ export function EmailReport({ id, people }: { id: string; people: boolean }) {
                       })}
                     </ul>
                     {people_.length === 0 ? <p className="text-[13px] text-muted">Nobody matches.</p> : null}
-                    {people_.length > shown ? <button onClick={() => setShown((s) => s + 50)} className="mt-3 w-full rounded-xl border border-line py-2.5 text-[14px] font-semibold text-brand">Show more</button> : null}
+                    {people_.length > shown ? <button onClick={() => setShown((s) => s + 50)} className="mt-3 w-full rounded-lg border border-line py-2.5 text-[14px] font-semibold text-brand">Show more</button> : null}
                   </Card>
                 ) : null}
                 <p className="flex items-start gap-2 px-1 text-[12px] leading-snug text-muted"><Info size={14} className="mt-0.5 shrink-0" />Opens are estimates (Apple Mail and Gmail load images ahead of readers). Clicks are the number to trust.</p>

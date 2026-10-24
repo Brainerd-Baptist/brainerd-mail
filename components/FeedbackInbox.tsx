@@ -34,7 +34,7 @@ function Card({ n, onChange }: { n: Note; onChange: (id: number, patch: Partial<
   const bits = [c.ministry, c.emailTitle && `“${c.emailTitle}”`, c.tab && `${c.tab} tab`, c.device, c.selectedBlock && `${c.selectedBlock} block`, c.viewport, c.build && `build ${c.build}`].filter(Boolean);
 
   return (
-    <li className="rounded-xl border border-line bg-surface p-4">
+    <li className="rounded-lg border border-line bg-surface p-4">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-muted"><Icon size={14} className="text-brand" />{label}</span>
         <span className="text-xs text-muted">{when(n.created_at)}</span>
@@ -68,7 +68,7 @@ export function FeedbackInbox({ initial }: { initial: Note[] }) {
           <button key={x.k} onClick={() => setFilter(x.k)} className={`min-h-10 rounded-full px-4 text-sm font-semibold ${filter === x.k ? "bg-navy text-white" : "bg-surface text-ink border border-line"}`}>{x.label} <span className="opacity-70">{items.filter(x.match).length}</span></button>
         ))}
       </div>
-      {shown.length === 0 ? <p className="rounded-xl bg-surface p-6 text-center text-[15px] text-muted">Nothing here. New notes from the builder will show up in this list.</p> : (
+      {shown.length === 0 ? <p className="rounded-lg bg-surface p-6 text-center text-[15px] text-muted">Nothing here. New notes from the builder will show up in this list.</p> : (
         <ul className="space-y-3">{shown.map((n) => <Card key={n.id} n={n} onChange={update} />)}</ul>
       )}
     </div>

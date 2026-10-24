@@ -54,7 +54,7 @@ export function PolishPanel({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d
   };
 
   return (
-    <div className="rounded-xl border border-line bg-surface p-4">
+    <div className="rounded-lg border border-line bg-surface p-4">
       <div className="mb-1 flex items-center justify-between">
         <h3 className="flex items-center gap-1.5 text-[15px] font-bold text-ink"><Sparkles size={16} className="text-brand" />Polish</h3>
         <span className={`text-xs font-bold ${tone}`}>{summary.label}</span>

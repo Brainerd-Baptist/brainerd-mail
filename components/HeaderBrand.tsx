@@ -9,7 +9,8 @@ export function HeaderBrand({ label = "Mail" }: { label?: string }) {
   return (
     <div className="flex shrink-0 items-center gap-3">
       <span className="inline-flex shrink-0 items-center" style={{ transform: `translateY(${Math.round(HEIGHT * 0.1)}px)` }}>
-        <img src="/brand/brainerd-full.png" alt="Brainerd Baptist Church" width={Math.round(HEIGHT * (560 / 131))} height={HEIGHT} style={{ height: HEIGHT, width: "auto" }} />
+        <img className="brand-logo-light" src="/brand/brainerd-full.png" alt="Brainerd Baptist Church" width={Math.round(HEIGHT * (560 / 131))} height={HEIGHT} style={{ height: HEIGHT, width: "auto" }} />
+        <img className="brand-logo-dark" src="/brand/brainerd-full-white.png" alt="Brainerd Baptist Church" width={Math.round(HEIGHT * (560 / 131))} height={HEIGHT} style={{ height: HEIGHT, width: "auto" }} />
       </span>
       <div className="hidden items-center gap-3 sm:flex">
         <div className="h-6 w-px bg-brand/20" />

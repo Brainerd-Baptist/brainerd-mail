@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, CalendarDays, Globe, Map as MapIcon, Compass, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Moon, Send, Sun, UsersRound, Users, X } from "lucide-react";
+import { BarChart3, CalendarDays, Globe, Map as MapIcon, Compass, HelpCircle, LifeBuoy, LogOut, Mail, Menu, Monitor, Moon, Send, Sun, UsersRound, Users, X } from "lucide-react";
 import { HeaderBrand } from "@/components/HeaderBrand";
 import { ROLE_LABEL, type Role } from "@/lib/roles-ui";
-import { applyTheme, THEME_STORAGE_KEY, type ThemeId } from "@/lib/theme";
+import { THEME_MODES, applyMode, getMode, type ThemeMode } from "@/lib/theme";
 
 // The one menu for every section of Brainerd Mail. Same hamburger on every screen size.
 const ITEMS = [
@@ -26,18 +26,9 @@ export function NavMenu() {
   const [roster, setRoster] = useState(true);
   const [who, setWho] = useState<{ name: string; role: string } | null>(null);
   const [fresh, setFresh] = useState(0);
-  const [theme, setTheme] = useState<ThemeId>("light");
+  const [mode, setMode] = useState<ThemeMode>("auto");
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(THEME_STORAGE_KEY);
-      if (stored === "dark" || stored === "light") setTheme(stored);
-      else {
-        const pref = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        setTheme(pref);
-      }
-    } catch {}
-  }, []);
+  useEffect(() => { setMode(getMode()); }, []);
 
   useEffect(() => { setOpen(false); }, [path]);
   useEffect(() => {
@@ -52,14 +43,10 @@ export function NavMenu() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  function toggleTheme() {
-    const next: ThemeId = theme === "light" ? "dark" : "light";
-    applyTheme(next);
-    setTheme(next);
-  }
+  function chooseMode(next: ThemeMode) { applyMode(next); setMode(next); }
 
   const link = (href: string, label: string, Icon: typeof Mail, active: boolean, badge?: number) => (
-    <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`flex min-h-12 items-center gap-3 rounded-xl px-4 text-[16px] font-semibold ${active ? "bg-brand/10 text-navy" : "text-ink active:bg-mist"}`}>
+    <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`flex min-h-12 items-center gap-3 rounded-lg px-4 text-[16px] font-semibold ${active ? "bg-brand/10 text-navy" : "text-ink active:bg-mist"}`}>
       <Icon size={20} className={active ? "text-brand" : "text-muted"} />
       <span className="flex-1">{label}</span>
       {badge ? <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">{badge}</span> : null}
@@ -86,13 +73,20 @@ export function NavMenu() {
             </div>
             <form action="/auth/signout" method="post" className="border-t border-line p-3">
               {who ? <p className="px-4 pb-2 text-sm text-muted"><span className="font-semibold text-ink">{who.name}</span>{who.role ? ` · ${who.role}` : ""}</p> : null}
-              <button type="button" onClick={toggleTheme} aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"} className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 text-[16px] font-semibold text-muted active:bg-mist">
-                {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
-                {theme === "light" ? "Dark mode" : "Light mode"}
-              </button>
-              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-help")); }} className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 text-[16px] font-semibold text-muted active:bg-mist"><HelpCircle size={20} />Help</button>
-              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-tour")); }} className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 text-[16px] font-semibold text-muted active:bg-mist"><Compass size={20} />Take the tour</button>
-              <button className="flex min-h-12 w-full items-center gap-3 rounded-xl px-4 text-[16px] font-semibold text-muted active:bg-mist"><LogOut size={20} />Sign out</button>
+              <p className="px-4 pb-1 pt-1 text-xs font-bold uppercase tracking-[0.12em] text-muted">Appearance</p>
+              <div className="grid grid-cols-3 gap-1 px-3 pb-2">
+                {THEME_MODES.map((m) => {
+                  const Icon = m.id === "auto" ? Monitor : m.id === "light" ? Sun : Moon;
+                  return (
+                    <button key={m.id} type="button" onClick={() => chooseMode(m.id)} title={m.description} aria-pressed={mode === m.id} className={`flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-lg border text-xs font-semibold ${mode === m.id ? "border-brand/50 bg-brand/15 text-ink" : "border-transparent text-muted active:bg-mist"}`}>
+                      <Icon size={16} />{m.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-help")); }} className="flex min-h-12 w-full items-center gap-3 rounded-lg px-4 text-[16px] font-semibold text-muted active:bg-mist"><HelpCircle size={20} />Help</button>
+              <button type="button" onClick={() => { setOpen(false); window.dispatchEvent(new Event("bm-tour")); }} className="flex min-h-12 w-full items-center gap-3 rounded-lg px-4 text-[16px] font-semibold text-muted active:bg-mist"><Compass size={20} />Take the tour</button>
+              <button className="flex min-h-12 w-full items-center gap-3 rounded-lg px-4 text-[16px] font-semibold text-muted active:bg-mist"><LogOut size={20} />Sign out</button>
             </form>
           </nav>
         </div>,

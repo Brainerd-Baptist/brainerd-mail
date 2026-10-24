@@ -44,14 +44,14 @@ export function SubmitSheet({ onClose, onSubmit, softWarnings, initial }: { onCl
         <span className="mt-1 block text-xs text-muted">{valid ? `${when(sendAt.toISOString())}, ${hrs >= 48 ? `${Math.round(hrs / 24)} days` : `${Math.round(hrs)} hours`} from now` : "Pick a time at least half an hour from now."}</span>
       </label>
       {valid && !expedited ? (
-        <p className="mb-4 rounded-xl bg-[#e8f5ee] p-3 text-sm text-[#0d3b2c]">That gives {LEAD_HOURS}+ hours of lead time. You’ll get reminders at {REMINDER_HOURS.join(", ")} hours if it hasn’t been reviewed.</p>
+        <p className="mb-4 rounded-lg bg-[#e8f5ee] p-3 text-sm text-[#0d3b2c]">That gives {LEAD_HOURS}+ hours of lead time. You’ll get reminders at {REMINDER_HOURS.join(", ")} hours if it hasn’t been reviewed.</p>
       ) : null}
       {expedited ? (
-        <p className="mb-4 flex gap-2 rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]"><AlertTriangle size={18} className="mt-0.5 shrink-0" /><span><b>Expedited.</b> Under {LEAD_HOURS} hours, so it needs explicit approval and will never send on its own. For a normal send, pick a time {LEAD_HOURS} or more hours out.</span></p>
+        <p className="mb-4 flex gap-2 rounded-lg bg-[#fff3d6] p-3 text-sm text-[#5c3a00]"><AlertTriangle size={18} className="mt-0.5 shrink-0" /><span><b>Expedited.</b> Under {LEAD_HOURS} hours, so it needs explicit approval and will never send on its own. For a normal send, pick a time {LEAD_HOURS} or more hours out.</span></p>
       ) : null}
       {softWarnings > 0 ? <p className="mb-4 text-sm text-muted">{softWarnings} suggestion{softWarnings === 1 ? "" : "s"} in the Check tab {softWarnings === 1 ? "is" : "are"} still open. They won’t stop this.</p> : null}
       {!SENDING_ENABLED ? <p className="mb-4 text-sm text-muted">Sending isn’t switched on yet, so approval won’t send anything for now.</p> : null}
-      {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
+      {err ? <p role="alert" className="mb-3 rounded-lg bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
       <button disabled={!valid || busy} onClick={async () => { setBusy(true); setErr(""); const m = await onSubmit(sendAt.toISOString()); if (m) { setErr(m); setBusy(false); } }} className="pill-btn w-full bg-brand text-white disabled:opacity-50"><Send size={16} className="mr-1.5" />{busy ? "Sending…" : "Send for approval"}</button>
     </Sheet>
   );
@@ -95,11 +95,11 @@ export function ScheduleSheet({ onClose, initial, locked, lockedAt, onSave, onSu
         <input type="datetime-local" className="field" value={value} onChange={(e) => setValue(e.target.value)} />
         <span className="mt-1 block text-xs text-muted">{valid ? `${when(at.toISOString())}${at.getTime() > Date.now() ? `, ${hrs >= 48 ? `${Math.round(hrs / 24)} days` : `${Math.round(hrs)} hours`} from now` : ""}` : "Pick a day and time."}</span>
       </label>
-      {submitOk && !expedited ? <p className="mb-4 rounded-xl bg-[#e8f5ee] p-3 text-sm text-[#0d3b2c]">That gives {LEAD_HOURS}+ hours of lead time for approval.</p> : null}
-      {expedited ? <p className="mb-4 flex gap-2 rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]"><AlertTriangle size={18} className="mt-0.5 shrink-0" /><span><b>Expedited.</b> Under {LEAD_HOURS} hours, so it needs explicit approval and will never send on its own.</span></p> : null}
+      {submitOk && !expedited ? <p className="mb-4 rounded-lg bg-[#e8f5ee] p-3 text-sm text-[#0d3b2c]">That gives {LEAD_HOURS}+ hours of lead time for approval.</p> : null}
+      {expedited ? <p className="mb-4 flex gap-2 rounded-lg bg-[#fff3d6] p-3 text-sm text-[#5c3a00]"><AlertTriangle size={18} className="mt-0.5 shrink-0" /><span><b>Expedited.</b> Under {LEAD_HOURS} hours, so it needs explicit approval and will never send on its own.</span></p> : null}
       {!SENDING_ENABLED ? <p className="mb-4 text-sm text-muted">Sending isn’t switched on yet. Scheduling sets the plan and the calendar entry, and nothing goes out on its own for now.</p> : null}
-      {blockedReason ? <p className="mb-4 rounded-xl bg-[#fff3d6] p-3 text-sm text-[#5c3a00]">{blockedReason}</p> : null}
-      {err ? <p role="alert" className="mb-3 rounded-xl bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
+      {blockedReason ? <p className="mb-4 rounded-lg bg-[#fff3d6] p-3 text-sm text-[#5c3a00]">{blockedReason}</p> : null}
+      {err ? <p role="alert" className="mb-3 rounded-lg bg-[#fbe9eb] p-3 text-sm text-[#8a1020]">{err}</p> : null}
       <div className="flex flex-col gap-2">
         <button disabled={!submitOk || !!busy || !!blockedReason} onClick={() => run("submit")} className="pill-btn w-full bg-brand text-white disabled:opacity-50"><Send size={16} className="mr-1.5" />{busy === "submit" ? "Sending…" : "Send for approval at this time"}</button>
         <button disabled={!valid || !!busy} onClick={() => run("save")} className="pill-btn w-full border-2 border-navy text-navy disabled:opacity-50">{busy === "save" ? "Saving…" : "Just save the date"}</button>
@@ -145,10 +145,10 @@ export function HistorySheet({ emailId, onClose, onRestore, onSaveCopy, readOnly
         <button disabled={busy !== null} onClick={async () => { setBusy("copy"); await onSaveCopy(name.trim()); setName(""); await load(); setBusy(null); }} className="pill-btn shrink-0 border-2 border-navy px-4 text-navy disabled:opacity-50"><History size={16} className="mr-1.5" />{busy === "copy" ? "Saving…" : "Save"}</button>
       </div>
       {err ? <p role="alert" className="mb-3 text-sm text-[#8a1020]">{err}</p> : null}
-      {list === null ? <p className="text-sm text-muted">Loading…</p> : list.length === 0 ? <p className="rounded-xl border border-dashed border-line p-4 text-sm text-muted">No earlier copies yet. They appear as you keep working.</p> : (
+      {list === null ? <p className="text-sm text-muted">Loading…</p> : list.length === 0 ? <p className="rounded-lg border border-dashed border-line p-4 text-sm text-muted">No earlier copies yet. They appear as you keep working.</p> : (
         <ul className="space-y-2">
           {list.map((v) => (
-            <li key={v.id} className="rounded-xl border border-line p-3">
+            <li key={v.id} className="rounded-lg border border-line p-3">
               <div className="flex items-start gap-2">
                 <div className="min-w-0 flex-1">
                   {renaming === v.id ? (
