@@ -82,7 +82,7 @@ export function ScheduleSheet({ onClose, initial, locked, lockedAt, onSave, onSu
   if (locked) {
     return (
       <Sheet title="Schedule" onClose={onClose}>
-        <p className="mb-3 flex items-start gap-2 text-[15px] text-ink"><CalendarClock size={20} className="mt-0.5 shrink-0 text-brand" /><span>{lockedAt ? <>Set to go out <b>{when(lockedAt)}</b>.</> : "This email already has a send time."}</span></p>
+        <p className="mb-3 flex items-start gap-2 text-sm text-ink"><CalendarClock size={20} className="mt-0.5 shrink-0 text-brand" /><span>{lockedAt ? <>Set to go out <b>{when(lockedAt)}</b>.</> : "This email already has a send time."}</span></p>
         <p className="mb-4 text-sm text-muted">The time is locked while the email is waiting or approved. Use “Edit again” on the banner above to change it. That cancels the approval.</p>
         <button onClick={onClose} className="pill-btn w-full border-2 border-navy text-navy">Close</button>
       </Sheet>
@@ -154,7 +154,7 @@ export function HistorySheet({ emailId, onClose, onRestore, onSaveCopy, readOnly
                   {renaming === v.id ? (
                     <div className="flex gap-2"><input autoFocus value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={80} className="field min-w-0 flex-1" aria-label="Rename version" /><button disabled={busy !== null} onClick={() => saveName(v.id)} className="pill-btn px-4 text-brand">Save</button></div>
                   ) : (
-                    <div className="flex items-center gap-1.5 text-[15px] font-semibold text-ink">{v.named ? <Star size={14} className="shrink-0 fill-[#e0a100] text-[#e0a100]" aria-label="Named version" /> : null}<span className="truncate">{v.note || "Saved copy"}</span>
+                    <div className="flex items-center gap-1.5 text-sm font-medium text-ink">{v.named ? <Star size={14} className="shrink-0 fill-[#e0a100] text-[#e0a100]" aria-label="Named version" /> : null}<span className="truncate">{v.note || "Saved copy"}</span>
                       {!readOnly || true ? <button aria-label="Name this version" onClick={() => { setRenaming(v.id); setDraft(v.named ? v.note ?? "" : ""); }} className="shrink-0 text-muted"><Pencil size={13} /></button> : null}</div>
                   )}
                   <div className="text-xs text-muted">{new Date(v.created_at).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })} · {ago(v.created_at)}{v.by ? ` · ${v.by}` : ""}</div>

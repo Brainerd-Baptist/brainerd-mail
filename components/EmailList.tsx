@@ -80,14 +80,14 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
 
       <main className="mx-auto max-w-3xl space-y-4 px-4 pt-6">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="font-serif text-2xl font-semibold text-navy">Emails</h1>
+          <h1 className="font-serif text-2xl font-medium text-navy">Emails</h1>
           {buildable.length ? <button onClick={() => setCreating(true)} className="pill-btn bg-brand text-white"><Plus size={16} className="mr-1.5" />New email</button> : null}
         </div>
 
         {items.length > 4 ? (
           <label className="flex items-center gap-2 rounded-full border border-line bg-surface px-4">
             <Search size={16} className="text-muted" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or subject" className="h-11 min-w-0 flex-1 bg-transparent text-[15px] outline-none" />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or subject" className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none" />
           </label>
         ) : null}
 
@@ -102,7 +102,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
         {err ? <p role="alert" className="rounded-lg bg-[#fbe9eb] px-4 py-3 text-sm text-[#8a1020]">{err}</p> : null}
 
         {shown.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-line bg-surface p-8 text-center text-[15px] text-muted">
+          <div className="rounded-lg border border-dashed border-line bg-surface p-8 text-center text-sm text-muted">
             {items.length === 0 ? (buildable.length ? "No emails yet. Tap New email to start one." : "No emails yet.") : "Nothing matches. Clear the search or filter."}
           </div>
         ) : (
@@ -114,11 +114,11 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
                 <li key={it.id} className={`flex items-stretch overflow-hidden rounded-lg border border-line bg-surface ${busy === it.id ? "opacity-60" : ""}`}>
                   <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
                   <Link href={it.status === "pending_approval" ? `/review/${it.id}` : `/editor?e=${it.id}`} className="min-w-0 flex-1 p-4 active:bg-mist">
-                    <span className="block truncate text-[16px] font-semibold text-ink">{it.title || "Untitled"}</span>
+                    <span className="block truncate text-sm font-medium text-ink">{it.title || "Untitled"}</span>
                     {it.subject ? <span className="mt-0.5 block truncate text-sm text-muted">{it.subject}</span> : null}
                     <span className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-                      <span className="font-semibold" style={{ color: p.dark }}>{p.label}</span>
-                      <span className={`rounded-full px-2 py-0.5 font-semibold ${st.cls}`}>{st.label}</span>
+                      <span className="font-medium" style={{ color: p.dark }}>{p.label}</span>
+                      <span className={`rounded-full px-2 py-0.5 font-medium ${st.cls}`}>{st.label}</span>
                       <span>{it.scheduled_at && ["pending_approval", "approved", "scheduled"].includes(it.status) ? `Goes out ${when(it.scheduled_at)}` : `Edited ${ago(it.updated_at)}`}</span>
                     </span>
                   </Link>
@@ -150,7 +150,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
                 return (
                   <label key={k} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${start === k ? "border-brand bg-mist" : "border-line"} ${off ? "opacity-40" : ""}`}>
                     <input type="radio" name="start" className="mt-1" checked={start === k} disabled={off} onChange={() => setStart(k)} />
-                    <span><span className="block text-[15px] font-semibold text-ink">{t}</span><span className="block text-sm text-muted">{off ? (k === "homegoing" ? "Only for Church-Wide." : "Only for Missions and the BX.") : d}</span></span>
+                    <span><span className="block text-sm font-medium text-ink">{t}</span><span className="block text-sm text-muted">{off ? (k === "homegoing" ? "Only for Church-Wide." : "Only for Missions and the BX.") : d}</span></span>
                   </label>
                 );
               })}

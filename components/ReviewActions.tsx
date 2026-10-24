@@ -21,8 +21,8 @@ export function ReviewActions({ id, status, admin, expedited, editHref }: { id: 
     setSt(j.status);
   }
 
-  if (st === "approved") return <div className="bg-[#e8f5ee] px-4 py-3 text-sm text-[#0d3b2c]"><b>Approved.</b> It will wait until sending is switched on. <Link href="/emails" className="font-semibold underline">Back to emails</Link></div>;
-  if (st === "draft") return <div className="bg-[#fff3d6] px-4 py-3 text-sm text-[#5c3a00]">Sent back for changes. <Link href="/emails" className="font-semibold underline">Back to emails</Link></div>;
+  if (st === "approved") return <div className="bg-[#e8f5ee] px-4 py-3 text-sm text-[#0d3b2c]"><b>Approved.</b> It will wait until sending is switched on. <Link href="/emails" className="font-medium underline">Back to emails</Link></div>;
+  if (st === "draft") return <div className="bg-[#fff3d6] px-4 py-3 text-sm text-[#5c3a00]">Sent back for changes. <Link href="/emails" className="font-medium underline">Back to emails</Link></div>;
   if (st !== "pending_approval") return <div className="bg-brand/10 px-4 py-3 text-sm text-navy">This email isn’t waiting for approval (status: {st.replace("_", " ")}). <Link href={editHref} className="font-semibold underline">Open it</Link></div>;
   if (!admin) return <div className="bg-brand/10 px-4 py-3 text-sm text-navy">Waiting for the approver to review this. <Link href={editHref} className="font-semibold underline">Open in editor</Link></div>;
 

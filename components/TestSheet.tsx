@@ -38,7 +38,7 @@ export function TestSheet({ onClose, onSend }: { onClose: () => void; onSend: (e
       <div className="max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-3 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">Send a test to…</h2><button aria-label="Close" onClick={onClose} className="flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={20} /></button></div>
         <p className="mb-3 text-[14px] text-muted">The subject starts with [TEST]. Test emails are never counted as a real send.</p>
-        <label className="flex min-h-11 items-center gap-3 rounded-lg border border-line px-3 text-[15px] font-semibold text-ink"><input type="checkbox" checked={me} onChange={(e) => setMe(e.target.checked)} className="h-5 w-5" />Me{myEmail ? <span className="truncate font-normal text-muted">{myEmail}</span> : null}</label>
+        <label className="flex min-h-11 items-center gap-3 rounded-lg border border-line px-3 text-sm font-medium text-ink"><input type="checkbox" checked={me} onChange={(e) => setMe(e.target.checked)} className="h-5 w-5" />Me{myEmail ? <span className="truncate font-normal text-muted">{myEmail}</span> : null}</label>
 
         <div className="mt-3">
           <span className="label">People with access to Mail</span>
@@ -48,7 +48,7 @@ export function TestSheet({ onClose, onSend }: { onClose: () => void; onSend: (e
                 const on = picked.includes(p.email.toLowerCase());
                 return (
                   <li key={p.email}><label className="flex min-h-11 items-center gap-3 px-3 py-1.5"><input type="checkbox" checked={on} onChange={() => setPicked((v) => (on ? v.filter((x) => x !== p.email.toLowerCase()) : [...v, p.email.toLowerCase()]))} className="h-5 w-5" />
-                    <span className="min-w-0"><span className="block truncate text-[15px] font-semibold text-ink">{p.name}</span><span className="block truncate text-[12px] text-muted">{p.email} · {p.role}</span></span></label></li>
+                    <span className="min-w-0"><span className="block truncate text-sm font-medium text-ink">{p.name}</span><span className="block truncate text-[12px] text-muted">{p.email} · {p.role}</span></span></label></li>
                 );
               })}
             </ul>

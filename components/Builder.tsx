@@ -417,7 +417,7 @@ export default function Builder({ emailId }: { emailId: string }) {
     } catch { setStatus("Couldn’t open that email."); setSwitching(false); }
   }
   const ministrySelect = (
-    <select aria-label="Ministry email" disabled={switching} className="appearance-none rounded-full border border-line bg-surface bg-no-repeat py-1.5 pl-4 pr-9 text-sm font-semibold disabled:opacity-60" style={{ color: palette.dark, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")", backgroundPosition: "right 14px center" }} value={doc.ministry} onChange={(e) => openMinistry(e.target.value)}>
+    <select aria-label="Ministry email" disabled={switching} className="appearance-none rounded-full border border-line bg-surface bg-no-repeat py-1.5 pl-4 pr-9 text-sm font-medium disabled:opacity-60" style={{ color: palette.dark, backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")", backgroundPosition: "right 14px center" }} value={doc.ministry} onChange={(e) => openMinistry(e.target.value)}>
       {Object.values(PALETTES).map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
     </select>
   );
@@ -443,12 +443,12 @@ export default function Builder({ emailId }: { emailId: string }) {
     <div className="space-y-4">
     <div className="rounded-lg border border-line bg-surface p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-[15px] font-bold text-ink">Before you send</h3>
-        <span className={`text-xs font-bold ${statusColor}`}>{statusPill}</span>
+        <h3 className="text-sm font-medium text-ink">Before you send</h3>
+        <span className={`text-xs font-medium ${statusColor}`}>{statusPill}</span>
       </div>
       <ul className="space-y-3">
         {checks.map((c, i) => (
-          <li key={i} className="flex gap-2 text-[15px] text-ink">
+          <li key={i} className="flex gap-2 text-sm text-ink">
             {c.ok ? <Check size={18} className="mt-0.5 shrink-0 text-[#1e7a4c]" /> : <AlertTriangle size={18} className={`mt-0.5 shrink-0 ${c.severity === "block" ? "text-[#c8102e]" : "text-[#9a5a00]"}`} />}
             <div className="min-w-0 flex-1">
               <span>{c.label}{c.detail ? <span className="block text-xs text-muted">{c.detail}</span> : null}</span>
@@ -479,7 +479,7 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   const detailsPanel = (
     <div className="space-y-4">
-      <h2 className="font-serif text-xl font-semibold text-navy">Email details</h2>
+      <h2 className="font-serif text-xl font-medium text-navy">Email details</h2>
       <Field label="Subject line" value={doc.subject} onChange={(v) => setDoc({ ...doc, subject: v })} hint={`${doc.subject.length} characters`} />
       <Area label="Preview text" value={doc.previewText} onChange={(v) => setDoc({ ...doc, previewText: v })} rows={2} hint="The gray line people see next to the subject" />
       {colorSelect}
@@ -506,7 +506,7 @@ export default function Builder({ emailId }: { emailId: string }) {
       <div className="label">Add to this email</div>
       <div className="mb-6 grid grid-cols-2 gap-2">
         {ADDABLE.map((t) => (
-          <button key={t} onClick={() => { add(t); if (isPhoneLayout) setTab("edit"); }} className="flex min-h-12 items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-2.5 text-left text-[15px] font-semibold text-ink transition active:bg-mist lg:hover:border-brand"><Plus size={16} className="shrink-0 text-brand" />{BLOCK_LABELS[t]}</button>
+          <button key={t} onClick={() => { add(t); if (isPhoneLayout) setTab("edit"); }} className="flex min-h-12 items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-2.5 text-left text-sm font-semibold text-ink transition active:bg-mist lg:hover:border-brand"><Plus size={16} className="shrink-0 text-brand" />{BLOCK_LABELS[t]}</button>
         ))}
       </div>
       <div className="label">In this email</div>
@@ -515,7 +515,7 @@ export default function Builder({ emailId }: { emailId: string }) {
           <li key={b.id}>
             <div className={`rounded-lg border px-2 pb-1 pt-1 text-sm transition ${selected === b.id ? "border-brand bg-mist" : "border-line bg-surface"}`}>
               <button className={`block min-h-11 w-full min-w-0 px-1 text-left ${b.hidden ? "text-muted line-through" : "text-ink"}`} onClick={() => { setSelected(b.id); if (isPhoneLayout) setTab("edit"); }}>
-                <span className="block truncate text-[15px] font-semibold"><span className="mr-1.5 text-muted">{i + 1}.</span>{BLOCK_LABELS[b.type]}</span>
+                <span className="block truncate text-sm font-medium"><span className="mr-1.5 text-muted">{i + 1}.</span>{BLOCK_LABELS[b.type]}</span>
                 {blockHint(b) ? <span className="block truncate text-[13px] font-normal text-muted">{blockHint(b)}</span> : null}
               </button>
               <div className="flex items-center justify-end gap-0.5 border-t border-line/60 pt-0.5">
@@ -534,21 +534,21 @@ export default function Builder({ emailId }: { emailId: string }) {
 
   const textPreview = (
     <div className="mx-auto max-w-[380px] rounded-[28px] bg-surface p-5 shadow-sm">
-      <div className="mb-3 text-center text-xs font-semibold text-muted">Brainerd Baptist Church · Today</div>
-      <div className="rounded-lg bg-line/60 p-4 text-[16px] leading-snug text-ink">
+      <div className="mb-3 text-center text-xs font-medium text-muted">Brainerd Baptist Church · Today</div>
+      <div className="rounded-lg bg-line/60 p-4 text-sm leading-snug text-ink">
         {palette.label === "Church-Wide" ? "Brainerd" : `Brainerd ${palette.label}`}: {doc.previewText || doc.subject}
         <div className="mt-2 text-[#1e5fa8] underline">{origin.replace(/^https?:\/\//, "")}/w/xxxx</div>
         <div className="mt-2 text-sm text-muted">Reply STOP to opt out</div>
       </div>
       <p className="mt-4 text-sm text-muted">This is the text subscribers get. The link opens the web version of this same email.</p>
-      <details className="mt-4 text-sm text-muted"><summary className="cursor-pointer font-semibold">Plain-text version of the email</summary><pre className="mt-2 whitespace-pre-wrap text-xs">{plain}</pre></details>
+      <details className="mt-4 text-sm text-muted"><summary className="cursor-pointer font-medium">Plain-text version of the email</summary><pre className="mt-2 whitespace-pre-wrap text-xs">{plain}</pre></details>
     </div>
   );
 
   const inspector = sel ? (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="font-serif text-xl font-semibold text-navy">{BLOCK_LABELS[sel.type]}</h2>
+        <h2 className="font-serif text-xl font-medium text-navy">{BLOCK_LABELS[sel.type]}</h2>
         <div className="flex items-center">
           {isPhoneLayout ? (<>
             <IconBtn label="Move up" onClick={() => move(sel.id, -1)}><ChevronUp size={20} /></IconBtn>
@@ -565,7 +565,7 @@ export default function Builder({ emailId }: { emailId: string }) {
   if (isDesktop === null) return null;
   if (loadErr) return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-mist p-6 text-center">
-      <p className="max-w-sm text-[16px] text-ink">{loadErr}</p>
+      <p className="max-w-sm text-sm text-ink">{loadErr}</p>
       <div className="flex gap-3"><Link href="/emails" className="pill-btn border-2 border-navy text-navy">All emails</Link><button onClick={() => location.reload()} className="pill-btn bg-brand text-white">Try again</button></div>
     </div>
   );
@@ -593,7 +593,7 @@ export default function Builder({ emailId }: { emailId: string }) {
         {rowStatus === "sent" ? <b>This email has been sent.</b> : null}
         {rowStatus === "cancelled" ? <b>This email was cancelled.</b> : null}
       </span>
-      <span className="flex gap-3 font-semibold">
+      <span className="flex gap-3 font-medium">
         {rowStatus === "pending_approval" || rowStatus === "approved" ? <button onClick={startEditing} className="min-h-11 underline">Edit again</button> : <button onClick={duplicateThis} className="min-h-11 underline">Duplicate</button>}
       </span>
     </div>
@@ -631,7 +631,7 @@ export default function Builder({ emailId }: { emailId: string }) {
             <NavMenu />
             <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: swatch(palette) }} />
             <div className="min-w-0">
-              <input aria-label="Email name" readOnly={locked} className="w-full min-w-0 truncate bg-transparent text-[16px] font-semibold outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
+              <input aria-label="Email name" readOnly={locked} className="w-full min-w-0 truncate bg-transparent text-[16px] font-medium outline-none" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
               <div className="-mt-0.5 truncate text-xs text-muted">{palette.label} · {saveLabel}{planIso ? ` · ${chipWhen(planIso)}` : ""}</div>
             </div>
           </div>
@@ -642,12 +642,12 @@ export default function Builder({ emailId }: { emailId: string }) {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
                   <div role="menu" className="absolute right-0 top-12 z-50 w-[min(280px,80vw)] overflow-hidden rounded-lg border border-line bg-surface py-1.5 shadow-xl">
-                    <button role="menuitem" onClick={() => { setMoreOpen(false); setScheduleOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><CalendarClock size={20} className={planIso ? "text-brand" : "text-muted"} /><span className="min-w-0 flex-1">Schedule{planIso ? <span className="block truncate text-xs font-normal text-muted">{chipWhen(planIso)}</span> : null}</span></button>
-                    <button role="menuitem" onClick={() => { setMoreOpen(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><Users size={20} className="text-muted" />Send a test to others</button>
-                    <a role="menuitem" href={`/preview/${emailId}`} target="_blank" rel="noopener" onClick={() => setMoreOpen(false)} className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-mist"><Monitor size={20} />Live preview in a new tab</a>
-                    <button role="menuitem" onClick={() => { setMoreOpen(false); setHistoryOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><History size={20} className="text-muted" />Version history</button>
-                    {doc.ministry === "missions" ? <a role="menuitem" href="/roster" className="flex min-h-12 w-full items-center gap-3 px-4 text-[16px] font-semibold text-ink active:bg-mist"><Globe size={20} className="text-muted" />Serving list</a> : null}
-                    <button role="menuitem" onClick={() => { setMoreOpen(false); setFeedbackOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[16px] font-semibold text-ink active:bg-mist"><LifeBuoy size={20} className="text-muted" /><span className="flex-1">Feedback</span>{inboxNew ? <span className="rounded-full bg-red-600 px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setScheduleOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm font-semibold text-ink active:bg-mist"><CalendarClock size={20} className={planIso ? "text-brand" : "text-muted"} /><span className="min-w-0 flex-1">Schedule{planIso ? <span className="block truncate text-xs font-normal text-muted">{chipWhen(planIso)}</span> : null}</span></button>
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm font-semibold text-ink active:bg-mist"><Users size={20} className="text-muted" />Send a test to others</button>
+                    <a role="menuitem" href={`/preview/${emailId}`} target="_blank" rel="noopener" onClick={() => setMoreOpen(false)} className="flex min-h-12 w-full items-center gap-3 px-4 text-sm font-medium text-ink active:bg-mist"><Monitor size={20} />Live preview in a new tab</a>
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setHistoryOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm font-semibold text-ink active:bg-mist"><History size={20} className="text-muted" />Version history</button>
+                    {doc.ministry === "missions" ? <a role="menuitem" href="/roster" className="flex min-h-12 w-full items-center gap-3 px-4 text-sm font-medium text-ink active:bg-mist"><Globe size={20} className="text-muted" />Serving list</a> : null}
+                    <button role="menuitem" onClick={() => { setMoreOpen(false); setFeedbackOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm font-semibold text-ink active:bg-mist"><LifeBuoy size={20} className="text-muted" /><span className="flex-1">Feedback</span>{inboxNew ? <span className="rounded-full bg-red-600 px-1.5 text-xs font-semibold text-white">{inboxNew}</span> : null}</button>
                   </div>
                 </>
               ) : null}
@@ -698,7 +698,7 @@ export default function Builder({ emailId }: { emailId: string }) {
         {sendOpen ? (
           <div className="fixed inset-0 z-50 flex items-end bg-black/40" onClick={() => setSendOpen(false)}>
             <div className="max-h-[85dvh] w-full overflow-y-auto rounded-t-3xl bg-surface p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
-              <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-semibold text-navy">Ready to send?</h2><IconBtn label="Close" onClick={() => setSendOpen(false)}><X size={22} /></IconBtn></div>
+              <div className="mb-4 flex items-center justify-between"><h2 className="font-serif text-xl font-medium text-navy">Ready to send?</h2><IconBtn label="Close" onClick={() => setSendOpen(false)}><X size={22} /></IconBtn></div>
               <div className="mb-4">{checksPanel}</div>
               {sendActions}
             </div>
@@ -716,27 +716,27 @@ export default function Builder({ emailId }: { emailId: string }) {
           <NavMenu />
                     {ministrySelect}
           <div>
-            <input aria-label="Email name" readOnly={locked} className="w-28 min-w-0 bg-transparent text-[15px] font-semibold outline-none min-[1500px]:w-40 min-[1900px]:w-64" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
+            <input aria-label="Email name" readOnly={locked} className="w-28 min-w-0 bg-transparent text-sm font-medium outline-none min-[1500px]:w-40 min-[1900px]:w-64" value={doc.title} onChange={(e) => setDoc({ ...doc, title: e.target.value })} />
             <div className="text-xs text-muted">{saveLabel}</div>
           </div>
         </div>
         {deviceToggle(["phone", "desktop", "dark", "text"])}
         <div className="flex items-center gap-1 min-[1900px]:gap-3">
-          {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><Globe size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Serving list</span></a> : null}
+          {doc.ministry === "missions" ? <a href="/roster" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-medium min-[1900px]:px-3 text-muted hover:bg-mist"><Globe size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Serving list</span></a> : null}
           <button onClick={() => setScheduleOpen(true)} className={`flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2 text-sm font-semibold min-[1900px]:px-3 hover:bg-mist ${planIso ? "border-line text-ink" : "border-transparent text-brand"}`}><CalendarClock size={18} className={planIso ? "text-brand" : ""} />{planIso ? chipShort(planIso) : "Schedule"}</button>
-          <button onClick={() => setFeedbackOpen(true)} aria-label="Feedback" title="Feedback" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><LifeBuoy size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Feedback</span>{inboxNew ? <span className="rounded-full bg-red-600 px-1.5 text-xs font-bold text-white">{inboxNew}</span> : null}</button>
+          <button onClick={() => setFeedbackOpen(true)} aria-label="Feedback" title="Feedback" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><LifeBuoy size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Feedback</span>{inboxNew ? <span className="rounded-full bg-red-600 px-1.5 text-xs font-semibold text-white">{inboxNew}</span> : null}</button>
           <HelpButton />
           <button onClick={undo} disabled={!undoStack.current.length || locked} aria-label="Undo" title="Undo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-mist disabled:opacity-30"><Undo2 size={20} /></button><button onClick={redo} disabled={!redoStack.current.length || locked} aria-label="Redo" title="Redo" className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-mist disabled:opacity-30"><Redo2 size={20} /></button>
           <button onClick={() => setHistoryOpen(true)} aria-label="History" title="History" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><History size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">History</span></button>
-          <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold min-[1900px]:px-3 text-muted hover:bg-mist"><Monitor size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Live preview</span></a>
+          <a href={`/preview/${emailId}`} target="_blank" rel="noopener" title="Open a live preview in its own tab" className="flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-medium min-[1900px]:px-3 text-muted hover:bg-mist"><Monitor size={18} /><span className="hidden whitespace-nowrap min-[1900px]:inline">Live preview</span></a>
           <div className="relative shrink-0">
             <button onClick={() => setTestMenu((v) => !v)} aria-haspopup="menu" aria-expanded={testMenu} disabled={testBusy} className="pill-btn whitespace-nowrap border-2 border-navy text-navy disabled:opacity-60"><FlaskConical size={16} className="mr-1.5" />{testBusy ? "Sending…" : "Send a test"}<ChevronDown size={16} className="ml-1" /></button>
             {testMenu ? (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setTestMenu(false)} />
                 <div role="menu" className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-lg border border-line bg-surface py-1 shadow-lg">
-                  <button role="menuitem" onClick={() => { setTestMenu(false); sendTest().catch(() => {}); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-mist"><FlaskConical size={18} className="text-muted" />Send to me</button>
-                  <button role="menuitem" onClick={() => { setTestMenu(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-ink hover:bg-mist"><Users size={18} className="text-muted" />Send to others…</button>
+                  <button role="menuitem" onClick={() => { setTestMenu(false); sendTest().catch(() => {}); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm font-semibold text-ink hover:bg-mist"><FlaskConical size={18} className="text-muted" />Send to me</button>
+                  <button role="menuitem" onClick={() => { setTestMenu(false); setTestOpen(true); }} className="flex min-h-12 w-full items-center gap-3 px-4 text-left text-sm font-semibold text-ink hover:bg-mist"><Users size={18} className="text-muted" />Send to others…</button>
                 </div>
               </>
             ) : null}

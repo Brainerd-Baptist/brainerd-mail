@@ -64,12 +64,12 @@ export function TourHost() {
     <div className="fixed inset-0 z-[80] flex items-end bg-black/50 sm:items-center sm:justify-center" role="dialog" aria-modal="true" aria-label="Brainerd Mail tour">
       <div className="w-full rounded-t-3xl bg-surface p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-xl sm:max-w-md sm:rounded-3xl">
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-[0.12em] text-muted">Step {i + 1} of {steps.length}</span>
+          <span className="text-xs font-medium uppercase tracking-[0.12em] text-muted">Step {i + 1} of {steps.length}</span>
           <button onClick={finish} aria-label="Close tour" className="-mr-2 flex h-11 w-11 items-center justify-center rounded-lg text-muted"><X size={22} /></button>
         </div>
-        <h2 className="font-serif text-2xl font-semibold text-navy">{s.title}</h2>
-        <p className="mt-2 text-[16px] leading-relaxed text-ink">{s.body}</p>
-        {s.hint ? <p className="mt-3 inline-block rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-navy">{s.hint}</p> : null}
+        <h2 className="font-serif text-2xl font-medium text-navy">{s.title}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-ink">{s.body}</p>
+        {s.hint ? <p className="mt-3 inline-block rounded-full bg-brand/10 px-3 py-1 text-xs font-semibold text-navy">{s.hint}</p> : null}
         <div className="mt-5 flex justify-center gap-1.5" aria-hidden>
           {steps.map((_, k) => <span key={k} className={`h-1.5 rounded-full ${k === i ? "w-5 bg-brand" : "w-1.5 bg-line"}`} />)}
         </div>

@@ -16,7 +16,7 @@ function useIgnored(kind: string, ministry: string) {
   return [list, add] as const;
 }
 
-const btn = "min-h-9 rounded-full px-3.5 text-sm font-semibold";
+const btn = "min-h-9 rounded-full px-3.5 text-sm font-medium";
 
 // Spelling: checks automatically a moment after you stop typing. Names and church words a dictionary
 // doesn't know can be ignored, and the choice is shared with the whole team.
@@ -48,7 +48,7 @@ export function SpellRow({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d: E
   const icon = err ? <AlertTriangle size={18} className="mt-0.5 shrink-0 text-[#9a5a00]" /> : !issues || (busy && !live.length) ? <Loader2 size={18} className="mt-0.5 shrink-0 animate-spin text-muted" /> : live.length ? <AlertTriangle size={18} className="mt-0.5 shrink-0 text-[#9a5a00]" /> : <Check size={18} className="mt-0.5 shrink-0 text-[#1e7a4c]" />;
   const label = err ? err : !issues ? "Checking spelling…" : live.length ? `${live.length} word${live.length === 1 ? "" : "s"} to check for spelling` : "No spelling mistakes found";
   return (
-    <li className="flex gap-2 text-[15px] text-ink">
+    <li className="flex gap-2 text-sm text-ink">
       {icon}
       <div className="min-w-0 flex-1">
         <span>{label}</span>
@@ -57,8 +57,8 @@ export function SpellRow({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d: E
           <ul className="mt-2 space-y-2">
             {live.map((i) => (
               <li key={i.blockId + i.word} className="rounded-lg bg-mist p-3">
-                <div className="text-xs font-bold uppercase tracking-wide text-muted">{i.label}</div>
-                <div className="mt-0.5 text-[15px] text-ink">…{i.before} <b className="rounded bg-[#fdecc8] px-1">{i.word}</b> {i.after}…</div>
+                <div className="text-xs font-medium uppercase tracking-wide text-muted">{i.label}</div>
+                <div className="mt-0.5 text-sm text-ink">…{i.before} <b className="rounded bg-[#fdecc8] px-1">{i.word}</b> {i.after}…</div>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {i.suggestions.map((s) => <button key={s} onClick={() => setDoc(replaceWord(doc, i.blockId, i.word, s))} className={`${btn} bg-brand text-white`}>{s}</button>)}
                   <button onClick={() => onShow(i.blockId)} className={`${btn} flex items-center gap-1 border border-line text-ink`}><Eye size={14} />Show me</button>
@@ -95,7 +95,7 @@ export function ClarityRow({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d:
   const icon = busy ? <Loader2 size={18} className="mt-0.5 shrink-0 animate-spin text-muted" /> : err || live.length ? <AlertTriangle size={18} className="mt-0.5 shrink-0 text-[#9a5a00]" /> : checked ? <Check size={18} className="mt-0.5 shrink-0 text-[#1e7a4c]" /> : <Eye size={18} className="mt-0.5 shrink-0 text-muted" />;
   const label = busy ? "Reading your sentences…" : err ? err : live.length ? `${live.length} sentence${live.length === 1 ? "" : "s"} could be clearer` : checked ? "Sentences read clearly" : "Do the sentences make sense?";
   return (
-    <li className="flex gap-2 text-[15px] text-ink">
+    <li className="flex gap-2 text-sm text-ink">
       {icon}
       <div className="min-w-0 flex-1">
         <span>{label}</span>
@@ -107,7 +107,7 @@ export function ClarityRow({ doc, setDoc, onShow }: { doc: EmailDoc; setDoc: (d:
               <li key={keyOf(e)} className="rounded-lg bg-mist p-3">
                 <div className="text-xs text-muted">{e.why}</div>
                 <div className="mt-1 text-sm text-muted line-through">{currentValue(doc, e.blockId, e.field) ?? e.before}</div>
-                <div className="mt-1 font-semibold text-ink">{e.after}</div>
+                <div className="mt-1 font-medium text-ink">{e.after}</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <button onClick={() => { const d = applyEdit(doc, e); if (d) setDoc(d); }} className={`${btn} bg-brand text-white`}>Use this</button>
                   <button onClick={() => onShow(e.blockId)} className={`${btn} flex items-center gap-1 border border-line text-ink`}><Eye size={14} />Show me</button>

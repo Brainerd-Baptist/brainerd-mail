@@ -48,7 +48,7 @@ function CountryCard({ c, isNew, canEdit, levels, onSaved, onRemoved, onCancel }
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="flex min-h-14 w-full items-center gap-3 px-3 py-2 text-left">
         <span className="h-3.5 w-3.5 flex-none rounded-full" style={{ background: LEVEL_COLOR[d.level] }} />
         <span className="min-w-0 flex-1">
-          <span className="block truncate font-semibold text-ink">{c.name}{isNew ? " (new)" : ""}</span>
+          <span className="block truncate font-medium text-ink">{c.name}{isNew ? " (new)" : ""}</span>
           <span className="block truncate text-sm text-muted">{lname(c.level)}{c.since ? ` · since ${c.since}` : ""}{!c.isPublic ? " · Private" : !c.showPeopleGroup && c.peopleGroup ? " · Group names private" : ""}{dirty && !isNew ? " · Unsaved" : ""}</span>
         </span>
         {!c.isPublic ? <EyeOff size={18} className="flex-none text-muted" aria-label="Not shown publicly" /> : null}
@@ -75,7 +75,7 @@ function CountryCard({ c, isNew, canEdit, levels, onSaved, onRemoved, onCancel }
               <p className="text-xs text-muted">Off keeps the names private. Everything else about the country still shows.</p>
             </div>
           </div>
-          {err ? <p className="text-sm font-semibold text-[#b3261e]" role="alert">{err}</p> : null}
+          {err ? <p className="text-sm font-medium text-[#b3261e]" role="alert">{err}</p> : null}
           {canEdit ? (
             <div className="flex items-center gap-2 border-t border-line pt-3">
               {isNew ? <button type="button" onClick={onCancel} className="pill-btn border border-line text-ink">Cancel</button> : <button type="button" onClick={remove} className="pill-btn px-3 text-[#b3261e]"><Trash2 size={16} className="mr-1" />Remove</button>}
@@ -149,15 +149,15 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
       <header className="sticky top-0 z-10 border-b border-line bg-surface/95 px-4 py-3 backdrop-blur">
         <div className="mx-auto flex max-w-2xl items-center gap-3">
           <NavMenu />
-          <h1 className="flex-1 truncate text-center font-serif text-lg font-semibold text-navy">Missions map</h1>
+          <h1 className="flex-1 truncate text-center font-serif text-lg font-medium text-navy">Missions map</h1>
           <HelpButton />
-          <a href="/embed/missions-map?standalone=1" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-semibold text-brand">View<ExternalLink size={14} /></a>
+          <a href="/embed/missions-map?standalone=1" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-sm font-medium text-brand">View<ExternalLink size={14} /></a>
         </div>
       </header>
 
       <main className="mx-auto max-w-2xl space-y-6 px-4 pt-6">
         {!canEdit ? <p className="rounded-lg border border-line bg-surface p-3 text-sm text-muted">Your role can look at the Missions map but not change it. Ask the Owner or an Admin if you need to edit.</p> : null}
-        <p className="text-[15px] text-muted">This is the map on the website’s missions page and in missions emails. Change a country and tap Save: the website updates within seconds.</p>
+        <p className="text-sm text-muted">This is the map on the website’s missions page and in missions emails. Change a country and tap Save: the website updates within seconds.</p>
 
         <section aria-label="Preview" className="overflow-hidden rounded-lg border border-line bg-surface">
           <img src={`/api/public/missions-map.png?t=${stamp}`} alt="Preview of the public world map" className="block w-full" />
@@ -174,7 +174,7 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
             <div className="space-y-2 rounded-lg border border-line bg-surface p-3">
               <label className="block"><span className="label">Find a country</span><input autoFocus className="field" value={pick} onChange={(e) => setPick(e.target.value)} placeholder="Start typing, for example Kenya" /></label>
               <ul>{available.map((g) => (
-                <li key={g.id}><button type="button" onClick={() => { setDraftNew({ iso2: g.id, name: g.name, level: 1, since: "", religion: "", peopleGroup: "", unreachedGroups: "", unreachedPop: "", isPublic: true, showPeopleGroup: true }); setAdding(false); }} className="flex min-h-12 w-full items-center rounded-lg px-3 text-left text-[16px] text-ink active:bg-mist">{g.name}</button></li>
+                <li key={g.id}><button type="button" onClick={() => { setDraftNew({ iso2: g.id, name: g.name, level: 1, since: "", religion: "", peopleGroup: "", unreachedGroups: "", unreachedPop: "", isPublic: true, showPeopleGroup: true }); setAdding(false); }} className="flex min-h-12 w-full items-center rounded-lg px-3 text-left text-sm text-ink active:bg-mist">{g.name}</button></li>
               ))}</ul>
               {available.length === 0 ? <p className="px-1 text-sm text-muted">No match. Every country on the map is already in your list, or the name is spelled differently.</p> : null}
             </div>
@@ -212,7 +212,7 @@ export function MissionsEditor({ initialCountries, initialLevels, canEdit }: { i
         </section>
 
         <details className="rounded-lg border border-line bg-surface p-4">
-          <summary className="cursor-pointer text-[15px] font-semibold text-ink">For the website team</summary>
+          <summary className="cursor-pointer text-sm font-medium text-ink">For the website team</summary>
           <div className="mt-3 space-y-3 text-sm text-muted">
             <p>The missions page can show this map in a frame. It always shows the latest saved version, and it only contains what is marked public.</p>
             <button type="button" onClick={() => copy("embed", embedSnippet)} className="pill-btn border border-line text-ink"><Copy size={16} className="mr-1" />{copied === "embed" ? "Copied" : "Copy the embed code"}</button>
