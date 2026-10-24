@@ -31,7 +31,7 @@
 
 /* ── Base ─────────────────────────────────────────────────────────────── */
 html, body { min-height: 100%; }
-body { background: rgb(var(--color-mist)); color: rgb(var(--color-ink)); font-family: Georgia, "Times New Roman", serif; }
+body { background: rgb(var(--color-mist)); color: rgb(var(--color-ink)); font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; }
 ::-webkit-scrollbar { height: 8px; width: 8px; }
 ::-webkit-scrollbar-thumb { background: rgb(var(--color-brand) / 0.35); border-radius: 8px; }
 

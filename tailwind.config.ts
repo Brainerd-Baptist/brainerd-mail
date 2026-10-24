@@ -21,8 +21,8 @@ const config: Config = {
         surface: withOpacity("--color-surface"),
       } as any,
       fontFamily: {
-        sans:  ["Georgia", '"Times New Roman"', "serif"],
-        serif: ["Georgia", '"Times New Roman"', "serif"],
+        sans:  ["ui-sans-serif", "system-ui", "sans-serif", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"],
+        serif: ["ui-sans-serif", "system-ui", "sans-serif", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"],
       },
     },
   },
