@@ -46,7 +46,7 @@ export function NavMenu() {
   function chooseMode(next: ThemeMode) { applyMode(next); setMode(next); }
 
   const link = (href: string, label: string, Icon: typeof Mail, active: boolean, badge?: number) => (
-    <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`mx-2 my-0.5 flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors ${active ? "bg-brand/15 font-medium text-navy" : "text-ink hover:bg-brand/5"}`}>
+    <Link key={href} href={href} aria-current={active ? "page" : undefined} className={`mx-2 my-0.5 flex items-center gap-3 rounded-lg px-3 py-3 text-sm transition-colors ${active ? "bg-brand/15 font-medium text-brand-soft" : "text-ink hover:bg-brand/5"}`}>
       <Icon size={18} className="shrink-0" />
       <span className="flex-1">{label}</span>
       {badge ? <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">{badge}</span> : null}

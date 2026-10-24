@@ -12,6 +12,7 @@
   color-scheme: light;
   --color-navy:    0 32 91;       /* navy links / pressed states            */
   --color-brand:   0 171 201;     /* Brainerd Blue accent                   */
+  --color-brand-soft: 56 189 248; /* lighter blue — active menu text        */
   --color-line:    204 238 244;   /* borders (Brainerd Blue at 20%)         */
   --color-mist:    238 242 247;   /* page background                        */
   --color-ink:     30 41 59;      /* body text                              */
@@ -22,6 +23,7 @@
   color-scheme: dark;
   --color-navy:    125 211 252;
   --color-brand:   56 189 248;
+  --color-brand-soft: 125 211 252;
   --color-line:    35 71 97;
   --color-mist:    12 16 24;
   --color-ink:     241 245 249;

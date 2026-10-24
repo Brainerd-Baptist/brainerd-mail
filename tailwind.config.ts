@@ -14,6 +14,7 @@ const config: Config = {
       colors: {
         navy:    withOpacity("--color-navy"),
         brand:   withOpacity("--color-brand"),
+        "brand-soft": withOpacity("--color-brand-soft"),
         line:    withOpacity("--color-line"),
         mist:    withOpacity("--color-mist"),
         ink:     withOpacity("--color-ink"),
