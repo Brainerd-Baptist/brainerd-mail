@@ -34,7 +34,7 @@ export default async function ReviewPage({ params }: { params: { id: string } })
       <header className="border-b border-line bg-white px-4 py-3">
         <div className="flex items-center gap-2"><NavMenu /><Link href="/emails" className="text-sm font-medium text-brand">← All emails</Link><span className="flex-1" /><ProfileMenu /><HelpButton /></div>
         <h1 className="mt-1 font-serif text-xl text-ink">{row.title || "Untitled"}</h1>
-        <p className="text-sm text-muted"><span className="font-medium" style={{ color: p.dark }}>{p.label}</span>{doc.subject ? ` · ${doc.subject}` : ""}</p>
+        <p className="text-sm text-muted"><span className="font-medium text-ink">{p.label}</span>{doc.subject ? ` · ${doc.subject}` : ""}</p>
         {row.scheduled_at ? <p className="mt-1 text-sm text-ink">Planned to go out <b>{when(row.scheduled_at)}</b>{row.expedited ? " (expedited)" : ""}</p> : null}
       </header>
       <ReviewActions id={row.id} status={row.status} admin={admin} expedited={!!row.expedited} editHref={`/editor?e=${row.id}`} />

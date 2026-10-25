@@ -293,7 +293,7 @@ export function CalendarView({ view, ym, weekStart, today, emails, slots, undate
                     <span className="w-1.5 shrink-0" style={{ background: swatch(p) }} />
                     <div className="min-w-0 flex-1 p-4">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                        <span className="font-medium" style={{ color: p.dark }}>{p.label}</span>
+                        <span className="inline-flex items-center gap-1.5 font-medium text-ink"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: swatch(p) }} />{p.label}</span>
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium ${BADGE[en.kind]}`}>{ICON[en.kind]}{LABEL[en.kind]}</span>
                         {note ? <span className={`font-medium ${en.kind === "missed" || en.kind === "late" ? "text-[#8a3b00]" : "text-muted"}`}>{note}</span> : null}
                         {ser ? <span className="inline-flex items-center gap-1 text-muted"><Repeat size={12} />{describe(ser)}</span> : null}

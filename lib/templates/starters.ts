@@ -75,6 +75,21 @@ export const STARTERS: Record<string, { label: string; blurb: string; build: () 
       ],
     }),
   },
+  pdo: {
+    label: "PDO monthly update", blurb: "What's coming up, announcements, weather and closures, and payment reminders for PDO families.",
+    build: () => make("pdo", {
+      title: "PDO monthly update", subject: "[Month] at PDO", previewText: "[One line about the most important thing this month]",
+      blocks: [
+        hero("PARENTS DAY OUT", "[Month] at PDO", "[One or two warm sentences to open the month.]"),
+        text("Weather and closures", "[Any closure or delay this month, with the day and how families will hear about it. If there are none, say: No closures are planned this month.]"),
+        event("COMING UP", "[Activity or special day]", "[What children will do and anything to send with them.]"),
+        event("COMING UP", "[Second activity, field trip or event]", "[What it is and what to bring.]"),
+        text("Announcements", "[Two or three short items: staff news, enrollment, schedule changes, reminders.]"),
+        card("Payments", "[A short reminder of what is due and when.]", { label: "Make a payment", url: "" }),
+        cta("Questions?", "[Who to contact at PDO and the best way to reach them.]", { label: "Contact PDO", url: "" }),
+      ],
+    }),
+  },
   "life-groups": {
     label: "Life Groups update", blurb: "Invites people into groups, with a nudge to lead one.",
     build: () => make("life-groups", {

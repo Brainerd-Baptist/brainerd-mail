@@ -26,6 +26,7 @@ export const PALETTES: Record<string, Palette> = {
   "life-groups": { key: "life-groups", name: "LIFE GROUPS", label: "Life Groups", dark: "#1c1c1c", bar: "#efc360", button: "#efc360", btnText: "#1c1c1c", accent: "#946a00", bright: "#c9962e", tint: "#fdf6e3", soft: "#f3dd91" },
   adults: { key: "adults", name: "ADULTS", label: "Adults", dark: "#202020", bar: "#ffffff", button: "#3d3a36", btnText: "#ffffff", bright: "#c9bfb1", tint: "#fef7ee", soft: "#d9d2c8" },
   men: { key: "men", dot: "#118058", name: "MEN", label: "Men", dark: "#0d3b2c", button: "#118058", btnText: "#ffffff", bright: "#b7dcc8", tint: "#e6f5ee", soft: "#b7dcc8" },
+  pdo: { key: "pdo", dot: "#6b529c", name: "PDO", label: "PDO", dark: "#2f2150", button: "#6b529c", btnText: "#ffffff", bright: "#b8a8d9", tint: "#f0ecf7", soft: "#d9cfee" },
   women: { key: "women", dot: "#b3265c", name: "WOMEN", label: "Women", dark: "#4a1230", button: "#b3265c", btnText: "#ffffff", bright: "#e54e73", tint: "#fbe8ef", soft: "#f3c4d5" },
 };
 

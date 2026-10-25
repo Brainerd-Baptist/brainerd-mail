@@ -87,18 +87,20 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
           {buildable.length ? <button onClick={() => setCreating(true)} className="pill-btn bg-brand text-white"><Plus size={16} className="mr-1.5" />New email</button> : null}
         </div>
 
-        {items.length > 4 ? (
-          <label className="flex items-center gap-2 rounded-full border border-line bg-surface px-4">
-            <Search size={16} className="text-muted" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or subject" className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none" />
-          </label>
-        ) : null}
-
-        {ministries.length > 1 ? (
-          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-            {["all", ...ministries].map((m) => (
-              <button key={m} onClick={() => setFilter(m)} className={`h-9 shrink-0 rounded-full border px-4 text-sm font-semibold ${filter === m ? "border-navy bg-navy text-white" : "border-line bg-surface text-ink"}`}>{m === "all" ? "All" : paletteFor(m).label}</button>
-            ))}
+        {items.length > 4 || ministries.length > 1 ? (
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {items.length > 4 ? (
+              <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-line bg-surface px-4">
+                <Search size={16} className="text-muted" />
+                <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search by name or subject" className="h-11 min-w-0 flex-1 bg-transparent text-sm outline-none" />
+              </label>
+            ) : null}
+            {ministries.length > 1 ? (
+              <select aria-label="Filter by ministry" value={filter} onChange={(e) => setFilter(e.target.value)} className="field h-11 rounded-full sm:w-56">
+                <option value="all">All ministries</option>
+                {ministries.map((m) => <option key={m} value={m}>{paletteFor(m).label}</option>)}
+              </select>
+            ) : null}
           </div>
         ) : null}
 
@@ -120,7 +122,7 @@ export function EmailList({ initial, perm }: { initial: Item[]; perm: Perm }) {
                     <span className="block truncate text-sm font-medium text-ink">{it.title || "Untitled"}</span>
                     {it.subject ? <span className="mt-0.5 block truncate text-sm text-muted">{it.subject}</span> : null}
                     <span className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
-                      <span className="font-medium" style={{ color: p.dark }}>{p.label}</span>
+                      <span className="inline-flex items-center gap-1.5 font-medium text-ink"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: swatch(p) }} />{p.label}</span>
                       <span className={`rounded-full px-2 py-0.5 font-medium ${st.cls}`}>{st.label}</span>
                       <span>{it.scheduled_at && ["pending_approval", "approved", "scheduled"].includes(it.status) ? `Goes out ${when(it.scheduled_at)}` : `Edited ${ago(it.updated_at)}`}</span>
                     </span>
