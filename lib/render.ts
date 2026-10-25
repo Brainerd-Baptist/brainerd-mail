@@ -105,7 +105,7 @@ const MARKS: Record<string, { w: number; h: number }> = {
   women: { w: 232, h: 24 },
   students: { w: 150, h: 39 },
   bx: { w: 74, h: 32 },
-  pdo: { w: 340, h: 36 },
+  pdo: { w: 340, h: 37 },
 };
 function mark(o: RenderOpts, key: string): string | null {
   const m = MARKS[key];
