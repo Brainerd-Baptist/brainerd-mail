@@ -20,16 +20,19 @@ export async function POST(req: Request) {
     idToken = String(form.get("id_token") || "");
     gotState = String(form.get("state") || "");
   } catch { /* handled below */ }
-  const fail = (e: string) => {
+  const fail = (e: string, why = "") => {
+    if (why) console.error("[google-direct]", why);
     const res = NextResponse.redirect(`${base}/login?error=${e}`, { status: 303 });
     res.cookies.delete(COOKIE_NONCE); res.cookies.delete(COOKIE_STATE);
     return res;
   };
-  if (!idToken || !nonce || !state || gotState !== state) return fail("failed");
+  if (!idToken) return fail("failed", "no id_token in form (keys: " + "n/a" + ")");
+  if (!nonce || !state) return fail("failed", "flow cookies missing nonce=" + !!nonce + " state=" + !!state);
+  if (gotState !== state) return fail("failed", "state mismatch");
 
   const supabase = supabaseServer();
   const { error } = await supabase.auth.signInWithIdToken({ provider: "google", token: idToken, nonce });
-  if (error) return fail("failed");
+  if (error) return fail("failed", "signInWithIdToken: " + error.message);
 
   const ok = () => {
     const res = NextResponse.redirect(`${base}/emails`, { status: 303 });
