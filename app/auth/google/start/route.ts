@@ -21,7 +21,7 @@ export async function GET() {
   url.searchParams.set("hd", "brainerdbaptist.org");
   url.searchParams.set("prompt", "select_account");
   const res = NextResponse.redirect(url.toString());
-  res.cookies.set(COOKIE_NONCE, nonce, flowCookie);
-  res.cookies.set(COOKIE_STATE, state, flowCookie);
+  // One cookie carries both values (some browsers dropped the second cookie on Google's cross-site POST).
+  res.cookies.set(COOKIE_NONCE, `${nonce}.${state}`, flowCookie);
   return res;
 }
