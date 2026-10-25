@@ -11,7 +11,15 @@ const MESSAGES: Record<string, string> = {
 export default function Login({ searchParams }: { searchParams: { error?: string } }) {
   const [busy, setBusy] = useState(false);
   const msg = searchParams.error ? MESSAGES[searchParams.error] ?? MESSAGES.failed : "";
+  // Direct Google sign-in (our own pages, so Google shows mail.brainerdhq.app). Switched on with
+  // NEXT_PUBLIC_DIRECT_GOOGLE=1; the standard Supabase-hosted sign-in stays as a fallback link.
+  const direct = process.env.NEXT_PUBLIC_DIRECT_GOOGLE === "1";
   async function go() {
+    setBusy(true);
+    if (direct) { window.location.href = "/auth/google/start"; return; }
+    await classic();
+  }
+  async function classic() {
     setBusy(true);
     const base = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
     await supabaseBrowser().auth.signInWithOAuth({
@@ -33,6 +41,11 @@ export default function Login({ searchParams }: { searchParams: { error?: string
           <button onClick={go} disabled={busy} className="w-full rounded-full bg-brand py-2.5 font-semibold text-white disabled:opacity-60" style={{ boxShadow: "0 0 0 1px rgb(var(--color-brand) / 0.18), 0 4px 16px rgb(var(--color-brand) / 0.28)" }}>
             {busy ? "Opening Google…" : "Continue with Google"}
           </button>
+          {direct && (
+            <button onClick={classic} disabled={busy} className="block w-full text-center text-xs text-muted hover:text-brand-soft">
+              Trouble signing in? Use the standard Google sign-in
+            </button>
+          )}
         </div>
       </div>
     </main>
