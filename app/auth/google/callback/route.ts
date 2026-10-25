@@ -12,8 +12,7 @@ import { COOKIE_NONCE, COOKIE_STATE } from "@/lib/google-signin";
 export async function POST(req: Request) {
   const base = siteUrl();
   const store = cookies();
-  const nonce = store.get(COOKIE_NONCE)?.value;
-  const state = store.get(COOKIE_STATE)?.value;
+  const [nonce, state] = (store.get(COOKIE_NONCE)?.value || "").split(".");
   let idToken = "", gotState = "";
   try {
     const form = await req.formData();
